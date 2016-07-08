@@ -40,3 +40,7 @@ void Node4::traverse(unsigned depth) {
         children[i]->traverse(depth + 1);
 }
 
+size_t Node4::max_size() const {
+    return 4;
+}
+

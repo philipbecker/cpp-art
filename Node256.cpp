@@ -53,3 +53,6 @@ void Node256::traverse(unsigned depth) {
     }
 }
 
+size_t Node256::max_size() const {
+    return 256;
+}

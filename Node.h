@@ -32,9 +32,11 @@ public:
 
     virtual bool is_leaf();
 
-    size_t size() {
+    size_t size() const {
         return count;
     }
+
+    virtual size_t max_size() const = 0;
 
     uint8_t count;
 };

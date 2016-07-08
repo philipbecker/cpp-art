@@ -6,6 +6,7 @@
 #define ART_ADAPT_RADIX_TREE_H
 
 #include <bits/unique_ptr.h>
+#include <utility>
 #include "Node.h"
 #include "Node256.h"
 
@@ -18,7 +19,7 @@ public:
         this->root = nullptr;
     }
 
-    void insert(const int &x);
+    std::pair<Node*, bool> insert(const int &x);
 
     bool find(const int &x);
 

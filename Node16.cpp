@@ -37,8 +37,12 @@ Node **Node16::find(const uint8_t &key_byte) {
     return nullptr;
 }
 
-
 void Node16::traverse(unsigned depth) {
     for (uint8_t i = 0; i < count; i++)
         children[i]->traverse(depth + 1);
 }
+
+size_t Node16::max_size() const {
+    return 16;
+}
+

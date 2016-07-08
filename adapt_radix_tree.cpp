@@ -4,7 +4,7 @@
 #include "Leaf.h"
 #include "Node4.h"
 
-void adapt_radix_tree::insert(const int &x) {
+std::pair<Node *, bool> adapt_radix_tree::insert(const int &x) {
     Key key = {x};
     Leaf *new_leaf = new Leaf(key);
 
@@ -12,8 +12,8 @@ void adapt_radix_tree::insert(const int &x) {
 
     // Empty Tree
     if (root == nullptr) {
-        root = new Leaf(key);
-        return;
+        root = new_leaf;
+        return std::make_pair(root, true);
     }
 
     // Replace Leaf with inner node
@@ -46,7 +46,7 @@ void adapt_radix_tree::insert(const int &x) {
         if (*current_node != nullptr && (*current_node)->is_leaf()) {
             Leaf *existing_leaf = reinterpret_cast<Leaf *>(*current_node);
             if (existing_leaf->contains(key, i)) {
-                return;
+                return std::make_pair(existing_leaf, false);
             } else {
                 Key existing_key = existing_leaf->get_key();
                 *current_node = new Node256(existing_leaf, i);
@@ -58,10 +58,10 @@ void adapt_radix_tree::insert(const int &x) {
                         current_node = old_child;
                     } else {
                         (*current_node)->insert(key.chunks[j], new_leaf);
-                        return;
+                        return std::make_pair(new_leaf, true);
                     }
                 }
-                return;
+                return std::make_pair(*current_node, true);
             }
         }
         else if (*current_node != nullptr) {
@@ -69,7 +69,7 @@ void adapt_radix_tree::insert(const int &x) {
             current_node = (*current_node)->find(key, i);
         } else {
             (*previous_node)->insert(key.chunks[i - 1], new_leaf);
-            return;
+            return std::make_pair(new_leaf, true);
         }
     }
 }

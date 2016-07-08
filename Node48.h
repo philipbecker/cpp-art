@@ -13,6 +13,8 @@
 
 class Node48 : public Node {
 public:
+    virtual size_t max_size() const override;
+
     Node48();
 
     Node48(Node16 *pNode);

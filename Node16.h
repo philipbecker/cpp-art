@@ -13,6 +13,8 @@
 
 class Node16 : public Node {
 public:
+    virtual size_t max_size() const override;
+
     virtual Node **find(const uint8_t &key_byte) override;
 
     Node16(Node4 *pNode);

@@ -28,7 +28,7 @@ public:
     }
 
     virtual void traverse(unsigned depth) override {
-        std::cout << std::string(depth+1, '-') << " Leaf " << this << ": " << key.value << std::endl;
+        std::cout << std::string(depth + 1, '-') << " Leaf " << this << ": " << key.value << std::endl;
     }
 
     virtual Node **find(const uint8_t &key_byte) override {
@@ -44,7 +44,11 @@ public:
         return true;
     }
 
-    Key& get_key() {
+    size_t max_size() const override {
+        return 1;
+    }
+
+    Key &get_key() {
         return key;
     }
 };

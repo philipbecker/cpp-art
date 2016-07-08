@@ -9,6 +9,23 @@ TEST_CASE( "Can Insert", "[art]" ) {
     REQUIRE_FALSE( art.find(6) );
 }
 
+TEST_CASE( "Can't insert duplicate values", "[art]" ) {
+    adapt_radix_tree art;
+
+    for (int i = 0; i < 20000; i++) {
+        auto p = art.insert(i);
+        REQUIRE( p.second );
+        REQUIRE( art.find(i) );
+    }
+
+    for (int i = 0; i < 20000; i++) {
+        auto p = art.insert(i);
+        REQUIRE_FALSE( p.second );
+        REQUIRE( art.find(i) );
+    }
+}
+
+
 TEST_CASE( "Can tiebreak at level 1", "[art]" ) {
     adapt_radix_tree art;
     art.insert(5);

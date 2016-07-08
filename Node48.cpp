@@ -33,8 +33,6 @@ Node *Node48::insert(const Key &key, unsigned depth) {
 
 void Node48::insert(const uint8_t &key_byte, Node *node) {
     auto pos = this->count;
-    if (this->children[pos])
-        for (pos = 0; this->children[pos] != nullptr; pos++);
     child_index[key_byte] = pos;
     children[pos] = node;
     count++;
@@ -44,7 +42,7 @@ Node **Node48::find(const Key &key, unsigned depth) {
     return this->find(key.chunks[depth]);
 }
 
-Node **Node48::find(const uint8_t& key_byte) {
+Node **Node48::find(const uint8_t &key_byte) {
     if (child_index[key_byte] != EMPTY_MARKER)
         return &children[child_index[key_byte]];
     return nullptr;
@@ -55,3 +53,6 @@ void Node48::traverse(unsigned depth) {
         children[i]->traverse(depth + 1);
 }
 
+size_t Node48::max_size() const {
+    return 48;
+}

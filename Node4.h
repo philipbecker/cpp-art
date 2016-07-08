@@ -15,6 +15,8 @@ public:
     std::array<uint8_t, 4> keys{};
     std::array<Node *, 4> children{};
 
+    virtual size_t max_size() const override;
+
     Node4(Leaf *leaf, unsigned depth);
 
     virtual Node *insert(const Key &key, unsigned depth) override;
