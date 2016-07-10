@@ -11,25 +11,56 @@
 #include "Node.h"
 #include "Node4.h"
 
-class Node16 : public Node {
-public:
-    virtual size_t max_size() const override;
+namespace art
+{
+    class Node16 : public Node {
+    public:
+        std::array<Node *, 16> children{};
+        std::array<uint8_t, 16> keys{};
 
-    virtual Node **find(const uint8_t &key_byte) override;
+        Node16(Node4 *node) {
+            std::copy(node->keys.begin(), node->keys.end(), keys.begin());
+            std::copy(node->children.begin(), node->children.end(), children.begin());
 
-    Node16(Node4 *pNode);
+            count = node->size();
+            delete node;
+        }
 
-    virtual Node *insert(const Key &key, unsigned depth) override;
+        virtual Node *insert(const Key &key, unsigned depth) override {
+            return nullptr;
+        }
 
-    virtual void insert(const uint8_t &key_byte, Node *node) override;
+        virtual void insert(const uint8_t &key_byte, Node *node) override {
+            unsigned pos = 0;
+            for (; pos < count && keys[pos] < key_byte; pos++);
+            if (pos != count) {
+                std::move(keys.begin() + pos, keys.begin() + count, keys.begin() + pos + 1);
+                std::move(children.begin() + pos, children.begin() + count, children.begin() + pos + 1);
+            }
+            keys[pos] = key_byte;
+            children[pos] = node;
+            count++;
+        }
 
-    virtual Node **find(const Key &key, unsigned depth) override;
+        virtual Node **find(const uint8_t &key_byte) override {
+            unsigned pos = 0;
+            for (; pos < count && keys[pos] < key_byte; pos++);
 
-    virtual void traverse(unsigned depth) override;
+            if (keys[pos] == key_byte)
+                return &children[pos];
+            return nullptr;
+        }
 
-    std::array<Node *, 16> children{};
-    std::array<uint8_t, 16> keys{};
-};
+        virtual void traverse(unsigned depth) override {
+            for (uint8_t i = 0; i < count; i++)
+                children[i]->traverse(depth + 1);
+        }
+
+        virtual size_t max_size() const override {
+            return 16;
+        }
+    };
+}
 
 
 #endif //ART_NODE16_H

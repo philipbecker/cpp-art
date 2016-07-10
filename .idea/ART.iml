@@ -2,24 +2,21 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/adapt_radix_tree.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Node4.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Node48.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libs/catch.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Node.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Node256.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Node4.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/art_node_16.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/art_node_4.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/art_stress.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/test.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Node4.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/art_basic.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/adapt_radix_tree.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Leaf.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Node16.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Node.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Node256.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Node48.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/adapt_radix_tree.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Node16.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Leaf.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Leaf.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/Node16.h" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">

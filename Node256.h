@@ -10,32 +10,63 @@
 #include "Leaf.h"
 #include "Node48.h"
 
-class Node256 : public Node {
-public:
+namespace art
+{
+    class Node256 : public Node {
+    public:
+        std::array<Node *, 256> children{};
 
+        Node256() { }
 
-    virtual size_t max_size() const override;
+        Node256(Leaf *pLeaf, unsigned int depth) {
+            Key key = pLeaf->get_key();
+            children[key.chunks[depth]] = pLeaf;
 
-    virtual Node **find(const uint8_t &key_byte) override;
+            count = 1;
+        }
 
-    Node256() { }
+        Node256(Node48 *node) {
+            for (uint8_t i = 0; i < 16; i++)
+                children[node->child_index[i]] = node->children[node->child_index[i]];
+            count = 48;
 
-    Node256(Leaf *pLeaf, unsigned int depth);
+            delete node;
+        }
 
-    Node256(Node48 *node);
+        virtual Node *insert(const Key &key, unsigned depth) override {
+            children[key.chunks[depth]] = new Leaf(key);
+            count++;
+            return children[key.chunks[depth]];
+        }
 
-    virtual Node *insert(const Key &key, unsigned depth) override;
+        virtual void insert(const uint8_t &key_byte, Node *node) override {
+            children[key_byte] = node;
+            count++;
+        }
 
-    virtual void insert(const uint8_t &key_byte, Node *node) override;
+        virtual Node **find(const uint8_t &key_byte) override {
+            return &children[key_byte];
+        }
 
-    virtual Node **find(const Key &key, unsigned depth) override;
+        virtual void traverse(unsigned depth) override {
+            std::cout << std::string(depth + 1, '-') << " Node " << this << std::endl;
+            for (int i = 0; i < 256; i++) {
+                if (children[i] != nullptr) {
 
-    virtual void traverse(unsigned depth) override;
+                    std::bitset<8> x(i);
+                    std::cout << std::string(depth + 1, '-') << " Go along key: " << x << std::endl;
 
+                    children[i]->traverse(depth + 1);
+                }
+            }
+        }
 
-private:
-    std::array<Node *, 256> children{};
-};
+        virtual size_t max_size() const override {
+            return 256;
+        }
+
+    };
+}
 
 
 #endif //ART_NODE256_H

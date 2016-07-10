@@ -13,6 +13,7 @@ std::pair<Node *, bool> adapt_radix_tree::insert(const int &x) {
     // Empty Tree
     if (root == nullptr) {
         root = new_leaf;
+        count++;
         return std::make_pair(root, true);
     }
 
@@ -58,9 +59,11 @@ std::pair<Node *, bool> adapt_radix_tree::insert(const int &x) {
                         current_node = old_child;
                     } else {
                         (*current_node)->insert(key.chunks[j], new_leaf);
+                        count++;
                         return std::make_pair(new_leaf, true);
                     }
                 }
+                count++;
                 return std::make_pair(*current_node, true);
             }
         }
@@ -69,6 +72,7 @@ std::pair<Node *, bool> adapt_radix_tree::insert(const int &x) {
             current_node = (*current_node)->find(key, i);
         } else {
             (*previous_node)->insert(key.chunks[i - 1], new_leaf);
+            count++;
             return std::make_pair(new_leaf, true);
         }
     }
@@ -82,15 +86,11 @@ bool adapt_radix_tree::find(const int &x) {
         return false;
 
     Node *current_node = root;
-    for (int i = 0; i < sizeof(x) + 1; i++) {
+    for (size_t i = 0; i < sizeof(x) + 1; i++) {
         if (current_node == nullptr)
             return false;
-        if (current_node->is_leaf()) {
-#ifdef DEBUG
-            std::cout << "Found leaf with value " << ((Leaf *) current_node)->get_key().value << ", " << current_node << std::endl;
-#endif
+        if (current_node->is_leaf())
             return ((Leaf *) current_node)->contains(key, i);
-        }
 
         current_node = *current_node->find(key, i);
     }
@@ -99,6 +99,12 @@ bool adapt_radix_tree::find(const int &x) {
 }
 
 void adapt_radix_tree::traverse() {
-    root->traverse(0);
+
 }
+
+Node *adapt_radix_tree::grow(Node *old_node) {
+
+}
+
+
 
