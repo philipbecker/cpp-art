@@ -9,20 +9,21 @@
 #include <array>
 #include <assert.h>
 #include "Node.h"
-#include "Node16.h"
+#include "node_16.h"
 
 namespace art
 {
-    class Node48 : public Node {
+    class node_48 : public Node {
     public:
         std::array<uint8_t, 256> child_index;
         std::array<Node *, 48> children{};
 
-        Node48() {
+        node_48() {
+            _count = 0;
             std::fill(child_index.begin(), child_index.end(), EMPTY_MARKER);
         }
 
-        Node48(Node16 *node) {
+        node_48(node_16 *node) {
             assert(node->size() == 16);
 
             std::fill(child_index.begin(), child_index.end(), EMPTY_MARKER);
@@ -31,28 +32,28 @@ namespace art
                 child_index[node->keys[i]] = i;
                 children[i] = node->children[i];
             }
-            count = 16;
+            _count = 16;
 
             delete node;
         }
 
         virtual Node *insert(const Key &key, unsigned depth) override {
             auto key_byte = key.chunks[depth];
-            auto pos = this->count;
+            auto pos = _count;
             if (this->children[pos])
                 for (pos = 0; this->children[pos] != nullptr; pos++);
             child_index[key_byte] = pos;
             children[pos] = (Node *) new Leaf(key);
-            count++;
+            _count++;
 
             return nullptr;
         }
 
         virtual void insert(const uint8_t &key_byte, Node *node) override {
-            auto pos = this->count;
+            auto pos = _count;
             child_index[key_byte] = pos;
             children[pos] = node;
-            count++;
+            _count++;
         }
 
         virtual Node **find(const uint8_t &key_byte) override {
@@ -62,7 +63,7 @@ namespace art
         }
 
         virtual void traverse(unsigned depth) override {
-            for (uint8_t i = 0; i < count; i++)
+            for (uint8_t i = 0; i < _count; i++)
                 children[i]->traverse(depth + 1);
         }
 
@@ -70,9 +71,10 @@ namespace art
             return 48;
         }
 
-
+        virtual node_type get_type() const override {
+            return node_type::node_48;
+        }
     };
-
 }
 
 #endif //ART_NODE64_H

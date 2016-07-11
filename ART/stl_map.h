@@ -461,7 +461,7 @@ namespace std _GLIBCXX_VISIBILITY(default)
         /**
          *  @brief  Subscript ( @c [] ) access to %map data.
          *  @param  __k  The key for which data should be retrieved.
-         *  @return  A reference to the data of the (key,data) %pair.
+         *  @return  A ART to the data of the (key,data) %pair.
          *
          *  Allows for easy lookup with the subscript ( @c [] )
          *  operator.  Returns data associated with the key specified in
@@ -511,7 +511,7 @@ namespace std _GLIBCXX_VISIBILITY(default)
         /**
          *  @brief  Access to %map data.
          *  @param  __k  The key for which data should be retrieved.
-         *  @return  A reference to the data whose key is equivalent to @a __k, if
+         *  @return  A ART to the data whose key is equivalent to @a __k, if
          *           such a data is present in the %map.
          *  @throw  std::out_of_range  If no such data is present.
          */

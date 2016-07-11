@@ -12,36 +12,36 @@
 
 namespace art
 {
-    class Node256 : public Node {
+    class node_256 : public Node {
     public:
         std::array<Node *, 256> children{};
 
-        Node256() { }
+        node_256() { }
 
-        Node256(Leaf *pLeaf, unsigned int depth) {
+        node_256(Leaf *pLeaf, unsigned int depth) {
             Key key = pLeaf->get_key();
             children[key.chunks[depth]] = pLeaf;
 
-            count = 1;
+            _count = 1;
         }
 
-        Node256(Node48 *node) {
+        node_256(Node48 *node) {
             for (uint8_t i = 0; i < 16; i++)
                 children[node->child_index[i]] = node->children[node->child_index[i]];
-            count = 48;
+            _count = 48;
 
             delete node;
         }
 
         virtual Node *insert(const Key &key, unsigned depth) override {
             children[key.chunks[depth]] = new Leaf(key);
-            count++;
+            _count++;
             return children[key.chunks[depth]];
         }
 
         virtual void insert(const uint8_t &key_byte, Node *node) override {
             children[key_byte] = node;
-            count++;
+            _count++;
         }
 
         virtual Node **find(const uint8_t &key_byte) override {
@@ -63,6 +63,10 @@ namespace art
 
         virtual size_t max_size() const override {
             return 256;
+        }
+
+        virtual node_type get_type() const override {
+            return node_type::node_256;
         }
 
     };

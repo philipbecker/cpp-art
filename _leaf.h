@@ -5,31 +5,31 @@
 #ifndef ART_LEAF_H
 #define ART_LEAF_H
 
-#include "Node.h"
+#include "node.h"
 
 namespace art
 {
 
-    class Leaf : public Node {
+    class _leaf : public node {
     private:
         Key key;
 
     public:
-        Leaf(Key key) : key(key) { }
+        _leaf(Key key) : key(key) { }
 
-        virtual Node *insert(const Key &key, unsigned depth) override {
+        virtual node *insert(const Key &key, unsigned depth) override {
             return this;
         }
 
-        virtual void insert(const uint8_t &key_byte, Node *node) override {
+        virtual void insert(const uint8_t &key_byte, node *n) override {
 
         }
 
         virtual void traverse(unsigned depth) override {
-            std::cout << std::string(depth + 1, '-') << " Leaf " << this << ": " << key.value << std::endl;
+            std::cout << std::string(depth + 1, '-') << " _leaf " << this << ": " << key.value << std::endl;
         }
 
-        virtual Node **find(const uint8_t &key_byte) override {
+        virtual node **find(const uint8_t &key_byte) override {
             return nullptr;
         }
 
@@ -44,6 +44,10 @@ namespace art
 
         size_t max_size() const override {
             return 1;
+        }
+
+        virtual uint8_t get_type() const override {
+            return 0;
         }
 
         Key &get_key() {
