@@ -5,14 +5,14 @@ using namespace art;
 
 SCENARIO ("given a node_4 with one element", "[art]") {
     Key key = {261};
-    Leaf *leaf_five = new Leaf(key);
-    Node4 *node4 = new Node4(leaf_five, 0);
+    _leaf *leaf_five = new _leaf(key);
+    node_4 *node4 = new node_4(leaf_five, 0);
 
     WHEN ("when 3 elements are inserted in order") {
         std::vector<int> data = {262, 263, 264};
         for (auto &&item : data) {
             Key key2 = {item};
-            Leaf *leaf2 = new Leaf(key2);
+            _leaf *leaf2 = new _leaf(key2);
             node4->insert(key2.chunks[0], leaf2);
         }
 
@@ -27,8 +27,8 @@ SCENARIO ("given a node_4 with one element", "[art]") {
         }
         THEN ("the children are stored at the correct index and contain the right value") {
             for (int i = 0; i < 4; i++) {
-                REQUIRE(((Leaf *) node4->children[i])->get_key().chunks[0] == node4->keys[i]);
-                REQUIRE(((Leaf *) node4->children[i])->get_key().value == data[i]);
+                REQUIRE(((_leaf *) node4->children[i])->get_key().chunks[0] == node4->keys[i]);
+                REQUIRE(((_leaf *) node4->children[i])->get_key().value == data[i]);
             }
         }
     }
@@ -37,7 +37,7 @@ SCENARIO ("given a node_4 with one element", "[art]") {
         std::vector<int> data = {264, 263, 262};
         for (auto &&item : data) {
             Key key2 = {item};
-            Leaf *leaf2 = new Leaf(key2);
+            _leaf *leaf2 = new _leaf(key2);
             node4->insert(key2.chunks[0], leaf2);
         }
 
@@ -52,8 +52,8 @@ SCENARIO ("given a node_4 with one element", "[art]") {
         }
         THEN ("the children are stored at the correct index and contain the right value") {
             for (int i = 0; i < 4; i++) {
-                REQUIRE(((Leaf *) node4->children[i])->get_key().chunks[0] == node4->keys[i]);
-                REQUIRE(((Leaf *) node4->children[i])->get_key().value == data[i]);
+                REQUIRE(((_leaf *) node4->children[i])->get_key().chunks[0] == node4->keys[i]);
+                REQUIRE(((_leaf *) node4->children[i])->get_key().value == data[i]);
             }
         }
     }
@@ -63,7 +63,7 @@ SCENARIO ("given a node_4 with one element", "[art]") {
         std::random_shuffle(data.begin(), data.end());
         for (auto &&item : data) {
             Key key2 = {item};
-            Leaf *leaf2 = new Leaf(key2);
+            _leaf *leaf2 = new _leaf(key2);
             node4->insert(key2.chunks[0], leaf2);
         }
 
@@ -78,8 +78,8 @@ SCENARIO ("given a node_4 with one element", "[art]") {
         }
         THEN ("the children are stored at the correct index and contain the right value") {
             for (int i = 0; i < 4; i++) {
-                REQUIRE(((Leaf *) node4->children[i])->get_key().chunks[0] == node4->keys[i]);
-                REQUIRE(((Leaf *) node4->children[i])->get_key().value == data[i]);
+                REQUIRE(((_leaf *) node4->children[i])->get_key().chunks[0] == node4->keys[i]);
+                REQUIRE(((_leaf *) node4->children[i])->get_key().value == data[i]);
             }
         }
     }

@@ -3,23 +3,29 @@
 
 using namespace art;
 
-TEST_CASE ("Insert into node 16", "[art]") {
+TEST_CASE ("Insert into _node 16", "[art]") {
     std::vector<int> data = {
-            3, 54, 121, 212, 87, 86, 89, 17,
-            51, 67, 10, 12, 91, 172, 154
+            5, 3, 54, 121, 212, 87, 86, 89,
+            51, 67, 10, 12, 91, 172, 154, 17
     };
+    std::random_shuffle(data.begin(), data.end());
 
     for (int i = 0; i < 1; i++) {
-        Key key = {5};
-        Leaf *leaf_five = new Leaf(key);
-        Node4 *node4 = new Node4(leaf_five, 0);
-        Node16 *node16 = new Node16(node4);
+        Key first_key = {data[0]};
+        _leaf *first_leaf = new _leaf(first_key);
+        node_4 *node4 = new node_4(first_leaf, 0);
+        for (int i = 1; i < 4; i++) {
+            Key key = {data[i]};
+            _leaf *leaf = new _leaf(key);
+            node4->insert(key.chunks[0], leaf);
+        }
 
-        std::random_shuffle(data.begin(), data.end());
-        for (auto &&item : data) {
-            Key key2 = {item};
-            Leaf *leaf2 = new Leaf(key2);
-            node16->insert(key2.chunks[0], leaf2);
+        node_16 *node16 = new node_16(node4);
+
+        for (int i = 4; i < 16; i++) {
+            Key key = {data[i]};
+            _leaf *leaf = new _leaf(key);
+            node16->insert(key.chunks[0], leaf);
         }
         REQUIRE(std::is_sorted(node16->keys.begin(), node16->keys.end()));
         REQUIRE(node16->size() == 16);

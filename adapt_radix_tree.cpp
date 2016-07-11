@@ -1,10 +1,10 @@
 #include <iostream>
 #include <bitset>
 #include "adapt_radix_tree.h"
-#include "Leaf.h"
-#include "Node4.h"
+#include "_leaf.h"
+#include "node_4.h"
 
-std::pair<Node *, bool> adapt_radix_tree::insert(const int &x) {
+std::pair<_node *, bool> adapt_radix_tree::insert(const int &x) {
     Key key = {x};
     Leaf *new_leaf = new Leaf(key);
 
@@ -40,8 +40,8 @@ std::pair<Node *, bool> adapt_radix_tree::insert(const int &x) {
     }
      */
 
-    Node **current_node = &root;
-    Node **previous_node = nullptr;
+    _node **current_node = &root;
+    _node **previous_node = nullptr;
 
     for (unsigned i = 0; i < sizeof(x); i++) {
         if (*current_node != nullptr && (*current_node)->is_leaf()) {
@@ -85,7 +85,7 @@ bool adapt_radix_tree::find(const int &x) {
     if (root == nullptr)
         return false;
 
-    Node *current_node = root;
+    _node *current_node = root;
     for (size_t i = 0; i < sizeof(x) + 1; i++) {
         if (current_node == nullptr)
             return false;

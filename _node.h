@@ -12,11 +12,11 @@ namespace art
         const uint8_t chunks[sizeof(int)];
     };
 
-    /**
+
     enum node_type : uint8_t {
-        _leaf = 0, node_4 = 1, node_16 = 2, node_48 = 3, node_256 = 4
+        _leaf_t = 0, node_4_t = 1, node_16_t = 2, node_48_t = 3, node_256_t = 4
     };
-     */
+
 
     static std::string print_key(Key key, unsigned depth) {
         std::bitset<8> x(key.chunks[depth]);
@@ -36,7 +36,7 @@ namespace art
 
     class _node {
     protected:
-        uint8_t _count;
+        uint16_t _count;
 
     public:
         virtual _node *insert(const Key &key, unsigned depth) = 0;
@@ -51,13 +51,13 @@ namespace art
             return false;
         }
 
-        uint8_t size() const {
+        uint16_t size() const {
             return _count;
         }
 
-        virtual size_t max_size() const = 0;
+        virtual uint16_t max_size() const = 0;
 
-        virtual uint8_t get_type() const = 0;
+        virtual node_type get_type() const = 0;
     };
 
 

@@ -492,7 +492,7 @@ namespace Catch {
 
 namespace Catch {
 
-    // An intrusive reference counting smart pointer.
+    // An intrusive ART counting smart pointer.
     // T must implement addRef() and release() methods
     // typically implementing the IShared interface
     template<typename T>
@@ -2955,9 +2955,9 @@ namespace Catch {
         for( int c = 0; c < noClasses; c++ ) {
             Class cls = classes[c];
             {
-                u_int count;
-                Method* methods = class_copyMethodList( cls, &count );
-                for( u_int m = 0; m < count ; m++ ) {
+                u_int _count;
+                Method* methods = class_copyMethodList( cls, &_count );
+                for( u_int m = 0; m < _count ; m++ ) {
                     SEL selector = method_getName(methods[m]);
                     std::string methodName = sel_getName(selector);
                     if( startsWith( methodName, "Catch_TestCase_" ) ) {
@@ -5374,9 +5374,9 @@ namespace Catch {
     }
 
     struct TagInfo {
-        TagInfo() : count ( 0 ) {}
+        TagInfo() : _count ( 0 ) {}
         void add( std::string const& spelling ) {
-            ++count;
+            ++_count;
             spellings.insert( spelling );
         }
         std::string all() const {
@@ -5388,7 +5388,7 @@ namespace Catch {
             return out;
         }
         std::set<std::string> spellings;
-        std::size_t count;
+        std::size_t _count;
     };
 
     inline std::size_t listTags( Config const& config ) {
@@ -5424,7 +5424,7 @@ namespace Catch {
                 countIt != countItEnd;
                 ++countIt ) {
             std::ostringstream oss;
-            oss << "  " << std::setw(2) << countIt->second.count << "  ";
+            oss << "  " << std::setw(2) << countIt->second._count << "  ";
             Text wrapper( countIt->second.all(), TextAttributes()
                                                     .setInitialIndent( 0 )
                                                     .setIndent( oss.str().size() )
@@ -5626,7 +5626,7 @@ namespace TestCaseTracking {
                 : CATCH_NULL;
         }
         virtual ITracker& parent() CATCH_OVERRIDE {
-            assert( m_parent ); // Should always be non-null except for root
+            assert( m_parent ); // Should always be non-null except for _root
             return *m_parent;
         }
 
@@ -5778,7 +5778,7 @@ namespace TestCaseTracking {
     };
 
     inline ITracker& TrackerContext::startRun() {
-        m_rootTracker = new SectionTracker( "{root}", *this, CATCH_NULL );
+        m_rootTracker = new SectionTracker( "{_root}", *this, CATCH_NULL );
         m_currentTracker = CATCH_NULL;
         m_runState = Executing;
         return *m_rootTracker;
@@ -7832,8 +7832,8 @@ namespace Catch {
         return replaced;
     }
 
-    pluralise::pluralise( std::size_t count, std::string const& label )
-    :   m_count( count ),
+    pluralise::pluralise( std::size_t _count, std::string const& label )
+    :   m_count( _count ),
         m_label( label )
     {}
 
@@ -9438,7 +9438,7 @@ namespace Catch {
                 XmlWriter::ScopedElement e = xml.scopedElement( "testcase" );
                 if( className.empty() ) {
                     xml.writeAttribute( "classname", name );
-                    xml.writeAttribute( "name", "root" );
+                    xml.writeAttribute( "name", "_root" );
                 }
                 else {
                     xml.writeAttribute( "classname", className );
@@ -9848,9 +9848,9 @@ namespace Catch {
             :   label( _label ),
                 colour( _colour )
             {}
-            SummaryColumn addRow( std::size_t count ) {
+            SummaryColumn addRow( std::size_t _count ) {
                 std::ostringstream oss;
-                oss << count;
+                oss << _count;
                 std::string row = oss.str();
                 for( std::vector<std::string>::iterator it = rows.begin(); it != rows.end(); ++it ) {
                     while( it->size() < row.size() )
@@ -10208,8 +10208,8 @@ namespace Catch {
         // -   red: Failed N tests cases, failed M assertions.
         // - green: Passed [both/all] N tests cases with M assertions.
 
-        std::string bothOrAll( std::size_t count ) const {
-            return count == 1 ? "" : count == 2 ? "both " : "all " ;
+        std::string bothOrAll( std::size_t _count ) const {
+            return _count == 1 ? "" : _count == 2 ? "both " : "all " ;
         }
 
         void printTotals( const Totals& totals ) const {

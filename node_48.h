@@ -8,15 +8,15 @@
 
 #include <array>
 #include <assert.h>
-#include "Node.h"
+#include "_node.h"
 #include "node_16.h"
 
 namespace art
 {
-    class node_48 : public Node {
+    class node_48 : public _node {
     public:
         std::array<uint8_t, 256> child_index;
-        std::array<Node *, 48> children{};
+        std::array<_node *, 48> children{};
 
         node_48() {
             _count = 0;
@@ -37,26 +37,18 @@ namespace art
             delete node;
         }
 
-        virtual Node *insert(const Key &key, unsigned depth) override {
-            auto key_byte = key.chunks[depth];
-            auto pos = _count;
-            if (this->children[pos])
-                for (pos = 0; this->children[pos] != nullptr; pos++);
-            child_index[key_byte] = pos;
-            children[pos] = (Node *) new Leaf(key);
-            _count++;
-
+        virtual _node *insert(const Key &key, unsigned depth) override {
             return nullptr;
         }
 
-        virtual void insert(const uint8_t &key_byte, Node *node) override {
+        virtual void insert(const uint8_t &key_byte, _node *node) override {
             auto pos = _count;
             child_index[key_byte] = pos;
             children[pos] = node;
             _count++;
         }
 
-        virtual Node **find(const uint8_t &key_byte) override {
+        virtual _node **find(const uint8_t &key_byte) override {
             if (child_index[key_byte] != EMPTY_MARKER)
                 return &children[child_index[key_byte]];
             return nullptr;
@@ -67,12 +59,12 @@ namespace art
                 children[i]->traverse(depth + 1);
         }
 
-        virtual size_t max_size() const override {
+        virtual uint16_t max_size() const override {
             return 48;
         }
 
         virtual node_type get_type() const override {
-            return node_type::node_48;
+            return node_type::node_48_t;
         }
     };
 }

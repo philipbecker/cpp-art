@@ -6,17 +6,18 @@
 #define REFERENCE_NODE4_H
 
 #include <array>
-#include "Node.h"
-#include "Leaf.h"
+#include "_node.h"
+#include "_leaf.h"
+#include "node_16.h"
 
 namespace art
 {
-    class node_4 : public Node {
+    class node_4 : public _node {
     public:
         std::array<uint8_t, 4> keys{};
-        std::array<Node *, 4> children{};
+        std::array<_node *, 4> children{};
 
-        node_4(Leaf *leaf, unsigned depth) {
+        node_4(_leaf *leaf, unsigned depth) {
             Key key = leaf->get_key();
             keys[0] = key.chunks[depth];
             children[0] = leaf;
@@ -24,15 +25,17 @@ namespace art
             _count = 1;
         }
 
-        virtual size_t max_size() const override {
+
+
+        virtual uint16_t max_size() const override {
             return 4;
         }
 
-        virtual Node *insert(const Key &key, unsigned depth) override {
+        virtual _node *insert(const Key &key, unsigned depth) override {
             return nullptr;
         }
 
-        virtual void insert(const uint8_t &key_byte, Node *node) override {
+        virtual void insert(const uint8_t &key_byte, _node *node) override {
             unsigned pos = 0;
             for (; pos < _count && keys[pos] < key_byte; pos++);
             if (pos != _count) {
@@ -44,7 +47,7 @@ namespace art
             _count++;
         }
 
-        virtual Node **find(const uint8_t &key_byte) override {
+        virtual _node **find(const uint8_t &key_byte) override {
             unsigned pos = 0;
             for (; pos < _count && keys[pos] < key_byte; pos++);
 
@@ -59,7 +62,7 @@ namespace art
         }
 
         virtual node_type get_type() const override {
-            return node_type::node_4;
+            return node_type::node_4_t;
         }
 
     };

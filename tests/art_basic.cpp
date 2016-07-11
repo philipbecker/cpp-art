@@ -24,7 +24,7 @@ SCENARIO("given an empty art", "[art]") {
         }
     }
 
-    WHEN("two elements with an equal first key chunk are inserted") {
+    WHEN("two elements with an equal first prefix chunk are inserted") {
         auto p1 = art.insert(std::make_pair(5, 5));
         auto p2 = art.insert(std::make_pair(261, 261));
         THEN("both elements were inserted successfully") {
@@ -36,7 +36,7 @@ SCENARIO("given an empty art", "[art]") {
         }
     }
 
-    WHEN("two elements with three equal key chunks are inserted") {
+    WHEN("two elements with three equal prefix chunks are inserted") {
         auto p1 = art.insert(std::make_pair(5, 5));
         auto p2 = art.insert(std::make_pair(16777221, 16777221));
         THEN("both elements were inserted successfully") {
@@ -57,5 +57,45 @@ TEST_CASE("Can tiebreak at level 1", "[art]") {
     REQUIRE(art.find(5));
     REQUIRE(art.find(6));
     REQUIRE(art.find(261));
+}
+
+
+SCENARIO("growing the root node", "[art]") {
+    art::adapt_radix_tree<int, int> art;
+
+    std::vector<int> data(256);
+    std::iota(data.begin(), data.end(), 0);
+
+    WHEN("first 5 values are inserted") {
+        for (int i = 0; i < 5; i++) {
+            art.insert(std::make_pair(data[i], data[i]));
+        }
+
+        THEN("root grows to node 16") {
+            REQUIRE(art._root->size() == 5);
+            REQUIRE(art._root->get_type() == art::node_type::node_16_t);
+        }
+
+        AND_WHEN("12 more values are inserted") {
+            for (int i = 5; i < 17; i++) {
+                art.insert(std::make_pair(data[i], data[i]));
+            }
+
+            THEN ("root has grown to node 48") {
+                    REQUIRE(art._root->size() == 17);
+                    REQUIRE(art._root->get_type() == art::node_type::node_48_t);
+            };
+            AND_WHEN("32 more values are inserted") {
+                for (int i = 17; i < 49; i++) {
+                    art.insert(std::make_pair(data[i], data[i]));
+                }
+
+                THEN ("root has grown to node 256") {
+                    REQUIRE(art._root->size() == 49);
+                    REQUIRE(art._root->get_type() == art::node_type::node_256_t);
+                };
+            }
+        }
+    }
 }
 
