@@ -51,17 +51,7 @@ namespace art
         size_type size() const { return _art.size(); }
 
         mapped_type &operator[](const key_type &__k) {
-            // concept requirements
-            __glibcxx_function_requires(_DefaultConstructibleConcept < mapped_type >)
 
-            iterator __i = lower_bound(__k);
-            // __i->first is greater than or equivalent to __k.
-            if (__i == end() || key_comp()(__k, (*__i).first))
-                __i = _art._M_emplace_hint_unique(__i, std::piecewise_construct,
-                                                  std::tuple<const key_type &>(__k),
-                                                  std::tuple<>());
-
-            return (*__i).second;
         }
 
         std::pair<iterator, bool>

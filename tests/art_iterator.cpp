@@ -1,6 +1,21 @@
+#include <map>
 #include "../libs/catch.h"
 #include "../adapt_radix_tree.h"
 
+
+SCENARIO("basic iteration", "[iterator]") {
+    art::adapt_radix_tree<unsigned, unsigned> art;
+    std::map<unsigned, unsigned> std_map;
+
+    for (unsigned i = 1; i < 10; i++) {
+        art.insert(std::make_pair(i, i));
+        std_map.emplace(i, i);
+    }
+
+    REQUIRE(*(art.begin()) == std_map.begin()->first);
+    REQUIRE(*(art.end()) == std_map.end()->first);
+
+}
 
 SCENARIO("given an art with signed integer key", "[iterator]") {
     art::adapt_radix_tree<int, int> art;
@@ -18,7 +33,16 @@ SCENARIO("given an art with signed integer key", "[iterator]") {
     for (auto &d : data)
         art.insert(std::make_pair(d, d));
 
-    REQUIRE(std::is_sorted(art.begin(), art.end()));
+    THEN("forward iteration is sorted correctly") {
+        REQUIRE(std::is_sorted(art.begin(), art.end()));
+    }
+
+    THEN("reverse iteration is sorted correctly") {
+        REQUIRE(std::is_sorted(art.rbegin(), art.rend(), [](int a, int b) {
+            return a > b;
+        }));
+    }
+
 }
 
 SCENARIO("given an art with unsigned integer key", "[iterator]") {
@@ -37,5 +61,12 @@ SCENARIO("given an art with unsigned integer key", "[iterator]") {
     for (auto &d : data)
         art.insert(std::make_pair(d, d));
 
-    REQUIRE(std::is_sorted(art.begin(), art.end()));
+    THEN("forward iteration is sorted correctly") {
+        REQUIRE(std::is_sorted(art.begin(), art.end()));
+    }
+    THEN("reverse iteration is sorted correctly") {
+        REQUIRE(std::is_sorted(art.rbegin(), art.rend(), [](unsigned a, unsigned b) {
+            return a > b;
+        }));
+    }
 }
