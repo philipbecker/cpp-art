@@ -2,22 +2,18 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/node_48.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/_node.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/node_16.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libs/catch.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/art_iterator.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/art_node_16.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/art_stress.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/art_node_4.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/test.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/tests/art_node_48.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/art_basic.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/tests/art_node_48.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/adapt_radix_tree.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/node_256.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/libs/catch.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/_leaf.h" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/node_4.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/art_map.h" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">

@@ -25,7 +25,14 @@ namespace art
             _count = 1;
         }
 
+        node_4(node_16 *node) {
+            assert(node->size() == 4);
 
+            std::copy(node->keys.begin(), node->keys.begin() + 4, keys.begin());
+            std::copy(node->children.begin(), node->children.begin() + 4, children.begin());
+            _count = 4;
+            delete node;
+        }
 
         virtual uint16_t max_size() const override {
             return 4;

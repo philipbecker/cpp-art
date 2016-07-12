@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/adapt_radix_tree.h" line="747" mnemonic="6" />
+  </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" assignedExecutableTargets="true" buildAllGenerated="true">
     <generated>
       <config projectName="reference" targetName="TEST_ART" />
@@ -18,24 +21,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a28f0da-8473-4749-b200-729669205506" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/tests/art_iterator.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/ART.iml" afterPath="$PROJECT_DIR$/.idea/ART.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/_leaf.h" afterPath="$PROJECT_DIR$/_leaf.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/_node.h" afterPath="$PROJECT_DIR$/_node.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/adapt_radix_tree.cpp" afterPath="$PROJECT_DIR$/adapt_radix_tree.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/adapt_radix_tree.h" afterPath="$PROJECT_DIR$/adapt_radix_tree.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/libs/catch.h" afterPath="$PROJECT_DIR$/libs/catch.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/art_map.h" afterPath="$PROJECT_DIR$/art_map.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_16.h" afterPath="$PROJECT_DIR$/node_16.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_256.h" afterPath="$PROJECT_DIR$/node_256.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_4.h" afterPath="$PROJECT_DIR$/node_4.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/node_48.h" afterPath="$PROJECT_DIR$/node_48.h" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/art_basic.cpp" afterPath="$PROJECT_DIR$/tests/art_basic.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/art_node_16.cpp" afterPath="$PROJECT_DIR$/tests/art_node_16.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/art_node_4.cpp" afterPath="$PROJECT_DIR$/tests/art_node_4.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/art_node_48.cpp" afterPath="$PROJECT_DIR$/tests/art_node_48.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/art_stress.cpp" afterPath="$PROJECT_DIR$/tests/art_stress.cpp" />
     </list>
     <ignored path="ART.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -55,78 +54,50 @@
     <favorites_list name="ART" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5096094">
+    <splitter split-orientation="horizontal" split-proportion="0.5266927">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="_node.h" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/_node.h">
+          <file leaf-file-name="art_basic.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/tests/art_basic.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="444">
-                  <caret line="45" column="23" selection-start-line="45" selection-start-column="23" selection-end-line="45" selection-end-column="23" />
+                <state relative-caret-position="522">
+                  <caret line="95" column="56" selection-start-line="95" selection-start-column="56" selection-end-line="95" selection-end-column="56" />
                   <folding>
-                    <element signature="e#39#57#0" expanded="true" />
+                    <element signature="e#0#26#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="node_4.h" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/node_4.h">
+          <file leaf-file-name="art_iterator.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/tests/art_iterator.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="378">
-                  <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+                <state relative-caret-position="126">
+                  <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="adapt_radix_tree.cpp" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/adapt_radix_tree.cpp">
+          <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/main.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="270">
-                  <caret line="15" column="16" selection-start-line="15" selection-start-column="16" selection-end-line="15" selection-end-column="16" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="node_16.h" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/node_16.h">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="192">
-                  <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="19" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="node_48.h" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/node_48.h">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="18">
-                  <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="20" />
+                <state relative-caret-position="180">
+                  <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
                   <folding>
-                    <marker date="1468197802200" expanded="true" signature="177:1732" ph="{...}" />
-                    <marker date="1468197802200" expanded="true" signature="212:1729" ph="{...}" />
-                    <marker date="1468197802200" expanded="true" signature="335:447" ph="{...}" />
-                    <marker date="1468197802200" expanded="true" signature="480:819" ph="{...}" />
-                    <marker date="1468197802200" expanded="true" signature="1212:1363" ph="{...}" />
-                    <marker date="1468197802200" expanded="true" signature="1420:1530" ph="{...}" />
-                    <marker date="1468197802200" expanded="true" signature="1583:1617" ph="{...}" />
-                    <marker date="1468197802200" expanded="true" signature="1671:1723" ph="{...}" />
+                    <element signature="e#0#19#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="node_256.h" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/node_256.h">
+          <file leaf-file-name="art_node_48.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/tests/art_node_48.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="5">
-                  <caret line="30" column="25" selection-start-line="30" selection-start-column="17" selection-end-line="30" selection-end-column="25" />
+                <state relative-caret-position="180">
+                  <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
                   <folding>
-                    <element signature="e#86#114#0" expanded="true" />
-                    <marker date="1468195367287" expanded="true" signature="360:485" ph="{...}" />
+                    <element signature="e#0#26#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -135,19 +106,43 @@
           <file leaf-file-name="art_node_4.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/tests/art_node_4.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="126">
-                  <caret line="8" column="45" selection-start-line="8" selection-start-column="45" selection-end-line="8" selection-end-column="45" />
+                <state relative-caret-position="324">
+                  <caret line="18" column="48" selection-start-line="18" selection-start-column="48" selection-end-line="18" selection-end-column="48" />
+                  <folding>
+                    <element signature="e#0#26#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="node_16.h" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/node_16.h">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="162">
+                  <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="19" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="_leaf.h" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/_leaf.h">
+          <file leaf-file-name="node_48.h" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/node_48.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="466">
-                  <caret line="37" column="0" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+                <state relative-caret-position="439">
+                  <caret line="49" column="0" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
                   <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="art_map.h" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/art_map.h">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="90">
+                  <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+                  <folding>
+                    <element signature="e#135#164#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -155,11 +150,11 @@
           <file leaf-file-name="adapt_radix_tree.h" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/adapt_radix_tree.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="322">
-                  <caret line="143" column="33" selection-start-line="143" selection-start-column="33" selection-end-line="143" selection-end-column="33" />
+                <state relative-caret-position="537">
+                  <caret line="731" column="43" selection-start-line="731" selection-start-column="43" selection-end-line="731" selection-end-column="43" />
                   <folding>
-                    <element signature="e#63#91#0" expanded="true" />
-                    <element signature="e#181#210#0" expanded="true" />
+                    <element signature="e#63#82#0" expanded="true" />
+                    <element signature="e#280#309#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
@@ -169,11 +164,11 @@
       </split-first>
       <split-second>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="ART.cpp" pinned="false" current-in-tab="true">
+          <file leaf-file-name="ART.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/ART/ART.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="9810">
-                  <caret line="592" column="25" selection-start-line="592" selection-start-column="25" selection-end-line="592" selection-end-column="25" />
+                <state relative-caret-position="3240">
+                  <caret line="180" column="23" selection-start-line="180" selection-start-column="23" selection-end-line="180" selection-end-column="23" />
                   <folding>
                     <marker date="1468009971466" expanded="false" signature="2932:3113" ph="..." />
                   </folding>
@@ -184,13 +179,16 @@
           <file leaf-file-name="stl_tree.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/ART/stl_tree.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="16704">
-                  <caret line="928" column="10" selection-start-line="928" selection-start-column="5" selection-end-line="928" selection-end-column="10" />
+                <state relative-caret-position="46">
+                  <caret line="148" column="0" selection-start-line="148" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
                   <folding>
+                    <element signature="e#4762#4777#0" expanded="true" />
                     <element signature="e#5287#5301#0" expanded="true" />
+                    <element signature="e#6917#6931#0" expanded="true" />
                     <element signature="e#21028#21128#0" expanded="true" />
                     <element signature="e#24170#24270#0" expanded="true" />
                     <element signature="e#27082#27182#0" expanded="true" />
+                    <element signature="e#29926#30026#0" expanded="true" />
                     <element signature="e#37498#37598#0" expanded="true" />
                     <element signature="e#38129#38229#0" expanded="true" />
                   </folding>
@@ -201,8 +199,8 @@
           <file leaf-file-name="stl_map.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/ART/stl_map.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1098">
-                  <caret line="61" column="0" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
+                <state relative-caret-position="6408">
+                  <caret line="356" column="30" selection-start-line="356" selection-start-column="30" selection-end-line="356" selection-end-column="30" />
                   <folding>
                     <element signature="e#2468#2512#0" expanded="true" />
                     <element signature="e#3739#3881#0" expanded="true" />
@@ -217,83 +215,19 @@
           <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="108">
-                  <caret line="6" column="21" selection-start-line="6" selection-start-column="21" selection-end-line="6" selection-end-column="21" />
+                <state relative-caret-position="90">
+                  <caret line="5" column="45" selection-start-line="5" selection-start-column="45" selection-end-line="5" selection-end-column="45" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/main.cpp">
+          <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/.gitignore">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="570">
-                  <caret line="37" column="33" selection-start-line="37" selection-start-column="33" selection-end-line="37" selection-end-column="33" />
-                  <folding>
-                    <element signature="e#0#19#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="art_node_48.cpp" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/tests/art_node_48.cpp">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="684">
-                  <caret line="38" column="40" selection-start-line="38" selection-start-column="40" selection-end-line="38" selection-end-column="40" />
-                  <folding>
-                    <element signature="e#0#26#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="art_node_16.cpp" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/tests/art_node_16.cpp">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="208">
-                  <caret line="15" column="40" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
-                  <folding>
-                    <element signature="e#0#26#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="art_basic.cpp" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/tests/art_basic.cpp">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-528">
-                  <caret line="26" column="49" selection-start-line="26" selection-start-column="49" selection-end-line="26" selection-end-column="49" />
-                  <folding>
-                    <element signature="e#0#26#0" expanded="true" />
-                    <marker date="1468197093548" expanded="true" signature="101:1643" ph="{...}" />
-                    <marker date="1468197093548" expanded="true" signature="1691:1933" ph="{...}" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="art_map.h" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/art_map.h">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="990">
-                  <caret line="55" column="44" selection-start-line="55" selection-start-column="44" selection-end-line="55" selection-end-column="44" />
-                  <folding>
-                    <element signature="e#116#145#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="art_stress.cpp" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/tests/art_stress.cpp">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="82">
-                  <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-                  <folding>
-                    <element signature="e#0#26#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="-20">
+                  <caret line="6" column="27" selection-start-line="6" selection-start-column="27" selection-end-line="6" selection-end-column="27" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -313,11 +247,9 @@
         <option value="$PROJECT_DIR$/reference/ART.cpp" />
         <option value="$PROJECT_DIR$/Node64.cpp" />
         <option value="$PROJECT_DIR$/Node64.h" />
-        <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/reference/stl_tree.h" />
         <option value="$PROJECT_DIR$/reference/stl_map.h" />
         <option value="$PROJECT_DIR$/tests/test.cpp" />
-        <option value="$PROJECT_DIR$/art_map.h" />
         <option value="$PROJECT_DIR$/Node4.cpp" />
         <option value="$PROJECT_DIR$/Node256.cpp" />
         <option value="$PROJECT_DIR$/Node48.cpp" />
@@ -330,22 +262,26 @@
         <option value="$PROJECT_DIR$/Node256.h" />
         <option value="$PROJECT_DIR$/Leaf.h" />
         <option value="$PROJECT_DIR$/node.h" />
-        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/leaf.h" />
-        <option value="$PROJECT_DIR$/tests/art_node_4.cpp" />
+        <option value="$PROJECT_DIR$/adapt_radix_tree.cpp" />
+        <option value="$PROJECT_DIR$/node_256.h" />
+        <option value="$PROJECT_DIR$/tests/art_stress.cpp" />
+        <option value="$PROJECT_DIR$/node_48.h" />
         <option value="$PROJECT_DIR$/_node.h" />
         <option value="$PROJECT_DIR$/_leaf.h" />
-        <option value="$PROJECT_DIR$/adapt_radix_tree.cpp" />
-        <option value="$PROJECT_DIR$/main.cpp" />
-        <option value="$PROJECT_DIR$/node_256.h" />
-        <option value="$PROJECT_DIR$/tests/art_node_16.cpp" />
-        <option value="$PROJECT_DIR$/tests/art_stress.cpp" />
-        <option value="$PROJECT_DIR$/tests/art_node_48.cpp" />
-        <option value="$PROJECT_DIR$/tests/art_basic.cpp" />
-        <option value="$PROJECT_DIR$/adapt_radix_tree.h" />
-        <option value="$PROJECT_DIR$/node_48.h" />
-        <option value="$PROJECT_DIR$/node_16.h" />
         <option value="$PROJECT_DIR$/node_4.h" />
+        <option value="$PROJECT_DIR$/node_16.h" />
+        <option value="$PROJECT_DIR$/tests/art_basic.cpp" />
+        <option value="$PROJECT_DIR$/tests/art_node_4.cpp" />
+        <option value="$PROJECT_DIR$/tests/art_node_16.cpp" />
+        <option value="$PROJECT_DIR$/tests/art_node_48.cpp" />
+        <option value="$PROJECT_DIR$/tests/art_iterator.cpp" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/ART/stl_tree.h" />
+        <option value="$PROJECT_DIR$/art_map.h" />
+        <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/adapt_radix_tree.h" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -356,6 +292,7 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
+    <option name="x" value="1920" />
     <option name="y" value="24" />
     <option name="width" value="1920" />
     <option name="height" value="1056" />
@@ -414,15 +351,13 @@
               <option name="myItemId" value="ART" />
               <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
             <PATH_ELEMENT>
-              <option name="myItemId" value="ART" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+              <option name="myItemId" value="External Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ExternalLibrariesNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="ART" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+              <option name="myItemId" value="Header Search Paths" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.NamedLibraryElementNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -432,24 +367,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="ART" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="tests" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ART" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ART" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="libs" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -468,7 +385,7 @@
       <recent name="$PROJECT_DIR$/tests" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.TEST_ART">
+  <component name="RunManager" selected="Application.ART_MAIN">
     <configuration default="true" type="CMakeGoogleTestRunConfigurationType" factoryName="Google Test" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ART" TARGET_NAME="ART" CONFIG_NAME="Debug" TEST_MODE="SUITE_TEST">
       <envs />
       <method />
@@ -638,7 +555,7 @@
       <envs />
       <method />
     </configuration>
-    <configuration default="false" name="TEST_ART" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ART" TARGET_NAME="TEST_ART" CONFIG_NAME="Release" RUN_TARGET_PROJECT_NAME="ART" RUN_TARGET_NAME="TEST_ART">
+    <configuration default="false" name="TEST_ART" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="[iterator]" WORKING_DIR="" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ART" TARGET_NAME="TEST_ART" CONFIG_NAME="Release" RUN_TARGET_PROJECT_NAME="ART" RUN_TARGET_NAME="TEST_ART">
       <envs />
       <method />
     </configuration>
@@ -675,17 +592,17 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="24" width="1920" height="1056" extended-state="6" />
+    <frame x="1920" y="24" width="1920" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14971007" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26354167" sideWeight="0.4686347" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.28645834" sideWeight="0.4686347" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32916668" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31875" sideWeight="0.53136533" order="5" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30208334" sideWeight="0.4686347" order="2" side_tool="false" content_ui="tabs" x="608" y="52" width="980" height="1028" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24986821" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19030048" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32916668" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="WINDOWED" visible="false" show_stripe_button="true" weight="1.0" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="0" y="24" width="1920" height="1056" />
@@ -711,43 +628,18 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/main.cpp</url>
-          <line>42</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="22" />
+      <option name="time" value="27" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Node16.cpp" />
-    <entry file="file://$PROJECT_DIR$/_leaf.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="288">
-          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_4.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/adapt_radix_tree.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="396">
           <caret line="22" column="35" selection-start-line="22" selection-start-column="35" selection-end-line="22" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -776,9 +668,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="522">
           <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-          <folding>
-            <element signature="e#39#57#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -786,16 +675,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1468197802200" expanded="true" signature="177:1732" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="212:1729" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="335:447" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="480:819" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="1212:1363" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="1420:1530" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="1583:1617" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="1671:1723" ph="{...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -812,7 +691,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="72">
           <caret line="4" column="18" selection-start-line="4" selection-start-column="18" selection-end-line="4" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -820,7 +698,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
           <caret line="17" column="35" selection-start-line="17" selection-start-column="35" selection-end-line="17" selection-end-column="35" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -877,13 +754,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="54">
-          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Leaf.cpp" />
     <entry file="file://$PROJECT_DIR$/Node4.cpp" />
     <entry file="file://$PROJECT_DIR$/Node48.cpp" />
@@ -897,10 +767,65 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/tests/art_stress.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="82">
+          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#26#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_leaf.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="55" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_256.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="7" column="28" selection-start-line="7" selection-start-column="28" selection-end-line="7" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/_node.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/adapt_radix_tree.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="15" column="16" selection-start-line="15" selection-start-column="16" selection-end-line="15" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_4.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="23" column="0" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/art_node_16.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ART/stl_map.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1098">
-          <caret line="61" column="0" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
+        <state relative-caret-position="6408">
+          <caret line="356" column="30" selection-start-line="356" selection-start-column="30" selection-end-line="356" selection-end-column="30" />
           <folding>
             <element signature="e#2468#2512#0" expanded="true" />
             <element signature="e#3739#3881#0" expanded="true" />
@@ -911,15 +836,135 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/tests/art_node_4.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="324">
+          <caret line="18" column="48" selection-start-line="18" selection-start-column="48" selection-end-line="18" selection-end-column="48" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/ext/new_allocator.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="119" column="0" selection-start-line="119" selection-start-column="0" selection-end-line="119" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/bits/stl_deque.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="356">
+          <caret line="882" column="27" selection-start-line="882" selection-start-column="27" selection-end-line="882" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/array">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="52" column="0" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ART/ART.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3240">
+          <caret line="180" column="23" selection-start-line="180" selection-start-column="23" selection-end-line="180" selection-end-column="23" />
+          <folding>
+            <marker date="1468009971466" expanded="false" signature="2932:3113" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/art_basic.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="522">
+          <caret line="95" column="56" selection-start-line="95" selection-start-column="56" selection-end-line="95" selection-end-column="56" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/art_node_48.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
+          <folding>
+            <element signature="e#0#26#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tests/art_iterator.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="7" column="37" selection-start-line="7" selection-start-column="37" selection-end-line="7" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/art_map.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="5" column="0" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+          <folding>
+            <element signature="e#135#164#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_16.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="9" column="0" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/node_48.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="439">
+          <caret line="49" column="0" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/adapt_radix_tree.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="537">
+          <caret line="731" column="43" selection-start-line="731" selection-start-column="43" selection-end-line="731" selection-end-column="43" />
+          <folding>
+            <element signature="e#63#82#0" expanded="true" />
+            <element signature="e#280#309#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ART/stl_tree.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="16704">
-          <caret line="928" column="10" selection-start-line="928" selection-start-column="5" selection-end-line="928" selection-end-column="10" />
+        <state relative-caret-position="46">
+          <caret line="148" column="0" selection-start-line="148" selection-start-column="0" selection-end-line="148" selection-end-column="0" />
           <folding>
+            <element signature="e#4762#4777#0" expanded="true" />
             <element signature="e#5287#5301#0" expanded="true" />
+            <element signature="e#6917#6931#0" expanded="true" />
             <element signature="e#21028#21128#0" expanded="true" />
             <element signature="e#24170#24270#0" expanded="true" />
             <element signature="e#27082#27182#0" expanded="true" />
+            <element signature="e#29926#30026#0" expanded="true" />
             <element signature="e#37498#37598#0" expanded="true" />
             <element signature="e#38129#38229#0" expanded="true" />
           </folding>
@@ -928,178 +973,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="108">
-          <caret line="6" column="21" selection-start-line="6" selection-start-column="21" selection-end-line="6" selection-end-column="21" />
+        <state relative-caret-position="90">
+          <caret line="5" column="45" selection-start-line="5" selection-start-column="45" selection-end-line="5" selection-end-column="45" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/_node.h">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="444">
-          <caret line="45" column="23" selection-start-line="45" selection-start-column="23" selection-end-line="45" selection-end-column="23" />
-          <folding>
-            <element signature="e#39#57#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/_leaf.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="37" column="0" selection-start-line="37" selection-start-column="0" selection-end-line="37" selection-end-column="0" />
+        <state relative-caret-position="-20">
+          <caret line="6" column="27" selection-start-line="6" selection-start-column="27" selection-end-line="6" selection-end-column="27" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="37" column="33" selection-start-line="37" selection-start-column="33" selection-end-line="37" selection-end-column="33" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/include/c++/5/array">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="52" column="0" selection-start-line="52" selection-start-column="0" selection-end-line="52" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_256.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5">
-          <caret line="30" column="25" selection-start-line="30" selection-start-column="17" selection-end-line="30" selection-end-column="25" />
-          <folding>
-            <element signature="e#86#114#0" expanded="true" />
-            <marker date="1468195367287" expanded="true" signature="360:485" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/art_node_4.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="8" column="45" selection-start-line="8" selection-start-column="45" selection-end-line="8" selection-end-column="45" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/art_map.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="990">
-          <caret line="55" column="44" selection-start-line="55" selection-start-column="44" selection-end-line="55" selection-end-column="44" />
-          <folding>
-            <element signature="e#116#145#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/art_node_48.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="684">
-          <caret line="38" column="40" selection-start-line="38" selection-start-column="40" selection-end-line="38" selection-end-column="40" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/art_node_16.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="15" column="40" selection-start-line="15" selection-start-column="40" selection-end-line="15" selection-end-column="40" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/art_basic.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-528">
-          <caret line="26" column="49" selection-start-line="26" selection-start-column="49" selection-end-line="26" selection-end-column="49" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-            <marker date="1468197093548" expanded="true" signature="101:1643" ph="{...}" />
-            <marker date="1468197093548" expanded="true" signature="1691:1933" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tests/art_stress.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="82">
-          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ART/ART.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="9810">
-          <caret line="592" column="25" selection-start-line="592" selection-start-column="25" selection-end-line="592" selection-end-column="25" />
-          <folding>
-            <marker date="1468009971466" expanded="false" signature="2932:3113" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_48.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="20" />
-          <folding>
-            <marker date="1468197802200" expanded="true" signature="177:1732" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="212:1729" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="335:447" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="480:819" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="1212:1363" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="1420:1530" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="1583:1617" ph="{...}" />
-            <marker date="1468197802200" expanded="true" signature="1671:1723" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_16.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="11" column="0" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/adapt_radix_tree.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="15" column="16" selection-start-line="15" selection-start-column="16" selection-end-line="15" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/node_4.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/adapt_radix_tree.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="322">
-          <caret line="143" column="33" selection-start-line="143" selection-start-column="33" selection-end-line="143" selection-end-column="33" />
-          <folding>
-            <element signature="e#63#91#0" expanded="true" />
-            <element signature="e#181#210#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>

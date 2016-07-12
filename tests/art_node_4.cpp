@@ -3,6 +3,13 @@
 
 using namespace art;
 
+typedef adapt_radix_tree<int, int>::Key Key;
+typedef adapt_radix_tree<int, int>::_leaf _leaf;
+typedef adapt_radix_tree<int, int>::node_4 node_4;
+typedef adapt_radix_tree<int, int>::node_16 node_16;
+typedef adapt_radix_tree<int, int>::node_48 node_48;
+typedef adapt_radix_tree<int, int>::node_256 node_256;
+
 SCENARIO ("given a node_4 with one element", "[art]") {
     Key key = {261};
     _leaf *leaf_five = new _leaf(key);

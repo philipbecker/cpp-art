@@ -1,6 +1,7 @@
 #include "../libs/catch.h"
 #include "../adapt_radix_tree.h"
 
+
 SCENARIO("given an empty art", "[art]") {
     art::adapt_radix_tree<int, int> art;
 
@@ -73,7 +74,7 @@ SCENARIO("growing the root node", "[art]") {
 
         THEN("root grows to node 16") {
             REQUIRE(art._root->size() == 5);
-            REQUIRE(art._root->get_type() == art::node_type::node_16_t);
+            REQUIRE(art._root->get_type() == 2);
         }
 
         AND_WHEN("12 more values are inserted") {
@@ -83,7 +84,7 @@ SCENARIO("growing the root node", "[art]") {
 
             THEN ("root has grown to node 48") {
                     REQUIRE(art._root->size() == 17);
-                    REQUIRE(art._root->get_type() == art::node_type::node_48_t);
+                    REQUIRE(art._root->get_type() == 3);
             };
             AND_WHEN("32 more values are inserted") {
                 for (int i = 17; i < 49; i++) {
@@ -92,7 +93,7 @@ SCENARIO("growing the root node", "[art]") {
 
                 THEN ("root has grown to node 256") {
                     REQUIRE(art._root->size() == 49);
-                    REQUIRE(art._root->get_type() == art::node_type::node_256_t);
+                    REQUIRE(art._root->get_type() == 4);
                 };
             }
         }

@@ -17,7 +17,6 @@ namespace art
         _leaf_t = 0, node_4_t = 1, node_16_t = 2, node_48_t = 3, node_256_t = 4
     };
 
-
     static std::string print_key(Key key, unsigned depth) {
         std::bitset<8> x(key.chunks[depth]);
         std::string output = x.to_string();
@@ -59,8 +58,6 @@ namespace art
 
         virtual node_type get_type() const = 0;
     };
-
-
 }
 
 #endif //ART_NODE_H

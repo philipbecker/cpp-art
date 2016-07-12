@@ -2,6 +2,7 @@
 #define REFERENCE_ART_MAP_H
 
 #include "adapt_radix_tree.h"
+#include <utility>
 
 namespace art
 {
@@ -17,11 +18,11 @@ namespace art
         _Rep_type _M_t;
 
         typedef typename _Rep_type::iterator iterator;
-        typedef typename _Rep_type::const_iterator const_iterator;
+//        typedef typename _Rep_type::const_iterator const_iterator;
         typedef typename _Rep_type::size_type size_type;
         typedef typename _Rep_type::difference_type difference_type;
-        typedef typename _Rep_type::reverse_iterator reverse_iterator;
-        typedef typename _Rep_type::const_reverse_iterator const_reverse_iterator;
+//        typedef typename _Rep_type::reverse_iterator reverse_iterator;
+//        typedef typename _Rep_type::const_reverse_iterator const_reverse_iterator;
 
         /**
          * @brief  Default constructor creates no elements.
