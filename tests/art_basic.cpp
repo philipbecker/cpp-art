@@ -62,13 +62,17 @@ TEST_CASE("Can tiebreak at level 1", "[art]") {
 
 
 SCENARIO("growing the root node", "[art]") {
-    art::adapt_radix_tree<int, int> art;
+    art::adapt_radix_tree<uint64_t , uint64_t> art;
 
-    std::vector<int> data(256);
+    std::vector<uint64_t> data(256);
     std::iota(data.begin(), data.end(), 0);
+    // The first key byte needs to be decisive,
+    // otherwise the root won't grow as desired
+    for (auto& d : data)
+        d <<= 56;
 
     WHEN("first 5 values are inserted") {
-        for (int i = 0; i < 5; i++) {
+        for (uint64_t i = 0; i < 5; i++) {
             art.insert(std::make_pair(data[i], data[i]));
         }
 
@@ -78,7 +82,7 @@ SCENARIO("growing the root node", "[art]") {
         }
 
         AND_WHEN("12 more values are inserted") {
-            for (int i = 5; i < 17; i++) {
+            for (uint64_t i = 5; i < 17; i++) {
                 art.insert(std::make_pair(data[i], data[i]));
             }
 
@@ -87,7 +91,7 @@ SCENARIO("growing the root node", "[art]") {
                     REQUIRE(art._root->get_type() == 3);
             };
             AND_WHEN("32 more values are inserted") {
-                for (int i = 17; i < 49; i++) {
+                for (uint64_t i = 17; i < 49; i++) {
                     art.insert(std::make_pair(data[i], data[i]));
                 }
 

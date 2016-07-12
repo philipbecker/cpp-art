@@ -11,13 +11,70 @@
 
 namespace art
 {
+    template<class T>
+    struct key_transformer {
+
+        T operator()(T &v) {
+            return key_transform(v);
+        }
+
+        T operator()(const T &v) {
+            return key_transform(v);
+        }
+
+        uint16_t byte_swap(uint16_t val) {
+            return (val << 8) | (val >> 8);
+        }
+
+        int16_t byte_swap(int16_t val) {
+            return (val << 8) | ((val >> 8) & 0xFF);
+        }
+
+        uint32_t byte_swap(uint32_t val) {
+            val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
+            return (val << 16) | (val >> 16);
+        }
+
+        int32_t byte_swap(int32_t val) {
+            val = ((val << 8) & 0xFF00FF00) | ((val >> 8) & 0xFF00FF);
+            return (val << 16) | ((val >> 16) & 0xFFFF);
+        }
+
+        int64_t byte_swap(int64_t val) {
+            val = ((val << 8) & 0xFF00FF00FF00FF00ULL) | ((val >> 8) & 0x00FF00FF00FF00FFULL);
+            val = ((val << 16) & 0xFFFF0000FFFF0000ULL) | ((val >> 16) & 0x0000FFFF0000FFFFULL);
+            return (val << 32) | ((val >> 32) & 0xFFFFFFFFULL);
+        }
+
+        uint64_t byte_swap(uint64_t val) {
+            val = ((val << 8) & 0xFF00FF00FF00FF00ULL) | ((val >> 8) & 0x00FF00FF00FF00FFULL);
+            val = ((val << 16) & 0xFFFF0000FFFF0000ULL) | ((val >> 16) & 0x0000FFFF0000FFFFULL);
+            return (val << 32) | (val >> 32);
+        }
+
+        inline bool is_big_endian() {
+            int num = 1;
+            return !(*(char *) &num == 1);
+        }
+
+        //       typename std::enable_if<std::is_integral<T>::value, T>::type
+
+        T key_transform(T n) {
+            if (std::is_signed<T>::value)
+                n ^= 1 << ((sizeof(T) * 8) - 1);
+            if (is_big_endian())
+                return n;
+            return byte_swap(n);
+        }
+    };
+
     static const uint8_t EMPTY_MARKER = 48;
 
     template<typename _Key, typename _Tp>
     class adapt_radix_tree {
     private:
         size_t _count;
-
+        key_transformer<_Key> transformer;
 
         typedef _Key key_type;
         typedef _Tp mapped_type;
@@ -98,7 +155,7 @@ namespace art
             }
 
             virtual void traverse(unsigned depth) override {
-                std::cout << std::string(depth + 1, '-') << " leaf " << this << ": " << key.value << std::endl;
+                std::cout << std::string(depth + 1, '-') << " leaf " << this << ": " << value << std::endl;
             }
 
             virtual _node **find(const uint8_t &key_byte) override {
@@ -232,7 +289,7 @@ namespace art
             virtual std::pair<bool, _node *> next(unsigned pos,
                                                   parent_iter_stack &parents) override {
                 if (pos < this->_count) {
-                    parents.emplace(this, pos + 1);
+                    parents.emplace(this, pos);
                     return children[pos]->next(0, parents);
                 }
                 return std::pair<bool, _node *>(false, nullptr);
@@ -326,7 +383,7 @@ namespace art
             virtual std::pair<bool, _node *> next(unsigned pos,
                                                   parent_iter_stack &parents) override {
                 if (pos < this->_count) {
-                    parents.emplace(this, pos + 1);
+                    parents.emplace(this, pos);
                     return children[pos]->next(0, parents);
                 }
                 return std::pair<bool, _node *>(false, nullptr);
@@ -439,7 +496,7 @@ namespace art
             virtual std::pair<bool, _node *> next(unsigned pos,
                                                   parent_iter_stack &parents) override {
                 if (pos < this->_count) {
-                    parents.emplace(this, pos + 1);
+                    parents.emplace(this, pos);
                     return children[child_index[pos]]->next(0, parents);
                 }
                 return std::pair<bool, _node *>(false, nullptr);
@@ -541,7 +598,7 @@ namespace art
             virtual std::pair<bool, _node *> next(unsigned pos, parent_iter_stack &parents) override {
                 for (; pos < 256; pos++) {
                     if (children[pos] != nullptr) {
-                        parents.emplace(this, pos + 1);
+                        parents.emplace(this, pos);
                         return children[pos]->next(0, parents);
                     }
                 }
@@ -568,7 +625,9 @@ namespace art
         }
 
         std::pair<_node *, bool> insert(const value_type &x) {
-            Key key = {x.first};
+            Key debugKey = {x.first};
+            Key key = {transformer(x.first)};
+
             _leaf *new_leaf = new _leaf(key, x.second);
 
             // Empty Tree
@@ -631,7 +690,7 @@ namespace art
         }
 
         bool find(const key_type &x) {
-            Key key = {x};
+            Key key = {transformer(x)};
 
             if (_root == nullptr)
                 return false;
@@ -776,6 +835,16 @@ namespace art
             return iterator(nullptr);
         }
 
+        iterator rbegin() {
+            return iterator(nullptr);
+        }
+
+        iterator rend() {
+            parent_iter_stack parents;
+            auto max = maximum(parents);
+            return iterator(max, parents);
+        }
+
     private:
         _node *grow(_node *old_node) {
             auto type = old_node->get_type();
@@ -826,8 +895,6 @@ namespace art
             throw; // unreachable
         }
     };
-
-
 }
 
 

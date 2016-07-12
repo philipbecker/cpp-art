@@ -15,7 +15,7 @@ namespace art
         typedef std::pair<const _Key, _Tp> value_type;
 
         typedef adapt_radix_tree<key_type, value_type> _Rep_type;
-        _Rep_type _M_t;
+        _Rep_type _art;
 
         typedef typename _Rep_type::iterator iterator;
 //        typedef typename _Rep_type::const_iterator const_iterator;
@@ -27,28 +27,28 @@ namespace art
         /**
          * @brief  Default constructor creates no elements.
          */
-        map() : _M_t() { }
+        map() : _art() { }
 
         /**
          * @brief  Map copy constructor.
          */
-        map(const map &__x) : _M_t(__x._M_t) { }
+        map(const map &__x) : _art(__x._art) { }
 
         /**
          * @brief  Map move constructor.
          */
-        map(map &&__x) : _M_t(std::move(__x._M_t)) { }
+        map(map &&__x) : _art(std::move(__x._art)) { }
 
         /**
          * Returns true if the map is empty.  (Thus begin() would equal
          *  end().)
         */
-        bool empty() const { return _M_t.empty(); }
+        bool empty() const { return _art.empty(); }
 
         /**
          * Returns the size of the map.
          */
-        size_type size() const { return _M_t.size(); }
+        size_type size() const { return _art.size(); }
 
         mapped_type &operator[](const key_type &__k) {
             // concept requirements
@@ -57,7 +57,7 @@ namespace art
             iterator __i = lower_bound(__k);
             // __i->first is greater than or equivalent to __k.
             if (__i == end() || key_comp()(__k, (*__i).first))
-                __i = _M_t._M_emplace_hint_unique(__i, std::piecewise_construct,
+                __i = _art._M_emplace_hint_unique(__i, std::piecewise_construct,
                                                   std::tuple<const key_type &>(__k),
                                                   std::tuple<>());
 
@@ -66,8 +66,16 @@ namespace art
 
         std::pair<iterator, bool>
         insert(const value_type &__x) {
-            return _M_t.insert(__x);
+            return _art.insert(__x);
         }
+
+        iterator
+        find(const key_type& __x)
+        { return _art.find(__x); }
+
+        size_type
+        count(const key_type& __x) const
+        { return _art.find(__x) == _art.end() ? 0 : 1; }
     };
 }
 
