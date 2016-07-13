@@ -1,7 +1,7 @@
 #ifndef REFERENCE_ART_MAP_H
 #define REFERENCE_ART_MAP_H
 
-#include "adapt_radix_tree.h"
+#include "Adaptive_radix_tree.h"
 #include <utility>
 
 namespace art
@@ -14,7 +14,7 @@ namespace art
         typedef _Tp mapped_type;
         typedef std::pair<const _Key, _Tp> value_type;
 
-        typedef adapt_radix_tree<key_type, value_type> _Rep_type;
+        typedef Adaptive_radix_tree<key_type, value_type> _Rep_type;
         _Rep_type _art;
 
         typedef typename _Rep_type::iterator iterator;

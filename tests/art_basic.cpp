@@ -1,9 +1,9 @@
 #include "../libs/catch.h"
-#include "../adapt_radix_tree.h"
+#include "../Adaptive_radix_tree.h"
 
 
 SCENARIO("given an empty art", "[art]") {
-    art::adapt_radix_tree<int, int> art;
+    art::Adaptive_radix_tree<int, int> art;
 
     THEN("its size is 0") {
         REQUIRE(art.size() == 0);
@@ -51,7 +51,7 @@ SCENARIO("given an empty art", "[art]") {
 }
 
 TEST_CASE("Can tiebreak at level 1", "[art]") {
-    art::adapt_radix_tree<int, int> art;
+    art::Adaptive_radix_tree<int, int> art;
     art.insert(std::make_pair(5, 5));
     art.insert(std::make_pair(6, 6));
     art.insert(std::make_pair(261, 261));
@@ -62,7 +62,7 @@ TEST_CASE("Can tiebreak at level 1", "[art]") {
 
 
 SCENARIO("growing the root node", "[art]") {
-    art::adapt_radix_tree<uint64_t , uint64_t> art;
+    art::Adaptive_radix_tree<uint64_t , uint64_t> art;
 
     std::vector<uint64_t> data(256);
     std::iota(data.begin(), data.end(), 0);

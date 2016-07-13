@@ -1,12 +1,13 @@
 #include <iostream>
 #include <random>
 #include <algorithm>
-#include "adapt_radix_tree.h"
+#include "Adaptive_radix_tree.h"
 
 using namespace std;
 
 int main() {
-    art::adapt_radix_tree<int, int> art;
+    /*
+    art::Adaptive_radix_tree<int, int> art;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -25,25 +26,24 @@ int main() {
     for (auto &d : data)
         art.insert(std::make_pair(d, d));
 
-
-    art::adapt_radix_tree<unsigned , unsigned> art2;
+*/
+    art::Adaptive_radix_tree<unsigned , unsigned> art2;
 
     for (unsigned i = 1; i < 8; i += 1)
         art2.insert(std::make_pair(i, i));
 
     std::cout << "---------------" << std::endl;
     std::cout << "Begin of art: " << *art2.begin() << std::endl;
-    std::cout << "End of art: " << *art2.end() << std::endl;
     std::cout << "RBegin of art: " << *art2.rbegin() << std::endl;
-    std::cout << "REnd of art: " << *art2.rend() << std::endl;
     std::cout << "---------------" << std::endl;
 
     for (auto &&item : art2)
         std::cout << item <<  " < ";
     std::cout << std::endl;
 
-    for (auto it2 = art2.rbegin(), end = art2.rend(); it2 != end; ++it2)
-        std::cout << *it2 <<  " > ";
+    for (auto it2 = art2.rbegin(), end = art2.rend(); it2 != end; it2++)
+        std::cout << *it2 << " > ";
     std::cout << std::endl;
+
     return 0;
 }

@@ -4,6 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/main.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/key_transform.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/libs/catch.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/art_iterator.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/art_node_16.cpp" isTestSource="false" />
@@ -12,7 +13,8 @@
       <sourceFolder url="file://$MODULE_DIR$/tests/test.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/art_basic.cpp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tests/art_node_48.cpp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/adapt_radix_tree.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Adaptive_radix_tree.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/byte_swap.h" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/art_map.h" isTestSource="false" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />

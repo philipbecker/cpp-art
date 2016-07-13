@@ -1,10 +1,10 @@
 #include <map>
 #include "../libs/catch.h"
-#include "../adapt_radix_tree.h"
+#include "../Adaptive_radix_tree.h"
 
 
 SCENARIO("basic iteration", "[iterator]") {
-    art::adapt_radix_tree<unsigned, unsigned> art;
+    art::Adaptive_radix_tree<unsigned, unsigned> art;
     std::map<unsigned, unsigned> std_map;
 
     for (unsigned i = 1; i < 10; i++) {
@@ -12,13 +12,13 @@ SCENARIO("basic iteration", "[iterator]") {
         std_map.emplace(i, i);
     }
 
-    REQUIRE(*(art.begin()) == std_map.begin()->first);
-    REQUIRE(*(art.end()) == std_map.end()->first);
+    CHECK(*(art.begin()) == std_map.begin()->first);
+    CHECK(*(art.rbegin()) == std_map.rbegin()->first);
 
 }
 
 SCENARIO("given an art with signed integer key", "[iterator]") {
-    art::adapt_radix_tree<int, int> art;
+    art::Adaptive_radix_tree<int, int> art;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -46,7 +46,7 @@ SCENARIO("given an art with signed integer key", "[iterator]") {
 }
 
 SCENARIO("given an art with unsigned integer key", "[iterator]") {
-    art::adapt_radix_tree<unsigned, unsigned> art;
+    art::Adaptive_radix_tree<unsigned, unsigned> art;
 
     std::random_device rd;
     std::mt19937 gen(rd());

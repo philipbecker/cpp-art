@@ -3,7 +3,8 @@ project(ART)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_C_FLAGS_DEBUG "-DMY_DEBUG")
-set(SOURCE_FILES adapt_radix_tree.h art_map.h)
+set(SOURCE_FILES key_transform.h byte_swap.h
+        Adaptive_radix_tree.h art_map.h)
 
 set(TEST_FILES
         tests/test.cpp tests/art_basic.cpp tests/art_stress.cpp

@@ -1,9 +1,8 @@
 #include "../libs/catch.h"
-#include "../adapt_radix_tree.h"
-
+#include "../Adaptive_radix_tree.h"
 
 TEST_CASE("Stress tests", "[art]") {
-    art::adapt_radix_tree<int, int> art;
+    art::Adaptive_radix_tree<int, int> art;
 
     std::random_device rd;
     std::mt19937 gen(rd());
