@@ -6,7 +6,7 @@ ExternalProject_Add(
         PREFIX ${CMAKE_BINARY_DIR}/Celero
         GIT_REPOSITORY "https://github.com/DigitalInBlue/Celero.git"
         CMAKE_ARGS "-DCELERO_ENABLE_EXPERIMENTS=OFF;-DCMAKE_BUILD_TYPE=Release"
-        SOURCE_DIR ""
+        SOURCE_DIR "Celero"
         BINARY_DIR "CeleroBuild"
         INSTALL_COMMAND ""
         TEST_COMMAND ""
@@ -14,6 +14,6 @@ ExternalProject_Add(
 set_target_properties(Celero PROPERTIES EXCLUDE_FROM_ALL TRUE)
 set(CELERO_FOUND true)
 ExternalProject_Get_Property(Celero source_dir)
-set(CELERO_INCLUDE_DIR "${source_dir}/include")
+set(CELERO_INCLUDE_DIR "${source_dir}/include" CACHE INTERNAL "Path to include folder for Celero")
 ExternalProject_Get_Property(Celero binary_dir)
-set(CELERO_LIBRARY "${binary_dir}/libcelero.so")
+set(CELERO_LIBRARY "${binary_dir}/libcelero.so" CACHE INTERNAL "Path to binary folder for Celero")
