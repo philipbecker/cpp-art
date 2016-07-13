@@ -23,24 +23,24 @@ namespace art
         size_t _count;
         _Key_transform key_transformer;
 
-        typedef _Key key_type;
-        typedef _Tp mapped_type;
-        typedef std::pair<const _Key, _Tp> value_type;
-
         enum node_type : uint8_t {
             _leaf_t = 0, node_4_t = 1, node_16_t = 2,
             node_48_t = 3, node_256_t = 4, _dummy_node = 5
         };
 
     public:
+        // Forward declaration for typedefs
+        class _Node;
+
+        typedef _Key key_type;
+        typedef _Tp mapped_type;
+        typedef std::pair<const _Key, _Tp> value_type;
+        typedef std::stack<std::pair<_Node *, unsigned>> parent_iter_stack;
+
         union Key {
             const key_type value;
             const byte chunks[sizeof(key_type)];
         };
-
-        class _Node;
-
-        typedef std::stack<std::pair<_Node *, unsigned>> parent_iter_stack;
 
         class _Node {
         protected:
@@ -800,32 +800,33 @@ namespace art
             throw; // unreachable
         }
 
-        _Node *minimum() {
+        _Node *minimum() const {
             if (_root != nullptr)
                 return _root->minimum();
             return nullptr;
         }
 
-        _Node *minimum(parent_iter_stack &parents) {
+        _Node *minimum(parent_iter_stack &parents) const {
             if (_root != nullptr)
                 return _root->minimum(parents);
             return nullptr;
         }
 
-        _Node *maximum() {
+        _Node *maximum() const {
             if (_root != nullptr)
                 return _root->maximum();
             return nullptr;
         }
 
-        _Node *maximum(parent_iter_stack &parents) {
+        _Node *maximum(parent_iter_stack &parents) const {
             if (_root != nullptr)
                 return _root->maximum(parents);
             return nullptr;
         }
 
-        void traverse() {
-            _root->traverse(0);
+        void traverse() const {
+            if (_root != nullptr)
+                _root->traverse(0);
         }
 
         size_t size() const {
@@ -866,6 +867,11 @@ namespace art
             parent_iter_stack parents;
 
             adapt_radix_tree_iterator() : node(nullptr) { }
+
+            // @TODO INCORRECT, need to get parent stack
+            explicit adapt_radix_tree_iterator(_Node *node)
+                    : node(node) {
+            }
 
             explicit adapt_radix_tree_iterator(_Node *node, parent_iter_stack &parents)
                     : node(node), parents(parents) {
@@ -947,7 +953,7 @@ namespace art
 
             typedef adapt_radix_tree_const_iterator _Self;
             typedef _Node *_Base_ptr;
-            typedef _Leaf *_Link_type;
+            typedef const _Leaf *_Link_type;
 
             // pointer to current leaf node
             _Node *node;
@@ -1033,7 +1039,6 @@ namespace art
         };
 
         // @TODO const iterators
-
         typedef adapt_radix_tree_iterator iterator;
         typedef adapt_radix_tree_const_iterator const_iterator;
         typedef std::reverse_iterator<iterator> reverse_iterator;
@@ -1043,19 +1048,32 @@ namespace art
 
         iterator begin() {
             parent_iter_stack parents;
+            // Place maximum dummy node on stack, since the
+            // maximum leaf has no idea about this node
+            // when going through the root's children has completed,
+            // this will be popped from the stack as the end marker
             parents.emplace(maximum_dummy, 0);
             _Node *min = minimum(parents);
             return iterator(min, parents);
         }
 
-        const const_iterator begin() const {
-
+        const_iterator begin() const {
+            parent_iter_stack parents;
+            parents.emplace(maximum_dummy, 0);
+            _Node *min = minimum(parents);
+            return const_iterator(min, parents);
         }
 
         iterator end() {
             parent_iter_stack parents;
             parents.emplace(maximum_dummy, 0);
             return iterator(maximum_dummy->_leaf, parents);
+        }
+
+        const_iterator end() const {
+            parent_iter_stack parents;
+            parents.emplace(maximum_dummy, 0);
+            return const_iterator(maximum_dummy->_leaf, parents);
         }
 
         reverse_iterator rbegin() {
@@ -1124,15 +1142,20 @@ namespace art
         }
     };
 
-    /**
-    bool operator==(const iterator &__x, const const_iterator &__y) {
-        return __x.node == __y.node;
+    template<typename _Key, typename _Tp,
+            typename _Key_transform = key_transform<_Key> >
+    inline bool operator==(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
+                           const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
+        return lhs.size() == rhs.size()
+               && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
-    bool operator!=(const iterator &__x, const const_iterator &__y) {
-        return __x.node != __y.node;
+    template<typename _Key, typename _Tp,
+            typename _Key_transform = key_transform<_Key> >
+    inline bool operator!=(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
+                           const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
+        return !(lhs == rhs);
     }
-     */
 }
 
 
