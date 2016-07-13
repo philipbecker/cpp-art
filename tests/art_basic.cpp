@@ -1,5 +1,5 @@
-#include "../libs/catch.h"
-#include "../Adaptive_radix_tree.h"
+#include "catch.hpp"
+#include "../src/Adaptive_radix_tree.h"
 
 
 SCENARIO("given an empty art", "[art]") {

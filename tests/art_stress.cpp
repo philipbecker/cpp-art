@@ -1,5 +1,5 @@
-#include "../libs/catch.h"
-#include "../Adaptive_radix_tree.h"
+#include "catch.hpp"
+#include "../src/Adaptive_radix_tree.h"
 
 TEST_CASE("Stress tests", "[art]") {
     art::Adaptive_radix_tree<int, int> art;

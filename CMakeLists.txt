@@ -1,16 +1,41 @@
 cmake_minimum_required(VERSION 3.5)
 project(ART)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_C_FLAGS_DEBUG "-DMY_DEBUG")
-set(SOURCE_FILES key_transform.h byte_swap.h
-        Adaptive_radix_tree.h art_map.h)
+set(EXT_PROJECTS_DIR libs)
 
-set(TEST_FILES
-        tests/test.cpp tests/art_basic.cpp tests/art_stress.cpp
-        tests/art_node_4.cpp tests/art_node_16.cpp
-        tests/art_node_48.cpp tests/art_iterator.cpp
-        )
-add_executable(ART ${SOURCE_FILES})
-add_executable(ART_MAIN ${SOURCE_FILES} main.cpp)
-add_executable(TEST_ART ${SOURCE_FILES} libs/catch.h  ${TEST_FILES} )
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS_DEBUG "-DMY_DEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
+
+set(
+        SOURCE_FILES
+        src/key_transform.h
+        src/byte_swap.h
+        src/Adaptive_radix_tree.h
+        src/art_map.h
+)
+
+add_library(art STATIC ${SOURCE_FILES})
+set_target_properties(art PROPERTIES LINKER_LANGUAGE CXX)
+
+# TESTS
+add_subdirectory(${EXT_PROJECTS_DIR}/catch)
+add_subdirectory(tests)
+
+# BENCHMARKS
+add_subdirectory(${EXT_PROJECTS_DIR}/celero)
+add_subdirectory(perf)
+
+# SANDBOX MAIN
+add_executable(main ${SOURCE_FILES} main.cpp)
+target_link_libraries(main art)
+add_dependencies(main art)
+
+add_custom_target(full)
+add_dependencies(
+        full
+        main
+        tests
+        benchmarks
+)
