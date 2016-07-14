@@ -19,15 +19,6 @@ namespace art
     template<typename _Key, typename _Tp,
             typename _Key_transform = key_transform<_Key> >
     class Adaptive_radix_tree {
-    private:
-        size_t _count;
-        _Key_transform key_transformer;
-
-        enum node_type : uint8_t {
-            _leaf_t = 0, node_4_t = 1, node_16_t = 2,
-            node_48_t = 3, node_256_t = 4, _dummy_node = 5
-        };
-
     public:
         // Forward declaration for typedefs
         class _Node;
@@ -37,6 +28,16 @@ namespace art
         typedef std::pair<const _Key, _Tp> value_type;
         typedef std::stack<std::pair<_Node *, unsigned>> parent_iter_stack;
 
+    private:
+        size_t _M_count;
+        _Key_transform key_transformer;
+
+        enum node_type : uint8_t {
+            _leaf_t = 0, node_4_t = 1, node_16_t = 2,
+            node_48_t = 3, node_256_t = 4, _dummy_node = 5
+        };
+
+    public:
         union Key {
             const key_type value;
             const byte chunks[sizeof(key_type)];
@@ -75,9 +76,9 @@ namespace art
 
             virtual node_type get_type() const = 0;
 
-            virtual std::pair<bool, _Node *> next(unsigned pos, parent_iter_stack &parents) = 0;
+            virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) = 0;
 
-            virtual std::pair<bool, _Node *> previous(int pos, parent_iter_stack &parents) = 0;
+            virtual std::pair<bool, _Node *> predecessor(int pos, parent_iter_stack &parents) = 0;
 
             virtual uint16_t key_array_end() const = 0;
         };
@@ -127,11 +128,11 @@ namespace art
                 return this;
             }
 
-            virtual std::pair<bool, _Node *> next(unsigned pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
                 return std::pair<bool, _Node *>(true, this);
             }
 
-            virtual std::pair<bool, _Node *> previous(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 return std::pair<bool, _Node *>(true, this);
             }
 
@@ -209,13 +210,13 @@ namespace art
                 return this;
             }
 
-            virtual std::pair<bool, _Node *> next(unsigned pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
                 if (_root != nullptr)
                     return std::make_pair(true, this->_leaf);
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual std::pair<bool, _Node *> previous(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 if (_root != nullptr) {
                     _Node *max = (*_root)->maximum(parents);
                     return std::make_pair(true, max);
@@ -261,7 +262,7 @@ namespace art
 
                 std::copy(node->keys.begin(), node->keys.begin() + 4, keys.begin());
                 std::copy(node->children.begin(), node->children.begin() + 4, children.begin());
-                _count = 4;
+                this->_count = 4;
                 delete node;
             }
 
@@ -318,19 +319,19 @@ namespace art
                     children[i]->traverse(depth + 1);
             }
 
-            virtual std::pair<bool, _Node *> next(unsigned pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
                 if (pos < this->_count) {
                     parents.emplace(this, pos);
-                    return children[pos]->next(0, parents);
+                    return children[pos]->successor(0, parents);
                 }
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual std::pair<bool, _Node *> previous(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 if (pos >= 0) {
                     pos = std::min(this->_count - 1, pos);
                     parents.emplace(this, pos);
-                    return children[pos]->previous(children[pos]->key_array_end(), parents);
+                    return children[pos]->predecessor(children[pos]->key_array_end(), parents);
                 }
                 return std::pair<bool, _Node *>(false, nullptr);
             }
@@ -424,19 +425,19 @@ namespace art
                 return children[max]->maximum(parents);
             }
 
-            virtual std::pair<bool, _Node *> next(unsigned pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
                 if (pos < this->_count) {
                     parents.emplace(this, pos);
-                    return children[pos]->next(0, parents);
+                    return children[pos]->successor(0, parents);
                 }
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual std::pair<bool, _Node *> previous(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 if (pos >= 0) {
                     pos = std::min(this->_count - 1, pos);
                     parents.emplace(this, pos);
-                    return children[pos]->previous(children[pos]->key_array_end(), parents);
+                    return children[pos]->predecessor(children[pos]->key_array_end(), parents);
                 }
                 return std::pair<bool, _Node *>(false, nullptr);
             }
@@ -461,7 +462,7 @@ namespace art
             std::array<_Node *, 48> children{};
 
             _Node_48() {
-                _count = 0;
+                this->_count = 0;
                 std::fill(child_index.begin(), child_index.end(), EMPTY_MARKER);
             }
 
@@ -549,21 +550,21 @@ namespace art
                     children[i]->traverse(depth + 1);
             }
 
-            virtual std::pair<bool, _Node *> next(unsigned pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
                 for (int i = pos; i < 256; i++) {
                     if (child_index[i] != EMPTY_MARKER) {
                         parents.emplace(this, i);
-                        return children[child_index[i]]->next(0, parents);
+                        return children[child_index[i]]->successor(0, parents);
                     }
                 }
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual std::pair<bool, _Node *> previous(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 for (int i = pos; i >= 0; i--) {
                     if (child_index[i] != EMPTY_MARKER) {
                         parents.emplace(this, i);
-                        return children[child_index[i]]->previous(children[child_index[i]]->key_array_end(), parents);
+                        return children[child_index[i]]->predecessor(children[child_index[i]]->key_array_end(), parents);
                     }
                 }
                 return std::pair<bool, _Node *>(false, nullptr);
@@ -666,21 +667,21 @@ namespace art
                 return children[pos]->maximum(parents);
             }
 
-            virtual std::pair<bool, _Node *> next(unsigned pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
                 for (; pos < 256; pos++) {
                     if (children[pos] != nullptr) {
                         parents.emplace(this, pos);
-                        return children[pos]->next(0, parents);
+                        return children[pos]->successor(0, parents);
                     }
                 }
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual std::pair<bool, _Node *> previous(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 for (; pos >= 0; pos--) {
                     if (children[pos] != nullptr) {
                         parents.emplace(this, pos);
-                        return children[pos]->previous(children[pos]->key_array_end(), parents);
+                        return children[pos]->predecessor(children[pos]->key_array_end(), parents);
                     }
                 }
                 return std::pair<bool, _Node *>(false, nullptr);
@@ -705,7 +706,7 @@ namespace art
         _Node *_root;
         _Dummy_Node *maximum_dummy;
 
-        Adaptive_radix_tree() : _count(0) {
+        Adaptive_radix_tree() : _M_count(0) {
             this->_root = nullptr;
         }
 
@@ -719,7 +720,7 @@ namespace art
             // Empty Tree
             if (_root == nullptr) {
                 _root = new_leaf;
-                _count++;
+                _M_count++;
                 maximum_dummy = new _Dummy_Node(&_root, new_leaf, false);
                 return std::make_pair(_root, true);
             }
@@ -756,7 +757,7 @@ namespace art
                                 if ((*current_node)->size() == (*current_node)->max_size())
                                     *current_node = grow(*current_node);
                                 (*current_node)->insert(transformed_key.chunks[j], new_leaf);
-                                _count++;
+                                _M_count++;
                                 return std::make_pair(new_leaf, true);
                             }
                         }
@@ -774,7 +775,7 @@ namespace art
                     if ((*previous_node)->size() == (*previous_node)->max_size())
                         *previous_node = grow(*previous_node);
                     (*previous_node)->insert(transformed_key.chunks[i - 1], new_leaf);
-                    _count++;
+                    _M_count++;
                     return std::make_pair(new_leaf, true);
                 }
             }
@@ -830,7 +831,11 @@ namespace art
         }
 
         size_t size() const {
-            return _count;
+            return _M_count;
+        }
+
+        bool empty() const {
+            return _M_count == 0;
         }
 
         std::string print_key(Key key, unsigned depth) {
@@ -880,12 +885,10 @@ namespace art
 
             // preincrement
             _Self &operator++() {
-                _Node *current_node;
-                uint16_t current_pos;
                 while (!parents.empty()) {
-                    std::tie(current_node, current_pos) = parents.top();
+                    auto p = parents.top();
                     parents.pop();
-                    auto next = current_node->next(current_pos + 1, parents);
+                    auto next = p.first->successor(p.second + 1, parents);
                     if (next.first) {
                         node = next.second;
                         return *this;
@@ -904,12 +907,10 @@ namespace art
 
             // predecrement
             _Self &operator--() {
-                _Node *current_node;
-                int current_pos;
                 while (!parents.empty()) {
-                    std::tie(current_node, current_pos) = parents.top();
+                    auto p = parents.top();
                     parents.pop();
-                    auto next = current_node->previous(current_pos - 1, parents);
+                    auto next = p.first->predecessor(p.second - 1, parents);
                     if (next.first) {
                         node = next.second;
                         return *this;
@@ -980,7 +981,7 @@ namespace art
                 while (!parents.empty()) {
                     std::tie(current_node, current_pos) = parents.top();
                     parents.pop();
-                    auto next = current_node->next(current_pos + 1, parents);
+                    auto next = current_node->successor(current_pos + 1, parents);
                     if (next.first) {
                         node = next.second;
                         return *this;
@@ -1004,7 +1005,7 @@ namespace art
                 while (!parents.empty()) {
                     std::tie(current_node, current_pos) = parents.top();
                     parents.pop();
-                    auto next = current_node->previous(current_pos - 1, parents);
+                    auto next = current_node->predecessor(current_pos - 1, parents);
                     if (next.first) {
                         node = next.second;
                         return *this;
