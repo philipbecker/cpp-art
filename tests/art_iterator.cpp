@@ -1,24 +1,34 @@
 #include <map>
 #include "catch.hpp"
-#include "../src/Adaptive_radix_tree.h"
+#include "../src/art_map.h"
 
+
+SCENARIO("given an empty container", "[iterator]") {
+    art::map<unsigned, unsigned> map;
+
+    THEN ("iterator's begin is equal to its end") {
+        REQUIRE(map.begin() == map.end());
+    }
+    THEN ("iterator's reverse begin is equal to its reverse end") {
+        REQUIRE(map.rbegin() == map.rend());
+    }
+}
 
 SCENARIO("basic iteration", "[iterator]") {
-    art::Adaptive_radix_tree<unsigned, unsigned> art;
+    art::map<unsigned, unsigned> art_map;
     std::map<unsigned, unsigned> std_map;
 
     for (unsigned i = 1; i < 10; i++) {
-        art.insert(std::make_pair(i, i));
+        art_map.insert(std::pair<unsigned, unsigned>(i, i));
         std_map.emplace(i, i);
     }
 
-    CHECK(*(art.begin()) == std_map.begin()->first);
-    CHECK(*(art.rbegin()) == std_map.rbegin()->first);
-
+    REQUIRE(art_map.begin()->second == std_map.begin()->second);
+    REQUIRE(art_map.rbegin()->second == std_map.rbegin()->second);
 }
 
 SCENARIO("given an art with signed integer key", "[iterator]") {
-    art::Adaptive_radix_tree<int, int> art;
+    art::map<int, int> map;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -31,16 +41,18 @@ SCENARIO("given an art with signed integer key", "[iterator]") {
     }
 
     for (auto &d : data)
-        art.insert(std::make_pair(d, d));
+        map.insert(std::make_pair(d, d));
 
     THEN("forward iteration is sorted correctly") {
-        REQUIRE(std::is_sorted(art.begin(), art.end()));
+        REQUIRE(std::is_sorted(map.begin(), map.end()));
     }
 
     THEN("reverse iteration is sorted correctly") {
-        REQUIRE(std::is_sorted(art.rbegin(), art.rend(), [](int a, int b) {
-            return a > b;
-        }));
+        REQUIRE(std::is_sorted(map.rbegin(), map.rend(),
+                               [](std::pair<int, int> a, std::pair<int, int> b) {
+                                   return std::tie(a.first, a.second) > std::tie(b.first, b.second);
+                               })
+        );
     }
 
 }
@@ -65,8 +77,10 @@ SCENARIO("given an art with unsigned integer key", "[iterator]") {
         REQUIRE(std::is_sorted(art.begin(), art.end()));
     }
     THEN("reverse iteration is sorted correctly") {
-        REQUIRE(std::is_sorted(art.rbegin(), art.rend(), [](unsigned a, unsigned b) {
-            return a > b;
-        }));
+        REQUIRE(std::is_sorted(art.rbegin(), art.rend(),
+                               [](std::pair<unsigned, unsigned> a, std::pair<unsigned, unsigned> b) {
+                                   return std::tie(a.first, a.second) > std::tie(b.first, b.second);
+                               })
+        );
     }
 }

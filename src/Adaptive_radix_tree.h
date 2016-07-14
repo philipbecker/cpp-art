@@ -30,7 +30,7 @@ namespace art
 
     private:
         size_t _M_count;
-        _Key_transform key_transformer;
+        _Key_transform _M_key_transform;
 
         enum node_type : uint8_t {
             _leaf_t = 0, node_4_t = 1, node_16_t = 2,
@@ -86,13 +86,13 @@ namespace art
         class _Leaf : public _Node {
         public:
             Key key;
-            mapped_type value;
+            value_type value;
 
             _Leaf(Key key) : key(key) {
                 this->_count = 1;
             }
 
-            _Leaf(Key key, mapped_type value) : key(key), value(value) {
+            _Leaf(Key key, value_type value) : key(key), value(value) {
                 this->_count = 1;
             }
 
@@ -105,7 +105,8 @@ namespace art
             }
 
             virtual void traverse(unsigned depth) override {
-                std::cout << std::string(depth + 1, '-') << " leaf " << this << ": " << value << std::endl;
+                std::cout << std::string(depth + 1, '-') << " leaf " << this << ": ("
+                << value.first << "," << value.second << ")" << std::endl;
             }
 
             virtual _Node **find(const byte &key_byte) override {
@@ -132,7 +133,7 @@ namespace art
                 return std::pair<bool, _Node *>(true, this);
             }
 
-            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 return std::pair<bool, _Node *>(true, this);
             }
 
@@ -156,26 +157,28 @@ namespace art
             virtual node_type get_type() const override {
                 return node_type::_leaf_t;
             }
-
-            Key &get_key() {
-                return key;
-            }
         };
 
         class _Dummy_Node : public _Node {
-        private:
-            _Node **_root;
-            bool _min;
-
-
         public:
+            _Node **_root;
+
             _Leaf *_leaf;
 
-            _Dummy_Node(_Node **root, _Leaf *leaf, bool min) : _root(root), _leaf(new _Leaf(leaf->key, leaf->value)),
-                                                               _min(min) {
+            _Dummy_Node() {
+                _root = nullptr;
+                _leaf = new _Leaf(Key{0}, std::pair<key_type, mapped_type>(0, 0));
             }
 
-            void update(_Leaf *leaf) {
+            _Dummy_Node(_Node **root, _Leaf *leaf)
+                    : _root(root), _leaf(new _Leaf(leaf->key, leaf->value)) {
+            }
+
+            void update_root(_Node **root) {
+                _root = root;
+            }
+
+            void update_maximum(_Leaf *leaf) {
                 _leaf = new _Leaf(leaf->key, leaf->value);
             }
 
@@ -211,17 +214,15 @@ namespace art
             }
 
             virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
-                if (_root != nullptr)
-                    return std::make_pair(true, this->_leaf);
-                return std::pair<bool, _Node *>(false, nullptr);
+                return std::pair<bool, _Node *>(true, this->_leaf);
             }
 
-            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 if (_root != nullptr) {
                     _Node *max = (*_root)->maximum(parents);
-                    return std::make_pair(true, max);
+                    return std::pair<bool, _Node *>(true, max);
                 }
-                return std::pair<bool, _Node *>(false, nullptr);
+                return std::pair<bool, _Node *>(false, this->_leaf);
             }
 
             uint16_t max_size() const override {
@@ -250,7 +251,7 @@ namespace art
             std::array<_Node *, 4> children{};
 
             _Node_4(_Leaf *leaf, unsigned depth) {
-                Key key = leaf->get_key();
+                Key key = leaf->key;
                 keys[0] = key.chunks[depth];
                 children[0] = leaf;
 
@@ -276,7 +277,9 @@ namespace art
 
             virtual void insert(const byte &key_byte, _Node *node) override {
                 unsigned pos = 0;
-                for (; pos < this->_count && keys[pos] < key_byte; pos++);
+                for (; pos < this->_count && keys[pos] < key_byte; pos++) {
+
+                }
                 if (pos != this->_count) {
                     std::move(keys.begin() + pos, keys.begin() + this->_count, keys.begin() + pos + 1);
                     std::move(children.begin() + pos, children.begin() + this->_count, children.begin() + pos + 1);
@@ -327,7 +330,7 @@ namespace art
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 if (pos >= 0) {
                     pos = std::min(this->_count - 1, pos);
                     parents.emplace(this, pos);
@@ -433,7 +436,7 @@ namespace art
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 if (pos >= 0) {
                     pos = std::min(this->_count - 1, pos);
                     parents.emplace(this, pos);
@@ -560,11 +563,12 @@ namespace art
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 for (int i = pos; i >= 0; i--) {
                     if (child_index[i] != EMPTY_MARKER) {
                         parents.emplace(this, i);
-                        return children[child_index[i]]->predecessor(children[child_index[i]]->key_array_end(), parents);
+                        return children[child_index[i]]->predecessor(children[child_index[i]]->key_array_end(),
+                                                                     parents);
                     }
                 }
                 return std::pair<bool, _Node *>(false, nullptr);
@@ -590,7 +594,7 @@ namespace art
             _Node_256() { }
 
             _Node_256(_Leaf *pLeaf, unsigned int depth) {
-                Key key = pLeaf->get_key();
+                Key key = pLeaf->key;
                 children[key.chunks[depth]] = pLeaf;
 
                 this->_count = 1;
@@ -677,7 +681,7 @@ namespace art
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual std::pair<bool,  _Node *> predecessor(int pos, parent_iter_stack &parents) override {
+            virtual std::pair<bool, _Node *> predecessor(int pos, parent_iter_stack &parents) override {
                 for (; pos >= 0; pos--) {
                     if (children[pos] != nullptr) {
                         parents.emplace(this, pos);
@@ -708,27 +712,34 @@ namespace art
 
         Adaptive_radix_tree() : _M_count(0) {
             this->_root = nullptr;
+            this->maximum_dummy = new _Dummy_Node();
+        }
+
+        Adaptive_radix_tree(const _Key_transform &key_transformer)
+                : _M_count(0), _M_key_transform(key_transformer) {
+            this->_root = nullptr;
+            this->maximum_dummy = new _Dummy_Node();
         }
 
         // @TODO: should return iterator instead of node*
         std::pair<_Node *, bool> insert(const value_type &x) {
             Key original_key = {x.first};
-            Key transformed_key = {key_transformer(x.first)};
+            Key transformed_key = {_M_key_transform(x.first)};
 
-            _Leaf *new_leaf = new _Leaf(transformed_key, x.second);
+            _Leaf *new_leaf = new _Leaf(transformed_key, x);
 
             // Empty Tree
             if (_root == nullptr) {
                 _root = new_leaf;
                 _M_count++;
-                maximum_dummy = new _Dummy_Node(&_root, new_leaf, false);
+                maximum_dummy->_root = &_root;
                 return std::make_pair(_root, true);
             }
 
             // Update maximum dummy node
             // @TODO remove this
-            if (maximum_dummy->_leaf->value < new_leaf->value)
-                maximum_dummy->update(new_leaf);
+            //if (maximum_dummy->_leaf->value.first < new_leaf->value.first)
+            //    maximum_dummy->update(new_leaf);
 
             _Node **current_node = &_root;
             _Node **previous_node = nullptr;
@@ -743,7 +754,7 @@ namespace art
                         return std::make_pair(existing_leaf, false);
                     } else {
                         // otherwise, the leaf needs to be replaced by a node 4
-                        Key existing_key = existing_leaf->get_key();
+                        Key existing_key = existing_leaf->key;
                         *current_node = new _Node_4(existing_leaf, i);
                         // if the keys are matching, go down all the way until we find a tiebreaker
                         // insert node4's with one child all the way down until a final node 4 with 2 children
@@ -784,7 +795,7 @@ namespace art
 
         bool find(const key_type &x) {
             Key original_key = {x};
-            Key transformed_key = {key_transformer(x)};
+            Key transformed_key = {_M_key_transform(x)};
 
             if (_root == nullptr)
                 return false;
@@ -854,9 +865,9 @@ namespace art
 
 
         struct adapt_radix_tree_iterator {
-            typedef _Tp value_type;
-            typedef _Tp &reference;
-            typedef _Tp *pointer;
+            typedef std::pair<const _Key, _Tp> value_type;
+            typedef const value_type &reference;
+            typedef const value_type *pointer;
 
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
@@ -872,6 +883,10 @@ namespace art
             parent_iter_stack parents;
 
             adapt_radix_tree_iterator() : node(nullptr) { }
+
+            // Copy Constructor
+            adapt_radix_tree_iterator(const adapt_radix_tree_iterator &__it)
+                    : node(__it.node), parents(__it.parents) { }
 
             // @TODO INCORRECT, need to get parent stack
             explicit adapt_radix_tree_iterator(_Node *node)
@@ -940,14 +955,16 @@ namespace art
             }
 
             pointer operator->() const {
-                &static_cast<_Link_type>(node)->value;
+                return &static_cast<_Link_type>(node)->value;
             }
         };
 
         struct adapt_radix_tree_const_iterator {
-            typedef _Tp value_type;
-            typedef const _Tp &reference;
-            typedef const _Tp *pointer;
+            typedef std::pair<const _Key, _Tp> value_type;
+            typedef const value_type &reference;
+            typedef const value_type *pointer;
+
+            typedef adapt_radix_tree_iterator iterator;
 
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
@@ -963,6 +980,10 @@ namespace art
             parent_iter_stack parents;
 
             adapt_radix_tree_const_iterator() : node(nullptr) { }
+
+            // Copy Constructor
+            adapt_radix_tree_const_iterator(const iterator &__it)
+                    : node(__it.node), parents(__it.parents) { }
 
             // @TODO INCORRECT, need to get parent stack
             explicit adapt_radix_tree_const_iterator(_Node *node)
@@ -1055,6 +1076,9 @@ namespace art
             // this will be popped from the stack as the end marker
             parents.emplace(maximum_dummy, 0);
             _Node *min = minimum(parents);
+            if (min == nullptr)
+                return iterator(maximum_dummy->_leaf, parents);
+
             return iterator(min, parents);
         }
 
@@ -1062,6 +1086,8 @@ namespace art
             parent_iter_stack parents;
             parents.emplace(maximum_dummy, 0);
             _Node *min = minimum(parents);
+            if (min == nullptr)
+                return iterator(maximum_dummy->_leaf, parents);
             return const_iterator(min, parents);
         }
 
@@ -1083,7 +1109,10 @@ namespace art
 
         reverse_iterator rend() {
             parent_iter_stack parents;
-            _Node *min = _root->minimum(parents);
+            _Node *min = minimum(parents);
+            if (min == nullptr)
+                return reverse_iterator(iterator(maximum_dummy->_leaf, parents));
+
             return reverse_iterator(iterator(min, parents));
         }
 
@@ -1143,19 +1172,56 @@ namespace art
         }
     };
 
-    template<typename _Key, typename _Tp,
-            typename _Key_transform = key_transform<_Key> >
-    inline bool operator==(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
-                           const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
+    //////////////////////////
+    // Relational Operators //
+    //////////////////////////
+
+    template<typename _Key, typename _Tp, typename _Key_transform>
+    inline bool
+    operator==(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
+               const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
         return lhs.size() == rhs.size()
                && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
-    template<typename _Key, typename _Tp,
-            typename _Key_transform = key_transform<_Key> >
-    inline bool operator!=(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
-                           const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
+    // Based on operator==
+    template<typename _Key, typename _Tp, typename _Key_transform>
+    inline bool
+    operator!=(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
+               const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
         return !(lhs == rhs);
+    }
+
+    template<typename _Key, typename _Tp, typename _Key_transform>
+    inline bool
+    operator<(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
+              const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+        return std::lexicographical_compare(__x.begin(), __x.end(),
+                                            __y.begin(), __y.end());
+    }
+
+    // Based on operator<
+    template<typename _Key, typename _Tp, typename _Key_transform>
+    inline bool
+    operator>(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
+              const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+        return __y < __x;
+    }
+
+    // Based on operator<
+    template<typename _Key, typename _Tp, typename _Key_transform>
+    inline bool
+    operator<=(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
+               const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+        return !(__y < __x);
+    }
+
+    // Based on operator<
+    template<typename _Key, typename _Tp, typename _Key_transform>
+    inline bool
+    operator>=(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
+               const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+        return !(__x < __y);
     }
 }
 
