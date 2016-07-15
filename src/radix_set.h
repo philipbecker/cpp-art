@@ -6,7 +6,8 @@
 namespace art
 {
     template<typename _Key,
-            typename _Key_transform = key_transform <_Key> >
+            typename _Key_transform = key_transform <_Key>,
+            typename _Alloc = std::allocator<std::pair<_Key> > >
     class radix_set {
         typedef _Key key_type;
         typedef _Key value_type;
