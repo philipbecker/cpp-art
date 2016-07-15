@@ -603,6 +603,12 @@ namespace art
                 this->_count = 1;
             }
 
+            ~_Node_256() {
+                for (int i = 0; i < 256; i++)
+                    if (children[i] != nullptr)
+                        delete children[i];
+            }
+
             _Node_256(_Node_48 *node) {
                 assert(node->size() == 48);
 
@@ -1024,8 +1030,11 @@ namespace art
         // Modifiers //
         ///////////////
 
-        // @TODO: should return iterator instead of node*
-        std::pair<iterator, bool> insert(const value_type &x) {
+        void clear() {
+            delete this->_M_root;
+        }
+
+        std::pair<iterator, bool> _M_insert_unique(const value_type &x) {
             Key transformed_key = {_M_key_transform(x.first)};
 
             _Leaf *new_leaf = new _Leaf(transformed_key, x);
@@ -1037,14 +1046,14 @@ namespace art
 
                 _M_dummy_node->_root = &_M_root;
                 parent_iter_stack parents;
-                parents.push(std::pair<_Node*, unsigned>(_M_dummy_node, 0));
+                parents.push(std::pair<_Node *, unsigned>(_M_dummy_node, 0));
                 return std::make_pair(iterator(_M_root, parents), true);
             }
 
             _Node **current_node = &_M_root;
             _Node **previous_node = nullptr;
             parent_iter_stack parents;
-            parents.push(std::pair<_Node*, unsigned>(_M_dummy_node, 0));
+            parents.push(std::pair<_Node *, unsigned>(_M_dummy_node, 0));
 
             for (unsigned i = 0; i < sizeof(x); i++) {
                 if (current_node != nullptr && *current_node != nullptr && (*current_node)->is_leaf()) {
@@ -1068,12 +1077,12 @@ namespace art
                                 _Node *new_child = new _Node_4(existing_leaf, j + 1);
                                 *old_child = new_child;
                                 current_node = old_child;
-                                parents.push(std::pair<_Node*, unsigned>(*current_node, 0));
+                                parents.push(std::pair<_Node *, unsigned>(*current_node, 0));
                             } else {
                                 if ((*current_node)->size() == (*current_node)->max_size())
                                     *current_node = grow(*current_node);
                                 unsigned pos = (*current_node)->insert(transformed_key.chunks[j], new_leaf);
-                                parents.push(std::pair<_Node*, unsigned>(*current_node, pos));
+                                parents.push(std::pair<_Node *, unsigned>(*current_node, pos));
                                 _M_count++;
                                 return std::make_pair(iterator(new_leaf, parents), true);
                             }
@@ -1096,13 +1105,20 @@ namespace art
                         *previous_node = grow(*previous_node);
                     }
                     unsigned pos = (*previous_node)->insert(transformed_key.chunks[i - 1], new_leaf);
-                    parents.push(std::pair<_Node*, unsigned>(*previous_node, pos));
+                    parents.push(std::pair<_Node *, unsigned>(*previous_node, pos));
                     _M_count++;
                     return std::make_pair(iterator(new_leaf, parents), true);
                 }
             }
             throw; // unreachable
         }
+
+        template<typename _InputIterator>
+        void _M_insert_unique(_InputIterator __first, _InputIterator __last) {
+            for (; __first != __last; ++__first)
+                _M_insert_unique(*__first);
+        }
+
 
         ////////////
         // Lookup //
@@ -1122,11 +1138,10 @@ namespace art
                 if (current_node == nullptr || *current_node == nullptr)
                     return end();
 
-                if ((*current_node)->is_leaf())
-                    if (((_Leaf *) *current_node)->contains_key(transformed_key))
-                        return iterator(*current_node, parents);
-                    else
-                        return end();
+                if ((*current_node)->is_leaf()) if (((_Leaf *) *current_node)->contains_key(transformed_key))
+                    return iterator(*current_node, parents);
+                else
+                    return end();
 
                 previous_node = current_node;
                 std::tie(current_node, pos) = (*current_node)->find(transformed_key.chunks[i]);

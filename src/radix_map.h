@@ -5,17 +5,38 @@
 
 namespace art
 {
+    /**
+     * @brief A standard container made up of (key,value) pairs, which can be
+     * retrieved based on a key, in linear time in size of the key.
+     *
+     *  @tparam _Key  Type of key objects.
+     *  @tparam  _Tp  Type of mapped objects.
+     *  @tparam _Key_transform  Key transformation function object type,
+     *                          defaults to key_transform<_Key>.
+     *  @tparam _Alloc  Allocator type, defaults to
+     *                  allocator<pair<const _Key, _Tp>.
+     */
     template<typename _Key, typename _Tp,
-            typename _Key_transform = key_transform<_Key> >
+            typename _Key_transform = key_transform<_Key>,
+            typename _Alloc = std::allocator<std::pair<const _Key, _Tp> > >
     class radix_map {
 
     public:
         typedef _Key key_type;
         typedef _Tp mapped_type;
         typedef std::pair<const _Key, _Tp> value_type;
+        typedef _Alloc allocator_type;
+
+    private:
+        // @TODO what is this?
+        // concept requirements
+        typedef typename _Alloc::value_type _Alloc_value_type;
 
         typedef Adaptive_radix_tree<key_type, mapped_type, _Key_transform> _Rep_type;
+
         _Rep_type _M_t;
+
+    public:
 
         typedef typename _Rep_type::iterator iterator;
 //        typedef typename _Rep_type::const_iterator const_iterator;
@@ -39,7 +60,6 @@ namespace art
          */
         //map(map &&__x) : _M_t(std::move(__x._M_t)) { }
 
-
         /**
          *  @brief  Builds a %map from a range.
          *  @param  __first  An input iterator.
@@ -49,8 +69,7 @@ namespace art
         template<typename _InputIterator>
         radix_map(_InputIterator __first, _InputIterator __last)
                 : _M_t() {
-            throw;
-            // _M_t._M_insert_unique(__first, __last);
+            _M_t._M_insert_unique(__first, __last);
         }
 
         //////////////
@@ -73,6 +92,14 @@ namespace art
         ///////////////
 
         /**
+         *  Erases all elements in a %map.  Note that this function only
+         *  erases the elements, and that if the elements themselves are
+         *  pointers, the pointed-to memory is not touched in any way.
+         *  Managing the pointer is the user's responsibility.
+         */
+        void clear() { _M_t.clear(); }
+
+        /**
          *  @brief Attempts to insert a std::pair into the %map.
 
          *  @param __x Pair to be inserted (see std::make_pair for easy
@@ -89,7 +116,7 @@ namespace art
          *  Insertion requires O(k) time.
          */
         std::pair<iterator, bool> insert(const value_type &__x) {
-            return _M_t.insert(__x);
+            return _M_t._M_insert_unique(__x);
         }
 
         /**

@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "../src/Adaptive_radix_tree.h"
+#include "../src/radix_map.h"
 
 
 SCENARIO("given an empty art", "[art]") {
@@ -9,14 +10,14 @@ SCENARIO("given an empty art", "[art]") {
         REQUIRE(art.size() == 0);
     }
     WHEN("an element is inserted") {
-        art.insert(std::make_pair(5, 5));
+        art._M_insert_unique(std::make_pair(5, 5));
         THEN("its size is 1 and the inserted value is correct") {
             REQUIRE(art.size() == 1);
             REQUIRE(art.find(5) != art.end());
         }
 
         AND_WHEN("the same element is inserted again") {
-            auto p = art.insert(std::make_pair(5, 5));
+            auto p = art._M_insert_unique(std::make_pair(5, 5));
             THEN("the insertion failed and its size is still 1") {
                 REQUIRE_FALSE(p.second);
                 REQUIRE(art.size() == 1);
@@ -26,8 +27,8 @@ SCENARIO("given an empty art", "[art]") {
     }
 
     WHEN("two elements with an equal first prefix chunk are inserted") {
-        auto p1 = art.insert(std::make_pair(5, 5));
-        auto p2 = art.insert(std::make_pair(261, 261));
+        auto p1 = art._M_insert_unique(std::make_pair(5, 5));
+        auto p2 = art._M_insert_unique(std::make_pair(261, 261));
         THEN("both elements were inserted successfully") {
             REQUIRE(p1.second);
             REQUIRE(p2.second);
@@ -38,8 +39,8 @@ SCENARIO("given an empty art", "[art]") {
     }
 
     WHEN("two elements with three equal prefix chunks are inserted") {
-        auto p1 = art.insert(std::make_pair(5, 5));
-        auto p2 = art.insert(std::make_pair(16777221, 16777221));
+        auto p1 = art._M_insert_unique(std::make_pair(5, 5));
+        auto p2 = art._M_insert_unique(std::make_pair(16777221, 16777221));
         THEN("both elements were inserted successfully") {
             REQUIRE(p1.second);
             REQUIRE(p2.second);
@@ -52,9 +53,9 @@ SCENARIO("given an empty art", "[art]") {
 
 TEST_CASE("Can tiebreak at level 1", "[art]") {
     art::Adaptive_radix_tree<int, int> art;
-    art.insert(std::make_pair(5, 5));
-    art.insert(std::make_pair(6, 6));
-    art.insert(std::make_pair(261, 261));
+    art._M_insert_unique(std::make_pair(5, 5));
+    art._M_insert_unique(std::make_pair(6, 6));
+    art._M_insert_unique(std::make_pair(261, 261));
     REQUIRE(art.find(5) != art.end());
     REQUIRE(art.find(6) != art.end());
     REQUIRE(art.find(261) != art.end());
@@ -73,7 +74,7 @@ SCENARIO("growing the root node", "[art]") {
 
     WHEN("first 5 values are inserted") {
         for (uint64_t i = 0; i < 5; i++) {
-            art.insert(std::make_pair(data[i], data[i]));
+            art._M_insert_unique(std::make_pair(data[i], data[i]));
         }
 
         THEN("root grows to node 16") {
@@ -83,7 +84,7 @@ SCENARIO("growing the root node", "[art]") {
 
         AND_WHEN("12 more values are inserted") {
             for (uint64_t i = 5; i < 17; i++) {
-                art.insert(std::make_pair(data[i], data[i]));
+                art._M_insert_unique(std::make_pair(data[i], data[i]));
             }
 
             THEN ("root has grown to node 48") {
@@ -92,7 +93,7 @@ SCENARIO("growing the root node", "[art]") {
             };
             AND_WHEN("32 more values are inserted") {
                 for (uint64_t i = 17; i < 49; i++) {
-                    art.insert(std::make_pair(data[i], data[i]));
+                    art._M_insert_unique(std::make_pair(data[i], data[i]));
                 }
 
                 THEN ("root has grown to node 256") {
@@ -104,3 +105,15 @@ SCENARIO("growing the root node", "[art]") {
     }
 }
 
+TEST_CASE("Build map from range", "[art]") {
+    std::vector<std::pair<int, int> > v(500);
+
+    for (int i = 0; i < v.size(); i++)
+        v[i] = std::pair<int, int>(i, 3 * i);
+
+    art::radix_map<int, int> art(v.begin(), v.end());
+    REQUIRE(art.size() == v.size());
+
+    for (int i = 0; i < v.size(); i++)
+        REQUIRE((*art.find(i)).second == 3 * i);
+}
