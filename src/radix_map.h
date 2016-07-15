@@ -7,7 +7,7 @@ namespace art
 {
     template<typename _Key, typename _Tp,
             typename _Key_transform = key_transform<_Key> >
-    class map {
+    class radix_map {
 
     public:
         typedef _Key key_type;
@@ -27,12 +27,12 @@ namespace art
         /**
          * @brief  Default constructor creates no elements.
          */
-        map() : _M_t() { }
+        radix_map() : _M_t() { }
 
         /**
          * @brief  Map copy constructor.
          */
-        map(const map &__x) : _M_t(__x._M_t) { }
+        radix_map(const radix_map &__x) : _M_t(__x._M_t) { }
 
         /**
          * @brief  Map move constructor.
@@ -47,7 +47,7 @@ namespace art
          *
          */
         template<typename _InputIterator>
-        map(_InputIterator __first, _InputIterator __last)
+        radix_map(_InputIterator __first, _InputIterator __last)
                 : _M_t() {
             throw;
             // _M_t._M_insert_unique(__first, __last);
@@ -68,8 +68,47 @@ namespace art
         */
         bool empty() const { return _M_t.empty(); }
 
+        ///////////////
+        // Modifiers //
+        ///////////////
+
+        // @TODO return pair<iterator, bool>
         void insert(const value_type &__x) {
             _M_t.insert(__x);
+        }
+
+        /**
+         * @brief  Subscript ( @c [] ) access to %map data.
+         * @param  __k  The key for which data should be retrieved.
+         * @return  A reference to the data of the (key,data) %pair.
+         *
+         * Allows for easy lookup with the subscript ( @c [] )
+         * operator.  Returns data associated with the key specified in
+         * subscript.  If the key does not exist, a pair with that key
+         * is created using default values, which is then returned.
+         *
+         * Lookup requires O(k) time.
+         *
+         */
+        mapped_type &operator[](const key_type &__k) {
+            // @TODO
+            return NULL;
+        }
+
+        ////////////
+        // Lookup //
+        ////////////
+
+        /**
+         *  @brief  Access to %map data.
+         *  @param  __k  The key for which data should be retrieved.
+         *  @return  A reference to the data whose key is equivalent to @a __k, if
+         *           such a data is present in the %map.
+         *  @throw  std::out_of_range  If no such data is present.
+         */
+        mapped_type &at(const key_type &__k) {
+            // @TODO
+            return NULL;
         }
 
         ///////////////
@@ -129,8 +168,8 @@ namespace art
     */
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator==(const map<_Key, _Tp, _Key_transform> &__x,
-               const map<_Key, _Tp, _Key_transform> &__y) {
+    operator==(const radix_map<_Key, _Tp, _Key_transform> &__x,
+               const radix_map<_Key, _Tp, _Key_transform> &__y) {
         return __x._M_t == __y._M_t;
     }
 
@@ -147,40 +186,40 @@ namespace art
     */
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator<(const map<_Key, _Tp, _Key_transform> &__x,
-              const map<_Key, _Tp, _Key_transform> &__y) {
+    operator<(const radix_map<_Key, _Tp, _Key_transform> &__x,
+              const radix_map<_Key, _Tp, _Key_transform> &__y) {
         return __x._M_t < __y._M_t;
     }
 
     // Based on operator==
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator!=(const map<_Key, _Tp, _Key_transform> &__x,
-               const map<_Key, _Tp, _Key_transform> &__y) {
+    operator!=(const radix_map<_Key, _Tp, _Key_transform> &__x,
+               const radix_map<_Key, _Tp, _Key_transform> &__y) {
         return !(__x == __y);
     }
 
     // Based on operator<
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator>(const map<_Key, _Tp, _Key_transform> &__x,
-              const map<_Key, _Tp, _Key_transform> &__y) {
+    operator>(const radix_map<_Key, _Tp, _Key_transform> &__x,
+              const radix_map<_Key, _Tp, _Key_transform> &__y) {
         return __y < __x;
     }
 
     // Based on operator<
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator<=(const map<_Key, _Tp, _Key_transform> &__x,
-               const map<_Key, _Tp, _Key_transform> &__y) {
+    operator<=(const radix_map<_Key, _Tp, _Key_transform> &__x,
+               const radix_map<_Key, _Tp, _Key_transform> &__y) {
         return !(__y < __x);
     }
 
     // Based on operator<
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator>=(const map<_Key, _Tp, _Key_transform> &__x,
-               const map<_Key, _Tp, _Key_transform> &__y) {
+    operator>=(const radix_map<_Key, _Tp, _Key_transform> &__x,
+               const radix_map<_Key, _Tp, _Key_transform> &__y) {
         return !(__x < __y);
     }
 }

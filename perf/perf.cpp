@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <map>
 #include <unordered_map>
-#include "../src/art_map.h"
+#include "../src/radix_map.h"
 
 class InsertFixture : public celero::TestFixture {
 public:
@@ -71,7 +71,7 @@ BENCHMARK_F(InsertionSignedInt64, UnorderedMap, InsertFixture, 3, 5) {
 
 BENCHMARK_F(InsertionSignedInt64, ArtMap, InsertFixture, 3, 5) {
     this->generate_data();
-    art::map<int64_t, int64_t> map;
+    art::radix_map<int64_t, int64_t> map;
 
     for (auto &d: this->data)
         map.insert(d);

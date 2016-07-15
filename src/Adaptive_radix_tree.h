@@ -707,33 +707,40 @@ namespace art
 
 
     public:
-        _Node *_root;
-        _Dummy_Node *maximum_dummy;
+        // Current root node of the radix tree
+        _Node *_M_root;
+
+        // Dummy node of special type to mark the right end of the container
+        // Necessary as the end marker for iterators
+        _Dummy_Node *_M_dummy_node;
 
         Adaptive_radix_tree() : _M_count(0) {
-            this->_root = nullptr;
-            this->maximum_dummy = new _Dummy_Node();
+            this->_M_root = nullptr;
+            this->_M_dummy_node = new _Dummy_Node();
         }
 
         Adaptive_radix_tree(const _Key_transform &key_transformer)
                 : _M_count(0), _M_key_transform(key_transformer) {
-            this->_root = nullptr;
-            this->maximum_dummy = new _Dummy_Node();
+            this->_M_root = nullptr;
+            this->_M_dummy_node = new _Dummy_Node();
         }
+
+        ///////////////
+        // Modifiers //
+        ///////////////
 
         // @TODO: should return iterator instead of node*
         std::pair<_Node *, bool> insert(const value_type &x) {
-            Key original_key = {x.first};
             Key transformed_key = {_M_key_transform(x.first)};
 
             _Leaf *new_leaf = new _Leaf(transformed_key, x);
 
             // Empty Tree
-            if (_root == nullptr) {
-                _root = new_leaf;
+            if (_M_root == nullptr) {
+                _M_root = new_leaf;
                 _M_count++;
-                maximum_dummy->_root = &_root;
-                return std::make_pair(_root, true);
+                _M_dummy_node->_root = &_M_root;
+                return std::make_pair(_M_root, true);
             }
 
             // Update maximum dummy node
@@ -741,7 +748,7 @@ namespace art
             //if (maximum_dummy->_leaf->value.first < new_leaf->value.first)
             //    maximum_dummy->update(new_leaf);
 
-            _Node **current_node = &_root;
+            _Node **current_node = &_M_root;
             _Node **previous_node = nullptr;
 
             for (unsigned i = 0; i < sizeof(x); i++) {
@@ -793,15 +800,18 @@ namespace art
             throw; // unreachable
         }
 
-        bool find(const key_type &x) {
-            Key original_key = {x};
-            Key transformed_key = {_M_key_transform(x)};
+        ////////////
+        // Lookup //
+        ////////////
 
-            if (_root == nullptr)
+        bool find(const key_type &__k) {
+            Key transformed_key = {_M_key_transform(__k)};
+
+            if (_M_root == nullptr)
                 return false;
 
-            _Node **current_node = &_root;
-            for (unsigned i = 0; i < sizeof(x) + 1; i++) {
+            _Node **current_node = &_M_root;
+            for (unsigned i = 0; i < sizeof(__k) + 1; i++) {
                 if (current_node == nullptr || *current_node == nullptr)
                     return false;
                 if ((*current_node)->is_leaf())
@@ -813,33 +823,37 @@ namespace art
         }
 
         _Node *minimum() const {
-            if (_root != nullptr)
-                return _root->minimum();
+            if (_M_root != nullptr)
+                return _M_root->minimum();
             return nullptr;
         }
 
         _Node *minimum(parent_iter_stack &parents) const {
-            if (_root != nullptr)
-                return _root->minimum(parents);
+            if (_M_root != nullptr)
+                return _M_root->minimum(parents);
             return nullptr;
         }
 
         _Node *maximum() const {
-            if (_root != nullptr)
-                return _root->maximum();
+            if (_M_root != nullptr)
+                return _M_root->maximum();
             return nullptr;
         }
 
         _Node *maximum(parent_iter_stack &parents) const {
-            if (_root != nullptr)
-                return _root->maximum(parents);
+            if (_M_root != nullptr)
+                return _M_root->maximum(parents);
             return nullptr;
         }
 
         void traverse() const {
-            if (_root != nullptr)
-                _root->traverse(0);
+            if (_M_root != nullptr)
+                _M_root->traverse(0);
         }
+
+        //////////////
+        // Capacity //
+        //////////////
 
         size_t size() const {
             return _M_count;
@@ -848,6 +862,10 @@ namespace art
         bool empty() const {
             return _M_count == 0;
         }
+
+        ///////////////////
+        // Debug helpers //
+        ///////////////////
 
         std::string print_key(Key key, unsigned depth) {
             std::bitset<8> x(key.chunks[depth]);
@@ -863,6 +881,9 @@ namespace art
             return output;
         }
 
+        ///////////////
+        // Iterators //
+        ///////////////
 
         struct adapt_radix_tree_iterator {
             typedef std::pair<const _Key, _Tp> value_type;
@@ -1074,33 +1095,33 @@ namespace art
             // maximum leaf has no idea about this node
             // when going through the root's children has completed,
             // this will be popped from the stack as the end marker
-            parents.emplace(maximum_dummy, 0);
+            parents.emplace(_M_dummy_node, 0);
             _Node *min = minimum(parents);
             if (min == nullptr)
-                return iterator(maximum_dummy->_leaf, parents);
+                return iterator(_M_dummy_node->_leaf, parents);
 
             return iterator(min, parents);
         }
 
         const_iterator begin() const {
             parent_iter_stack parents;
-            parents.emplace(maximum_dummy, 0);
+            parents.emplace(_M_dummy_node, 0);
             _Node *min = minimum(parents);
             if (min == nullptr)
-                return iterator(maximum_dummy->_leaf, parents);
+                return iterator(_M_dummy_node->_leaf, parents);
             return const_iterator(min, parents);
         }
 
         iterator end() {
             parent_iter_stack parents;
-            parents.emplace(maximum_dummy, 0);
-            return iterator(maximum_dummy->_leaf, parents);
+            parents.emplace(_M_dummy_node, 0);
+            return iterator(_M_dummy_node->_leaf, parents);
         }
 
         const_iterator end() const {
             parent_iter_stack parents;
-            parents.emplace(maximum_dummy, 0);
-            return const_iterator(maximum_dummy->_leaf, parents);
+            parents.emplace(_M_dummy_node, 0);
+            return const_iterator(_M_dummy_node->_leaf, parents);
         }
 
         reverse_iterator rbegin() {
@@ -1111,7 +1132,7 @@ namespace art
             parent_iter_stack parents;
             _Node *min = minimum(parents);
             if (min == nullptr)
-                return reverse_iterator(iterator(maximum_dummy->_leaf, parents));
+                return reverse_iterator(iterator(_M_dummy_node->_leaf, parents));
 
             return reverse_iterator(iterator(min, parents));
         }

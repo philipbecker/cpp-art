@@ -77,8 +77,8 @@ SCENARIO("growing the root node", "[art]") {
         }
 
         THEN("root grows to node 16") {
-            REQUIRE(art._root->size() == 5);
-            REQUIRE(art._root->get_type() == 2);
+            REQUIRE(art._M_root->size() == 5);
+            REQUIRE(art._M_root->get_type() == 2);
         }
 
         AND_WHEN("12 more values are inserted") {
@@ -87,8 +87,8 @@ SCENARIO("growing the root node", "[art]") {
             }
 
             THEN ("root has grown to node 48") {
-                    REQUIRE(art._root->size() == 17);
-                    REQUIRE(art._root->get_type() == 3);
+                    REQUIRE(art._M_root->size() == 17);
+                    REQUIRE(art._M_root->get_type() == 3);
             };
             AND_WHEN("32 more values are inserted") {
                 for (uint64_t i = 17; i < 49; i++) {
@@ -96,8 +96,8 @@ SCENARIO("growing the root node", "[art]") {
                 }
 
                 THEN ("root has grown to node 256") {
-                    REQUIRE(art._root->size() == 49);
-                    REQUIRE(art._root->get_type() == 4);
+                    REQUIRE(art._M_root->size() == 49);
+                    REQUIRE(art._M_root->get_type() == 4);
                 };
             }
         }

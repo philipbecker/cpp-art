@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <map>
 #include "src/Adaptive_radix_tree.h"
-#include "src/art_map.h"
+#include "src/radix_map.h"
 
 using namespace std;
 
@@ -47,7 +47,7 @@ int main() {
         std::cout << it2->first << " > ";
     std::cout << std::endl;
 
-    art::map<unsigned, unsigned> art;
+    art::radix_map<unsigned, unsigned> art;
     std::map<unsigned, unsigned> std_map;
 
     std::cout << "---------------" << std::endl;

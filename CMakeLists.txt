@@ -13,7 +13,7 @@ set(
         src/key_transform.h
         src/byte_swap.h
         src/Adaptive_radix_tree.h
-        src/art_map.h
+        src/radix_map.h
 )
 
 add_library(art STATIC ${SOURCE_FILES})

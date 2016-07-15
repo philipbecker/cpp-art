@@ -1,10 +1,10 @@
 #include <map>
 #include "catch.hpp"
-#include "../src/art_map.h"
+#include "../src/radix_map.h"
 
 
 SCENARIO("given an empty container", "[iterator]") {
-    art::map<unsigned, unsigned> map;
+    art::radix_map<unsigned, unsigned> map;
 
     THEN ("iterator's begin is equal to its end") {
         REQUIRE(map.begin() == map.end());
@@ -15,20 +15,20 @@ SCENARIO("given an empty container", "[iterator]") {
 }
 
 SCENARIO("basic iteration", "[iterator]") {
-    art::map<unsigned, unsigned> art_map;
+    art::radix_map<unsigned, unsigned> radix_map;
     std::map<unsigned, unsigned> std_map;
 
     for (unsigned i = 1; i < 10; i++) {
-        art_map.insert(std::pair<unsigned, unsigned>(i, i));
+        radix_map.insert(std::pair<unsigned, unsigned>(i, i));
         std_map.emplace(i, i);
     }
 
-    REQUIRE(art_map.begin()->second == std_map.begin()->second);
-    REQUIRE(art_map.rbegin()->second == std_map.rbegin()->second);
+    REQUIRE(radix_map.begin()->second == std_map.begin()->second);
+    REQUIRE(radix_map.rbegin()->second == std_map.rbegin()->second);
 }
 
 SCENARIO("given an art with signed integer key", "[iterator]") {
-    art::map<int, int> map;
+    art::radix_map<int, int> map;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -58,7 +58,7 @@ SCENARIO("given an art with signed integer key", "[iterator]") {
 }
 
 SCENARIO("given an art with unsigned integer key", "[iterator]") {
-    art::Adaptive_radix_tree<unsigned, unsigned> art;
+    art::radix_map<unsigned, unsigned> radix_map;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -71,13 +71,13 @@ SCENARIO("given an art with unsigned integer key", "[iterator]") {
     }
 
     for (auto &d : data)
-        art.insert(std::make_pair(d, d));
+        radix_map.insert(std::make_pair(d, d));
 
     THEN("forward iteration is sorted correctly") {
-        REQUIRE(std::is_sorted(art.begin(), art.end()));
+        REQUIRE(std::is_sorted(radix_map.begin(), radix_map.end()));
     }
     THEN("reverse iteration is sorted correctly") {
-        REQUIRE(std::is_sorted(art.rbegin(), art.rend(),
+        REQUIRE(std::is_sorted(radix_map.rbegin(), radix_map.rend(),
                                [](std::pair<unsigned, unsigned> a, std::pair<unsigned, unsigned> b) {
                                    return std::tie(a.first, a.second) > std::tie(b.first, b.second);
                                })
