@@ -10,7 +10,7 @@ typedef Adaptive_radix_tree<uint64_t, uint64_t>::_Node_16 node_16;
 typedef Adaptive_radix_tree<uint64_t, uint64_t>::_Node_48 node_48;
 typedef Adaptive_radix_tree<uint64_t, uint64_t>::_Node_256 node_256;
 
-SCENARIO ("given a node_4 with one element", "[art]") {
+SCENARIO ("given a node_4 with one element", "[nodes]") {
     uint64_t first_value = 261;
     Key key = {first_value};
     _leaf *leaf_five = new _leaf(key, std::make_pair(first_value, first_value));

@@ -50,9 +50,9 @@ namespace art
         public:
             virtual _Node *insert(const Key &key, unsigned depth) = 0;
 
-            virtual void insert(const byte &key_byte, _Node *node) = 0;
+            virtual unsigned insert(const byte &key_byte, _Node *node) = 0;
 
-            virtual _Node **find(const byte &key_byte) = 0;
+            virtual std::pair<_Node **, unsigned> find(const byte &key_byte) = 0;
 
             virtual _Node *minimum() = 0;
 
@@ -100,8 +100,8 @@ namespace art
                 return this;
             }
 
-            virtual void insert(const byte &key_byte, _Node *node) override {
-
+            virtual unsigned insert(const byte &key_byte, _Node *node) override {
+                return 0;
             }
 
             virtual void traverse(unsigned depth) override {
@@ -109,8 +109,8 @@ namespace art
                 << value.first << "," << value.second << ")" << std::endl;
             }
 
-            virtual _Node **find(const byte &key_byte) override {
-                return nullptr;
+            virtual std::pair<_Node **, unsigned> find(const byte &key_byte) override {
+                return std::pair<_Node **, unsigned>(nullptr, 0);
             }
 
             virtual _Node *minimum() override {
@@ -137,7 +137,7 @@ namespace art
                 return std::pair<bool, _Node *>(true, this);
             }
 
-            bool contains(const Key &key, unsigned depth) {
+            bool contains_key(const Key &key) {
                 return this->key.value == key.value;
             }
 
@@ -186,15 +186,15 @@ namespace art
                 return this;
             }
 
-            virtual void insert(const byte &key_byte, _Node *node) override {
-
+            virtual unsigned insert(const byte &key_byte, _Node *node) override {
+                return 0;
             }
 
             virtual void traverse(unsigned depth) override {
             }
 
-            virtual _Node **find(const byte &key_byte) override {
-                return nullptr;
+            virtual std::pair<_Node **, unsigned> find(const byte &key_byte) override {
+                return std::pair<_Node **, unsigned>(nullptr, 0);
             }
 
             virtual _Node *minimum() override {
@@ -275,7 +275,7 @@ namespace art
                 return nullptr;
             }
 
-            virtual void insert(const byte &key_byte, _Node *node) override {
+            virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++) {
 
@@ -287,15 +287,16 @@ namespace art
                 keys[pos] = key_byte;
                 children[pos] = node;
                 this->_count++;
+                return pos;
             }
 
-            virtual _Node **find(const byte &key_byte) override {
+            virtual std::pair<_Node **, unsigned> find(const byte &key_byte) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
                 if (keys[pos] == key_byte)
-                    return &children[pos];
-                return nullptr;
+                    return std::pair<_Node **, unsigned>(&children[pos], pos);
+                return std::pair<_Node **, unsigned>(nullptr, 0);
             }
 
             virtual _Node *minimum() override {
@@ -383,7 +384,7 @@ namespace art
                 return nullptr;
             }
 
-            virtual void insert(const byte &key_byte, _Node *node) override {
+            virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
                 if (pos != this->_count) {
@@ -393,15 +394,16 @@ namespace art
                 keys[pos] = key_byte;
                 children[pos] = node;
                 this->_count++;
+                return pos;
             }
 
-            virtual _Node **find(const byte &key_byte) override {
+            virtual std::pair<_Node **, unsigned> find(const byte &key_byte) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
                 if (keys[pos] == key_byte)
-                    return &children[pos];
-                return nullptr;
+                    return std::pair<_Node **, unsigned>(&children[pos], pos);
+                return std::pair<_Node **, unsigned>(nullptr, 0);
             }
 
             virtual void traverse(unsigned depth) override {
@@ -505,17 +507,18 @@ namespace art
                 return nullptr;
             }
 
-            virtual void insert(const byte &key_byte, _Node *node) override {
+            virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 auto pos = this->_count;
                 child_index[key_byte] = pos;
                 children[pos] = node;
                 this->_count++;
+                return key_byte;
             }
 
-            virtual _Node **find(const byte &key_byte) override {
+            virtual std::pair<_Node **, unsigned> find(const byte &key_byte) override {
                 if (child_index[key_byte] != EMPTY_MARKER)
-                    return &children[child_index[key_byte]];
-                return nullptr;
+                    return std::pair<_Node **, unsigned>(&children[child_index[key_byte]], key_byte);
+                return std::pair<_Node **, unsigned>(nullptr, 0);
             }
 
             virtual _Node *minimum() override {
@@ -617,15 +620,16 @@ namespace art
                 return children[key.chunks[depth]];
             }
 
-            virtual void insert(const byte &key_byte, _Node *node) override {
+            virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 children[key_byte] = node;
                 this->_count++;
+                return key_byte;
             }
 
-            virtual _Node **find(const byte &key_byte) override {
+            virtual std::pair<_Node **, unsigned> find(const byte &key_byte) override {
                 if (children[key_byte] != nullptr)
-                    return &children[key_byte];
-                return nullptr;
+                    return std::pair<_Node **, unsigned>(&children[key_byte], key_byte);
+                return std::pair<_Node **, unsigned>(nullptr, 0);
             }
 
             virtual void traverse(unsigned depth) override {
@@ -723,132 +727,6 @@ namespace art
                 : _M_count(0), _M_key_transform(key_transformer) {
             this->_M_root = nullptr;
             this->_M_dummy_node = new _Dummy_Node();
-        }
-
-        ///////////////
-        // Modifiers //
-        ///////////////
-
-        // @TODO: should return iterator instead of node*
-        std::pair<_Node *, bool> insert(const value_type &x) {
-            Key transformed_key = {_M_key_transform(x.first)};
-
-            _Leaf *new_leaf = new _Leaf(transformed_key, x);
-
-            // Empty Tree
-            if (_M_root == nullptr) {
-                _M_root = new_leaf;
-                _M_count++;
-                _M_dummy_node->_root = &_M_root;
-                return std::make_pair(_M_root, true);
-            }
-
-            // Update maximum dummy node
-            // @TODO remove this
-            //if (maximum_dummy->_leaf->value.first < new_leaf->value.first)
-            //    maximum_dummy->update(new_leaf);
-
-            _Node **current_node = &_M_root;
-            _Node **previous_node = nullptr;
-
-            for (unsigned i = 0; i < sizeof(x); i++) {
-                if (current_node != nullptr && *current_node != nullptr && (*current_node)->is_leaf()) {
-                    // Hit an existing leaf
-                    _Leaf *existing_leaf = reinterpret_cast<_Leaf *>(*current_node);
-                    if (existing_leaf->contains(transformed_key, i)) {
-                        // if it is a duplicate entry, ignore
-                        delete new_leaf;
-                        return std::make_pair(existing_leaf, false);
-                    } else {
-                        // otherwise, the leaf needs to be replaced by a node 4
-                        Key existing_key = existing_leaf->key;
-                        *current_node = new _Node_4(existing_leaf, i);
-                        // if the keys are matching, go down all the way until we find a tiebreaker
-                        // insert node4's with one child all the way down until a final node 4 with 2 children
-                        for (unsigned j = i; j < sizeof(x); j++) {
-                            if (existing_key.chunks[j] == transformed_key.chunks[j]) {
-                                _Node **old_child = (*current_node)->find(existing_key.chunks[j]);
-                                _Node *new_child = new _Node_4(existing_leaf, j + 1);
-                                *old_child = new_child;
-                                current_node = old_child;
-                            } else {
-                                if ((*current_node)->size() == (*current_node)->max_size())
-                                    *current_node = grow(*current_node);
-                                (*current_node)->insert(transformed_key.chunks[j], new_leaf);
-                                _M_count++;
-                                return std::make_pair(new_leaf, true);
-                            }
-                        }
-                        throw; // unreachable
-                    }
-                } else if (current_node != nullptr && *current_node != nullptr) {
-                    // traverse down the tree
-                    previous_node = current_node;
-                    current_node = (*current_node)->find(transformed_key.chunks[i]);
-                } else {
-                    // hit empty point, this can only happen if the inserted key
-                    // is not a prefix/equal to another key already in the tree
-                    // therefore we can just insert a new leaf
-                    // previous node might have to be grown before that
-                    if ((*previous_node)->size() == (*previous_node)->max_size())
-                        *previous_node = grow(*previous_node);
-                    (*previous_node)->insert(transformed_key.chunks[i - 1], new_leaf);
-                    _M_count++;
-                    return std::make_pair(new_leaf, true);
-                }
-            }
-            throw; // unreachable
-        }
-
-        ////////////
-        // Lookup //
-        ////////////
-
-        bool find(const key_type &__k) {
-            Key transformed_key = {_M_key_transform(__k)};
-
-            if (_M_root == nullptr)
-                return false;
-
-            _Node **current_node = &_M_root;
-            for (unsigned i = 0; i < sizeof(__k) + 1; i++) {
-                if (current_node == nullptr || *current_node == nullptr)
-                    return false;
-                if ((*current_node)->is_leaf())
-                    return ((_Leaf *) *current_node)->contains(transformed_key, i);
-
-                current_node = (*current_node)->find(transformed_key.chunks[i]);
-            }
-            throw; // unreachable
-        }
-
-        _Node *minimum() const {
-            if (_M_root != nullptr)
-                return _M_root->minimum();
-            return nullptr;
-        }
-
-        _Node *minimum(parent_iter_stack &parents) const {
-            if (_M_root != nullptr)
-                return _M_root->minimum(parents);
-            return nullptr;
-        }
-
-        _Node *maximum() const {
-            if (_M_root != nullptr)
-                return _M_root->maximum();
-            return nullptr;
-        }
-
-        _Node *maximum(parent_iter_stack &parents) const {
-            if (_M_root != nullptr)
-                return _M_root->maximum(parents);
-            return nullptr;
-        }
-
-        void traverse() const {
-            if (_M_root != nullptr)
-                _M_root->traverse(0);
         }
 
         //////////////
@@ -1140,6 +1018,150 @@ namespace art
         bool operator==(const Adaptive_radix_tree<key_type, value_type> &rhs) {
             return size() == rhs.size()
                    && std::equal(begin(), end(), rhs.begin());
+        }
+
+        ///////////////
+        // Modifiers //
+        ///////////////
+
+        // @TODO: should return iterator instead of node*
+        std::pair<iterator, bool> insert(const value_type &x) {
+            Key transformed_key = {_M_key_transform(x.first)};
+
+            _Leaf *new_leaf = new _Leaf(transformed_key, x);
+
+            // Empty Tree
+            if (_M_root == nullptr) {
+                _M_root = new_leaf;
+                _M_count++;
+
+                _M_dummy_node->_root = &_M_root;
+                parent_iter_stack parents;
+                parents.push(std::pair<_Node*, unsigned>(_M_dummy_node, 0));
+                return std::make_pair(iterator(_M_root, parents), true);
+            }
+
+            _Node **current_node = &_M_root;
+            _Node **previous_node = nullptr;
+            parent_iter_stack parents;
+            parents.push(std::pair<_Node*, unsigned>(_M_dummy_node, 0));
+
+            for (unsigned i = 0; i < sizeof(x); i++) {
+                if (current_node != nullptr && *current_node != nullptr && (*current_node)->is_leaf()) {
+                    // Hit an existing leaf
+                    _Leaf *existing_leaf = reinterpret_cast<_Leaf *>(*current_node);
+                    if (existing_leaf->contains_key(transformed_key)) {
+                        // if it is a duplicate entry, ignore
+                        delete new_leaf;
+                        return std::make_pair(iterator(existing_leaf, parents), false);
+                    } else {
+                        // otherwise, the leaf needs to be replaced by a node 4
+                        Key existing_key = existing_leaf->key;
+                        *current_node = new _Node_4(existing_leaf, i);
+                        // if the keys are matching, go down all the way until we find a tiebreaker
+                        // insert node4's with one child all the way down until a final node 4 with 2 children
+                        for (unsigned j = i; j < sizeof(x); j++) {
+                            if (existing_key.chunks[j] == transformed_key.chunks[j]) {
+                                _Node **old_child;
+                                unsigned pos;
+                                std::tie(old_child, pos) = (*current_node)->find(existing_key.chunks[j]);
+                                _Node *new_child = new _Node_4(existing_leaf, j + 1);
+                                *old_child = new_child;
+                                current_node = old_child;
+                                parents.push(std::pair<_Node*, unsigned>(*current_node, 0));
+                            } else {
+                                if ((*current_node)->size() == (*current_node)->max_size())
+                                    *current_node = grow(*current_node);
+                                unsigned pos = (*current_node)->insert(transformed_key.chunks[j], new_leaf);
+                                parents.push(std::pair<_Node*, unsigned>(*current_node, pos));
+                                _M_count++;
+                                return std::make_pair(iterator(new_leaf, parents), true);
+                            }
+                        }
+                        throw; // unreachable
+                    }
+                } else if (current_node != nullptr && *current_node != nullptr) {
+                    // traverse down the tree
+                    unsigned pos;
+                    previous_node = current_node;
+                    std::tie(current_node, pos) = (*current_node)->find(transformed_key.chunks[i]);
+                    parents.emplace(*previous_node, pos);
+                } else {
+                    // hit empty point, this can only happen if the inserted key
+                    // is not a prefix/equal to another key already in the tree
+                    // therefore we can just insert a new leaf
+                    // previous node might have to be grown before that
+                    if ((*previous_node)->size() == (*previous_node)->max_size()) {
+                        parents.pop();
+                        *previous_node = grow(*previous_node);
+                    }
+                    unsigned pos = (*previous_node)->insert(transformed_key.chunks[i - 1], new_leaf);
+                    parents.push(std::pair<_Node*, unsigned>(*previous_node, pos));
+                    _M_count++;
+                    return std::make_pair(iterator(new_leaf, parents), true);
+                }
+            }
+            throw; // unreachable
+        }
+
+        ////////////
+        // Lookup //
+        ////////////
+
+        iterator find(const key_type &__k) {
+            parent_iter_stack parents;
+            Key transformed_key = {_M_key_transform(__k)};
+
+            if (_M_root == nullptr)
+                return end();
+
+            _Node **previous_node = nullptr;
+            _Node **current_node = &_M_root;
+            unsigned pos;
+            for (unsigned i = 0; i < sizeof(__k) + 1; i++) {
+                if (current_node == nullptr || *current_node == nullptr)
+                    return end();
+
+                if ((*current_node)->is_leaf())
+                    if (((_Leaf *) *current_node)->contains_key(transformed_key))
+                        return iterator(*current_node, parents);
+                    else
+                        return end();
+
+                previous_node = current_node;
+                std::tie(current_node, pos) = (*current_node)->find(transformed_key.chunks[i]);
+                parents.emplace(*previous_node, pos);
+            }
+            throw; // unreachable
+        }
+
+        _Node *minimum() const {
+            if (_M_root != nullptr)
+                return _M_root->minimum();
+            return nullptr;
+        }
+
+        _Node *minimum(parent_iter_stack &parents) const {
+            if (_M_root != nullptr)
+                return _M_root->minimum(parents);
+            return nullptr;
+        }
+
+        _Node *maximum() const {
+            if (_M_root != nullptr)
+                return _M_root->maximum();
+            return nullptr;
+        }
+
+        _Node *maximum(parent_iter_stack &parents) const {
+            if (_M_root != nullptr)
+                return _M_root->maximum(parents);
+            return nullptr;
+        }
+
+        void traverse() const {
+            if (_M_root != nullptr)
+                _M_root->traverse(0);
         }
 
     private:

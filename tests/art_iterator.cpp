@@ -14,17 +14,32 @@ SCENARIO("given an empty container", "[iterator]") {
     }
 }
 
-SCENARIO("basic iteration", "[iterator]") {
+SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") {
     art::radix_map<unsigned, unsigned> radix_map;
     std::map<unsigned, unsigned> std_map;
 
-    for (unsigned i = 1; i < 10; i++) {
+    for (unsigned i = 5; i < 10000; i++) {
         radix_map.insert(std::pair<unsigned, unsigned>(i, i));
         std_map.emplace(i, i);
     }
 
     REQUIRE(radix_map.begin()->second == std_map.begin()->second);
     REQUIRE(radix_map.rbegin()->second == std_map.rbegin()->second);
+
+    THEN ("forward iteration is equal to std::map") {
+        auto it_radix = radix_map.begin(), it_radix_end = radix_map.end();
+        auto it_std = std_map.begin(), it_std_end = std_map.end();
+        for (; it_std != it_std_end; ++it_radix, ++it_std) {
+            REQUIRE(it_radix->second == it_std->second);
+        }
+    }
+    THEN ("reverse iteration is equal to std::map") {
+        auto it_radix_reverse = radix_map.rbegin(), it_radix_rend = radix_map.rend();
+        auto it_std_reverse = std_map.rbegin(), it_std_rend = std_map.rend();
+        for (; it_std_reverse != it_std_rend; ++it_radix_reverse, ++it_std_reverse) {
+            REQUIRE(it_radix_reverse->second == it_std_reverse->second);
+        }
+    }
 }
 
 SCENARIO("given an art with signed integer key", "[iterator]") {

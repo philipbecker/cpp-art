@@ -12,7 +12,7 @@ SCENARIO("given an empty art", "[art]") {
         art.insert(std::make_pair(5, 5));
         THEN("its size is 1 and the inserted value is correct") {
             REQUIRE(art.size() == 1);
-            REQUIRE(art.find(5));
+            REQUIRE(art.find(5) != art.end());
         }
 
         AND_WHEN("the same element is inserted again") {
@@ -20,7 +20,7 @@ SCENARIO("given an empty art", "[art]") {
             THEN("the insertion failed and its size is still 1") {
                 REQUIRE_FALSE(p.second);
                 REQUIRE(art.size() == 1);
-                REQUIRE(art.find(5));
+                REQUIRE(art.find(5) != art.end());
             }
         }
     }
@@ -31,8 +31,8 @@ SCENARIO("given an empty art", "[art]") {
         THEN("both elements were inserted successfully") {
             REQUIRE(p1.second);
             REQUIRE(p2.second);
-            REQUIRE(art.find(5));
-            REQUIRE(art.find(261));
+            REQUIRE(art.find(5) != art.end());
+            REQUIRE(art.find(261) != art.end());
             REQUIRE(art.size() == 2);
         }
     }
@@ -43,8 +43,8 @@ SCENARIO("given an empty art", "[art]") {
         THEN("both elements were inserted successfully") {
             REQUIRE(p1.second);
             REQUIRE(p2.second);
-            REQUIRE(art.find(5));
-            REQUIRE(art.find(16777221));
+            REQUIRE(art.find(5) != art.end());
+            REQUIRE(art.find(16777221) != art.end());
             REQUIRE(art.size() == 2);
         }
     }
@@ -55,9 +55,9 @@ TEST_CASE("Can tiebreak at level 1", "[art]") {
     art.insert(std::make_pair(5, 5));
     art.insert(std::make_pair(6, 6));
     art.insert(std::make_pair(261, 261));
-    REQUIRE(art.find(5));
-    REQUIRE(art.find(6));
-    REQUIRE(art.find(261));
+    REQUIRE(art.find(5) != art.end());
+    REQUIRE(art.find(6) != art.end());
+    REQUIRE(art.find(261) != art.end());
 }
 
 

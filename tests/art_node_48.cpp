@@ -10,7 +10,7 @@ typedef Adaptive_radix_tree<int, int>::_Node_16 node_16;
 typedef Adaptive_radix_tree<int, int>::_Node_48 node_48;
 typedef Adaptive_radix_tree<int, int>::_Node_256 node_256;
 
-SCENARIO ("given a node 48 with 16 random elements", "[art]") {
+SCENARIO ("given a node 48 with 16 random elements", "[nodes]") {
     std::vector<int> data(256);
     std::iota(data.begin(), data.end(), 0);
     std::random_shuffle(data.begin(), data.end());

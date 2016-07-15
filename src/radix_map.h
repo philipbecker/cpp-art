@@ -14,7 +14,7 @@ namespace art
         typedef _Tp mapped_type;
         typedef std::pair<const _Key, _Tp> value_type;
 
-        typedef Adaptive_radix_tree<key_type, mapped_type> _Rep_type;
+        typedef Adaptive_radix_tree<key_type, mapped_type, _Key_transform> _Rep_type;
         _Rep_type _M_t;
 
         typedef typename _Rep_type::iterator iterator;
@@ -72,9 +72,24 @@ namespace art
         // Modifiers //
         ///////////////
 
-        // @TODO return pair<iterator, bool>
-        void insert(const value_type &__x) {
-            _M_t.insert(__x);
+        /**
+         *  @brief Attempts to insert a std::pair into the %map.
+
+         *  @param __x Pair to be inserted (see std::make_pair for easy
+         *	     creation of pairs).
+         *
+         *  @return  A pair, of which the first element is an iterator that
+         *           points to the possibly inserted pair, and the second is
+         *           a bool that is true if the pair was actually inserted.
+         *
+         *  This function attempts to insert a (key, value) %pair into the %map.
+         *  A %map relies on unique keys and thus a %pair is only inserted if its
+         *  first element (the key) is not already present in the %map.
+         *
+         *  Insertion requires O(k) time.
+         */
+        std::pair<iterator, bool> insert(const value_type &__x) {
+            return _M_t.insert(__x);
         }
 
         /**
@@ -98,6 +113,14 @@ namespace art
         ////////////
         // Lookup //
         ////////////
+
+        iterator find(const key_type &__x) {
+            return _M_t.find(__x);
+        }
+
+        size_type count(const key_type &__x) const {
+            return _M_t.find(__x) == _M_t.end() ? 0 : 1;
+        }
 
         /**
          *  @brief  Access to %map data.
@@ -142,13 +165,7 @@ namespace art
             return _M_t.insert(__x);
         }
 
-        iterator
-        find(const key_type& __x)
-        { return _M_t.find(__x); }
 
-        size_type
-        count(const key_type& __x) const
-        { return _M_t.find(__x) == _M_t.end() ? 0 : 1; }
          */
     };
 
