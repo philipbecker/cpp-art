@@ -120,6 +120,36 @@ namespace art
         }
 
         /**
+         *  @brief Template function that attempts to insert a range of elements.
+         *  @param  __first  Iterator pointing to the start of the range to be
+         *                   inserted.
+         *  @param  __last  Iterator pointing to the end of the range.
+         *
+         *  Complexity similar to that of the range constructor.
+         */
+        template<typename _InputIterator>
+        void insert(_InputIterator __first, _InputIterator __last) {
+            _M_t._M_insert_unique(__first, __last);
+        }
+
+        /**
+         *  @brief Attempts to insert a list of std::pairs into the %map.
+         *  @param  __list  A std::initializer_list<value_type> of pairs to be
+         *                  inserted.
+         *
+         *  Complexity similar to that of the range constructor.
+         */
+        void insert(std::initializer_list<value_type> __list) {
+            insert(__list.begin(), __list.end());
+        }
+
+        template<typename... _Args>
+        std::pair<iterator, bool> emplace(_Args &&... __args) {
+            std::logic_error("function not yet implemented exception");
+            //return _M_t._M_emplace_unique(std::forward<_Args>(__args)...);
+        }
+
+        /**
          * @brief  Subscript ( @c [] ) access to %map data.
          * @param  __k  The key for which data should be retrieved.
          * @return  A reference to the data of the (key,data) %pair.
@@ -141,10 +171,11 @@ namespace art
         // Lookup //
         ////////////
 
-        iterator find(const key_type &__x) {
-            return _M_t.find(__x);
+        iterator find(const key_type &__k) {
+            return _M_t.find(__k);
         }
 
+        // @TODO requries const find method & const iterator
         size_type count(const key_type &__x) const {
             return _M_t.find(__x) == _M_t.end() ? 0 : 1;
         }
@@ -157,8 +188,10 @@ namespace art
          *  @throw  std::out_of_range  If no such data is present.
          */
         mapped_type &at(const key_type &__k) {
-            // @TODO
-            return NULL;
+            iterator res = _M_t.find(__k);
+            if (res == _M_t.end())
+                std::__throw_out_of_range("Radix map out of range");
+            return (*res).second;
         }
 
         ///////////////

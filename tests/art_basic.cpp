@@ -63,13 +63,13 @@ TEST_CASE("Can tiebreak at level 1", "[art]") {
 
 
 SCENARIO("growing the root node", "[art]") {
-    art::Adaptive_radix_tree<uint64_t , uint64_t> art;
+    art::Adaptive_radix_tree<uint64_t, uint64_t> art;
 
     std::vector<uint64_t> data(256);
     std::iota(data.begin(), data.end(), 0);
     // The first key byte needs to be decisive,
     // otherwise the root won't grow as desired
-    for (auto& d : data)
+    for (auto &d : data)
         d <<= 56;
 
     WHEN("first 5 values are inserted") {
@@ -88,8 +88,8 @@ SCENARIO("growing the root node", "[art]") {
             }
 
             THEN ("root has grown to node 48") {
-                    REQUIRE(art._M_root->size() == 17);
-                    REQUIRE(art._M_root->get_type() == 3);
+                REQUIRE(art._M_root->size() == 17);
+                REQUIRE(art._M_root->get_type() == 3);
             };
             AND_WHEN("32 more values are inserted") {
                 for (uint64_t i = 17; i < 49; i++) {
@@ -105,15 +105,67 @@ SCENARIO("growing the root node", "[art]") {
     }
 }
 
-TEST_CASE("Build map from range", "[art]") {
-    std::vector<std::pair<int, int> > v(500);
+TEST_CASE("basic operations", "[art]") {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(std::numeric_limits<int>::min(),
+                                        std::numeric_limits<int>::max());
 
-    for (int i = 0; i < v.size(); i++)
-        v[i] = std::pair<int, int>(i, 3 * i);
+    std::vector<std::pair<int, int> > v;
+    for (int i = 0; i < 10000; i++) {
+        auto candidate = dis(gen);
+        auto it = std::find(v.begin(), v.end(), std::make_pair(candidate, 3 * candidate));
+        if (it == v.end())
+            v.push_back(std::make_pair(candidate, 3 * candidate));
+    }
 
-    art::radix_map<int, int> art(v.begin(), v.end());
-    REQUIRE(art.size() == v.size());
+    SECTION ("range constructor") {
+        art::radix_map<int, int> art(v.begin(), v.end());
 
-    for (int i = 0; i < v.size(); i++)
-        REQUIRE((*art.find(i)).second == 3 * i);
+        REQUIRE(art.size() == v.size());
+
+        for (int i = 0; i < v.size(); i++)
+            REQUIRE((*art.find(v[i].first)).second == v[i].second);
+    }
+
+    SECTION ("range insertion") {
+        art::radix_map<int, int> art;
+        art.insert(v.begin(), v.end());
+
+        REQUIRE(art.size() == v.size());
+
+        for (int i = 0; i < v.size(); i++)
+            REQUIRE((*art.find(v[i].first)).second == v[i].second);
+    }
+
+    SECTION ("insert with initializer list") {
+        art::radix_map<int, int> art;
+        art.insert({{1,   3},
+                    {2,   12},
+                    {-20, 1512}}
+        );
+
+        REQUIRE(art.size() == 3);
+        REQUIRE((*art.find(1)).second == 3);
+        REQUIRE((*art.find(2)).second == 12);
+        REQUIRE((*art.find(-20)).second == 1512);
+    }
+
+    SECTION ("lookup operations") {
+        art::radix_map<int, int> art(v.begin(), v.end());
+
+        REQUIRE(art.size() == v.size());
+
+        SECTION ("map.at") {
+            for (int i = 0; i < v.size(); i++) {
+                REQUIRE(art.at(v[i].first) == v[i].second);
+            }
+        }
+
+        SECTION ("map.count(key)") {
+            for (int i = 0; i < v.size(); i++) {
+                //    REQUIRE(art.count(v[i].first) == 1);
+            }
+        }
+    }
 }

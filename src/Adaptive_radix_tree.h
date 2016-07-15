@@ -771,8 +771,8 @@ namespace art
 
         struct adapt_radix_tree_iterator {
             typedef std::pair<const _Key, _Tp> value_type;
-            typedef const value_type &reference;
-            typedef const value_type *pointer;
+            typedef value_type &reference;
+            typedef value_type *pointer;
 
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
