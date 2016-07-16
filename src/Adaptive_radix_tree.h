@@ -24,6 +24,12 @@ namespace art
         // Forward declaration for typedefs
         class _Node;
 
+        class _Node_16;
+
+        class _Node_48;
+
+        class _Node_256;
+
         typedef _Key key_type;
         typedef _Tp mapped_type;
         typedef std::pair<const _Key, _Tp> value_type;
@@ -51,8 +57,6 @@ namespace art
         public:
             _Node(uint16_t count) : _count(count) { }
 
-            virtual _Node *insert(const Key &key, unsigned depth) = 0;
-
             virtual unsigned insert(const byte &key_byte, _Node *node) = 0;
 
             virtual std::pair<_Node **, unsigned> find(const byte &key_byte) = 0;
@@ -67,22 +71,51 @@ namespace art
 
             virtual void traverse(unsigned depth) = 0;
 
-            virtual bool is_leaf() {
-                return false;
-            }
+            virtual bool is_leaf() { return false; }
 
-            uint16_t size() const {
-                return _count;
-            }
+            uint16_t size() const { return _count; }
 
             virtual uint16_t max_size() const = 0;
 
             virtual node_type get_type() const = 0;
 
+
+            /**
+             * @brief  Find the successor of key stored at pos or later.
+             *
+             * @param pos  Position from where the search should start.
+             * @param parents   Pair of node's and positions. In case that there
+             *                  are no more children after pos in the current node,
+             *                  we go back up the tree and search from pos on.
+             * @return  A pair, of which the first element is a success flag, denoting
+             *          whether a successor was found or not, and the second is a pointer
+             *          to the node. In case of failure, a nullptr is returned as the second
+             *          element.
+             *
+             * Finding a successor takes O(k) time.
+             */
             virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) = 0;
 
+            /**
+             * @brief  Find the predecessor of key stored at pos or earlier.
+             *
+             * @param pos  Position from where the search should start.
+             * @param parents   Pair of node's and positions. In case that there
+             *                  are no more children before pos in the current node,
+             *                  we go back up the tree and recurse.
+             * @return  A pair, of which the first element is a success flag, denoting
+             *          whether a predecessor was found or not, and the second is a pointer
+             *          to the node. In case of failure, a nullptr is returned as the second
+             *          element.
+             *
+             * Finding a predecessor takes O(k) time.
+             */
             virtual std::pair<bool, _Node *> predecessor(int pos, parent_iter_stack &parents) = 0;
 
+            /**
+             * Stupid helper for reverse iteration.
+             * @TODO replace this by something better
+             */
             virtual uint16_t key_array_end() const = 0;
         };
 
@@ -99,10 +132,6 @@ namespace art
                     : _Node(1), key(key), value(value) {
             }
 
-            virtual _Node *insert(const Key &key, unsigned depth) override {
-                return this;
-            }
-
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 return 0;
             }
@@ -113,24 +142,16 @@ namespace art
             }
 
             virtual std::pair<_Node **, unsigned> find(const byte &key_byte) override {
-                return std::pair<_Node **, unsigned>(nullptr, 0);
+                return std::make_pair<_Node **, unsigned>(nullptr, 0);
             }
 
-            virtual _Node *minimum() override {
-                return this;
-            }
+            virtual _Node *minimum() override { return this; }
 
-            virtual _Node *minimum(parent_iter_stack &parents) override {
-                return this;
-            }
+            virtual _Node *minimum(parent_iter_stack &parents) override { return this; }
 
-            virtual _Node *maximum() override {
-                return this;
-            }
+            virtual _Node *maximum() override { return this; }
 
-            virtual _Node *maximum(parent_iter_stack &parents) override {
-                return this;
-            }
+            virtual _Node *maximum(parent_iter_stack &parents) override { return this; }
 
             virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
                 return std::pair<bool, _Node *>(true, this);
@@ -140,28 +161,18 @@ namespace art
                 return std::pair<bool, _Node *>(true, this);
             }
 
-            bool contains_key(const Key &key) {
-                return this->key.value == key.value;
-            }
+            bool is_leaf() override { return true; }
 
-            bool is_leaf() override {
-                return true;
-            }
+            uint16_t max_size() const override { return 1; }
 
-            uint16_t max_size() const override {
-                return 1;
-            }
+            virtual uint16_t key_array_end() const override { return 1; }
 
-            virtual uint16_t key_array_end() const override {
-                return 1;
-            }
-
-
-            virtual node_type get_type() const override {
-                return node_type::_leaf_t;
-            }
+            virtual node_type get_type() const override { return node_type::_leaf_t; }
         };
 
+        /**
+         * End of iteration marker right of the container.
+         */
         class _Dummy_Node : public _Node {
         public:
             _Node **_root;
@@ -178,44 +189,23 @@ namespace art
                       _leaf(new _Leaf(leaf->key, leaf->value)) {
             }
 
-            void update_root(_Node **root) {
-                _root = root;
-            }
-
-            void update_maximum(_Leaf *leaf) {
-                _leaf = new _Leaf(leaf->key, leaf->value);
-            }
-
-            virtual _Node *insert(const Key &key, unsigned depth) override {
-                return this;
-            }
-
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 return 0;
             }
 
-            virtual void traverse(unsigned depth) override {
-            }
+            virtual void traverse(unsigned depth) override { }
 
             virtual std::pair<_Node **, unsigned> find(const byte &key_byte) override {
                 return std::pair<_Node **, unsigned>(nullptr, 0);
             }
 
-            virtual _Node *minimum() override {
-                return this;
-            }
+            virtual _Node *minimum() override { return this; }
 
-            virtual _Node *minimum(parent_iter_stack &parents) override {
-                return this;
-            }
+            virtual _Node *minimum(parent_iter_stack &parents) override { return this; }
 
-            virtual _Node *maximum() override {
-                return this;
-            }
+            virtual _Node *maximum() override { return this; }
 
-            virtual _Node *maximum(parent_iter_stack &parents) override {
-                return this;
-            }
+            virtual _Node *maximum(parent_iter_stack &parents) override { return this; }
 
             virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
                 return std::pair<bool, _Node *>(true, this->_leaf);
@@ -229,25 +219,12 @@ namespace art
                 return std::pair<bool, _Node *>(false, this->_leaf);
             }
 
-            uint16_t max_size() const override {
-                return 1;
-            }
+            uint16_t max_size() const override { return 1; }
 
-            virtual uint16_t key_array_end() const override {
-                return 1;
-            }
+            virtual uint16_t key_array_end() const override { return 1; }
 
-            virtual node_type get_type() const override {
-                return node_type::_dummy_node;
-            }
+            virtual node_type get_type() const override { return node_type::_dummy_node; }
         };
-
-        // Forward declarations
-        class _Node_16;
-
-        class _Node_48;
-
-        class _Node_256;
 
         class _Node_4 : public _Node {
         public:
@@ -265,14 +242,6 @@ namespace art
                 std::copy(node->keys.begin(), node->keys.begin() + 4, keys.begin());
                 std::copy(node->children.begin(), node->children.begin() + 4, children.begin());
                 delete node;
-            }
-
-            virtual uint16_t max_size() const override {
-                return 4;
-            }
-
-            virtual _Node *insert(const Key &key, unsigned depth) override {
-                return nullptr;
             }
 
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
@@ -340,13 +309,11 @@ namespace art
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual uint16_t key_array_end() const override {
-                return 3;
-            }
+            virtual uint16_t max_size() const override { return 4; }
 
-            virtual node_type get_type() const override {
-                return node_type::node_4_t;
-            }
+            virtual uint16_t key_array_end() const override { return 3; }
+
+            virtual node_type get_type() const override { return node_type::node_4_t; }
 
         };
 
@@ -376,10 +343,6 @@ namespace art
                 }
 
                 delete node;
-            }
-
-            virtual _Node *insert(const Key &key, unsigned depth) override {
-                return nullptr;
             }
 
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
@@ -445,17 +408,11 @@ namespace art
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual uint16_t max_size() const override {
-                return 16;
-            }
+            virtual uint16_t max_size() const override { return 16; }
 
-            virtual uint16_t key_array_end() const override {
-                return 15;
-            }
+            virtual uint16_t key_array_end() const override { return 15; }
 
-            virtual node_type get_type() const override {
-                return node_type::node_16_t;
-            }
+            virtual node_type get_type() const override { return node_type::node_16_t; }
         };
 
 
@@ -492,10 +449,6 @@ namespace art
                 }
 
                 delete node;
-            }
-
-            virtual _Node *insert(const Key &key, unsigned depth) override {
-                return nullptr;
             }
 
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
@@ -568,17 +521,11 @@ namespace art
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual uint16_t max_size() const override {
-                return 48;
-            }
+            virtual uint16_t max_size() const override { return 48; }
 
-            virtual uint16_t key_array_end() const override {
-                return 255;
-            }
+            virtual uint16_t key_array_end() const override { return 255; }
 
-            virtual node_type get_type() const override {
-                return node_type::node_48_t;
-            }
+            virtual node_type get_type() const override { return node_type::node_48_t; }
         };
 
         class _Node_256 : public _Node {
@@ -599,12 +546,6 @@ namespace art
                 for (int i = 0; i < 256; i++)
                     if (children[i] != nullptr)
                         delete children[i];
-            }
-
-            virtual _Node *insert(const Key &key, unsigned depth) override {
-                children[key.chunks[depth]] = new _Leaf(key);
-                this->_count++;
-                return children[key.chunks[depth]];
             }
 
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
@@ -682,17 +623,11 @@ namespace art
                 return std::pair<bool, _Node *>(false, nullptr);
             }
 
-            virtual uint16_t max_size() const override {
-                return 256;
-            }
+            virtual uint16_t max_size() const override { return 256; }
 
-            virtual uint16_t key_array_end() const override {
-                return 255;
-            }
+            virtual uint16_t key_array_end() const override { return 255; }
 
-            virtual node_type get_type() const override {
-                return node_type::node_256_t;
-            }
+            virtual node_type get_type() const override { return node_type::node_256_t; }
 
         };
 
@@ -706,14 +641,14 @@ namespace art
         _Dummy_Node *_M_dummy_node;
 
         Adaptive_radix_tree() : _M_count(0) {
-            this->_M_root = nullptr;
-            this->_M_dummy_node = new _Dummy_Node();
+            _M_root = nullptr;
+            _M_dummy_node = new _Dummy_Node();
         }
 
         Adaptive_radix_tree(const _Key_transform &key_transformer)
                 : _M_count(0), _M_key_transform(key_transformer) {
-            this->_M_root = nullptr;
-            this->_M_dummy_node = new _Dummy_Node();
+            _M_root = nullptr;
+            _M_dummy_node = new _Dummy_Node();
         }
 
         //////////////
@@ -1054,7 +989,7 @@ namespace art
                 if (current_node != nullptr && *current_node != nullptr && (*current_node)->is_leaf()) {
                     // Hit an existing leaf
                     _Leaf *existing_leaf = reinterpret_cast<_Leaf *>(*current_node);
-                    if (existing_leaf->contains_key(transformed_key)) {
+                    if (transformed_key.value == existing_leaf->key.value) {
                         // if it is a duplicate entry, ignore
                         delete new_leaf;
                         return std::make_pair(iterator(existing_leaf, parents), false);
@@ -1147,7 +1082,7 @@ namespace art
                     return end();
 
                 if ((*current_node)->is_leaf()) {
-                    if (((_Leaf *) *current_node)->contains_key(transformed_key)) {
+                    if (transformed_key.value == ((_Leaf *) *current_node)->key.value) {
                         return iterator(*current_node, parents);
                     } else {
                         return end();
@@ -1161,6 +1096,7 @@ namespace art
             throw; // unreachable
         }
 
+        // @TODO test this function
         iterator lower_bound(const key_type &__k) {
             parent_iter_stack parents;
             Key transformed_key = {_M_key_transform(__k)};

@@ -8,6 +8,17 @@
 using namespace std;
 
 int main() {
+
+    std::cout << "Memory footprint" << std::endl;
+    std::cout << "Node Type\t\t" << "Size" << std::endl;
+    std::cout << "Dummy Node\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Dummy_Node) << std::endl;
+    std::cout << "Leaf\t\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Leaf) << std::endl;
+    std::cout << "Node 4\t\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_4) << std::endl;
+    std::cout << "Node 16\t\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_16) << std::endl;
+    std::cout << "Node 48\t\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_48) << std::endl;
+    std::cout << "Node 256\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_256) << std::endl;
+
+
     art::radix_map<unsigned, unsigned> art;
     std::map<unsigned, unsigned> std_map;
 
@@ -16,6 +27,7 @@ int main() {
     std::cout << "RBegin of art: " << (art.rbegin() == art.rend()) << std::endl;
     std::cout << "---------------" << std::endl;
 
+    /**
     for (unsigned i = 1; i < 10; i++) {
         auto p = art.insert(std::pair<unsigned, unsigned>(i, i));
         std::cout << "insertion of " << i << (p.second ? " successful" : " failed") << std::endl;
@@ -35,7 +47,7 @@ int main() {
     std::cout << "Begin of stdmap: " << std_map.begin()->second << std::endl;
     std::cout << "RBegin of stdmap: " << std_map.rbegin()->second << std::endl;
     std::cout << "---------------" << std::endl;
-
+*/
 
     return 0;
 }
