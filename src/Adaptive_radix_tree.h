@@ -355,7 +355,7 @@ namespace art
             std::array<byte, 16> keys{};
             std::array<_Node *, 16> children{};
 
-            _Node_16(_Node_4 *node)  : _Node(4) {
+            _Node_16(_Node_4 *node) : _Node(4) {
                 assert(node->size() == 4);
 
                 std::copy(node->keys.begin(), node->keys.end(), keys.begin());
@@ -993,26 +993,39 @@ namespace art
             return reverse_iterator(end());
         }
 
+        const_reverse_iterator rbegin() const {
+            return const_reverse_iterator(end());
+        }
+
         reverse_iterator rend() {
             parent_iter_stack parents;
             _Node *min = minimum(parents);
             if (min == nullptr)
                 return reverse_iterator(iterator(_M_dummy_node->_leaf, parents));
-
             return reverse_iterator(iterator(min, parents));
         }
 
-        bool operator==(const Adaptive_radix_tree<key_type, value_type> &rhs) {
-            return size() == rhs.size()
-                   && std::equal(begin(), end(), rhs.begin());
+        const_reverse_iterator rend() const {
+            parent_iter_stack parents;
+            _Node *min = minimum(parents);
+            if (min == nullptr)
+                return const_reverse_iterator(iterator(_M_dummy_node->_leaf, parents));
+            return const_reverse_iterator(iterator(min, parents));
         }
 
         ///////////////
         // Modifiers //
         ///////////////
 
+        // @TODO
         void clear() {
             delete this->_M_root;
+        }
+
+        // @TODO memory management?
+        void _M_reset() {
+            this->_M_root = nullptr;
+            this->_M_count = 0;
         }
 
         std::pair<iterator, bool> _M_insert_unique(const value_type &__x) {
@@ -1101,6 +1114,17 @@ namespace art
                 _M_insert_unique(*__first);
         }
 
+        template<typename _InputIterator>
+        void _M_assign_unique(_InputIterator __first, _InputIterator __last) {
+            _M_reset();
+            for (; __first != __last; ++__first)
+                _M_insert_unique(*__first);
+        }
+
+        // @TODO implementation
+        void swap(Adaptive_radix_tree &__x) {
+            throw;
+        }
 
         ////////////
         // Lookup //
@@ -1116,7 +1140,8 @@ namespace art
 
             _Node **previous_node = nullptr;
             _Node **current_node = &_M_root;
-            unsigned pos;
+            parents.emplace(_M_dummy_node, 0);
+            unsigned pos = 0;
             for (unsigned i = 0; i < key_size + 1; i++) {
                 if (current_node == nullptr || *current_node == nullptr)
                     return end();
@@ -1134,6 +1159,48 @@ namespace art
                 parents.emplace(*previous_node, pos);
             }
             throw; // unreachable
+        }
+
+        iterator lower_bound(const key_type &__k) {
+            parent_iter_stack parents;
+            Key transformed_key = {_M_key_transform(__k)};
+            const auto key_size = sizeof(__k);
+
+            if (_M_root == nullptr)
+                return end();
+
+            _Node **previous_node = nullptr;
+            _Node **current_node = &_M_root;
+            parents.emplace(_M_dummy_node, 0);
+            unsigned pos = 0;
+            for (unsigned i = 0; i < key_size + 1; i++) {
+                if (current_node == nullptr || *current_node == nullptr) {
+                    auto prev = parents.top();
+                    parents.pop();
+                    auto successor = prev.first->successor(prev.second + 1, parents);
+                    return iterator(successor.second, parents);
+                }
+
+                if ((*current_node)->is_leaf()) {
+                    if (((_Leaf *) *current_node)->key.value <= transformed_key.value) {
+                        return iterator(*current_node, parents);
+                    } else {
+                        auto prev = parents.top();
+                        parents.pop();
+                        auto successor = prev.first->successor(prev.second + 1, parents);
+                        return iterator(successor.second, parents);
+                    }
+                }
+
+                previous_node = current_node;
+                std::tie(current_node, pos) = (*current_node)->find(transformed_key.chunks[i]);
+                parents.emplace(*previous_node, pos);
+            }
+            throw; // unreachable
+        }
+
+        iterator upper_bound(const key_type &__k) {
+            throw;
         }
 
         _Node *minimum() const {

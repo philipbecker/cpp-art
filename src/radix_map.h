@@ -17,7 +17,7 @@ namespace art
      *                  allocator<pair<const _Key, _Tp>.
      */
     template<typename _Key, typename _Tp,
-            typename _Key_transform = key_transform<_Key>,
+            typename _Key_transform = key_transform <_Key>,
             typename _Alloc = std::allocator<std::pair<const _Key, _Tp> > >
     class radix_map {
 
@@ -25,25 +25,33 @@ namespace art
         typedef _Key key_type;
         typedef _Tp mapped_type;
         typedef std::pair<const _Key, _Tp> value_type;
+        typedef _Key_transform key_transformer;
         typedef _Alloc allocator_type;
+        typedef value_type &reference;
+        typedef const value_type &const_reference;
 
     private:
         // @TODO what is this?
         // concept requirements
         typedef typename _Alloc::value_type _Alloc_value_type;
 
-        typedef Adaptive_radix_tree<key_type, mapped_type, _Key_transform> _Rep_type;
+        typedef Adaptive_radix_tree <key_type, mapped_type, _Key_transform> _Rep_type;
 
         _Rep_type _M_t;
 
     public:
 
+        //typedef typename _Alloc_traits::pointer            pointer;
+        //typedef typename _Alloc_traits::const_pointer      const_pointer;
+        //typedef typename _Alloc_traits::reference          reference;
+        //typedef typename _Alloc_traits::const_reference    const_reference;
+        // Bidiretional iterator
         typedef typename _Rep_type::iterator iterator;
-//        typedef typename _Rep_type::const_iterator const_iterator;
+        typedef typename _Rep_type::const_iterator const_iterator;
         typedef typename _Rep_type::size_type size_type;
         typedef typename _Rep_type::difference_type difference_type;
         typedef typename _Rep_type::reverse_iterator reverse_iterator;
-//        typedef typename _Rep_type::const_reverse_iterator const_reverse_iterator;
+        typedef typename _Rep_type::const_reverse_iterator const_reverse_iterator;
 
         /**
          * @brief  Default constructor creates no elements.
@@ -70,6 +78,39 @@ namespace art
         radix_map(_InputIterator __first, _InputIterator __last)
                 : _M_t() {
             _M_t._M_insert_unique(__first, __last);
+        }
+
+        /**
+         *  @brief  %Map assignment operator.
+         *  @param  __x  A %map of identical element and allocator types.
+         *
+         *  All the elements of @a __x are copied, but unlike the copy
+         *  constructor, the allocator object is not copied.
+         */
+        radix_map &operator=(const radix_map &__x) {
+            // @TODO implement art assignment operator
+            _M_t = __x._M_t;
+            return *this;
+        }
+
+        /// Move assignment operator.
+        // @TODO implement art move assignment operator
+        radix_map &operator=(radix_map &&) = default;
+
+        /**
+         *  @brief  %Map list assignment operator.
+         *  @param  __l  An initializer_list.
+         *
+         *  This function fills a %map with copies of the elements in the
+         *  initializer list @a __l.
+         *
+         *  Note that the assignment completely changes the %map and
+         *  that the resulting %map's size is the same as the number
+         *  of elements assigned.  Old data may be lost.
+         */
+        radix_map &operator=(std::initializer_list<value_type> __l) {
+            _M_t._M_assign_unique(__l.begin(), __l.end());
+            return *this;
         }
 
         //////////////
@@ -150,6 +191,22 @@ namespace art
         }
 
         /**
+         *  @brief  Swaps data with another %map.
+         *  @param  __x  A %map of the same element and allocator types.
+         *
+         *  This exchanges the elements between two maps in constant
+         *  time.
+         */
+        void swap(radix_map &__x) {
+            _M_t.swap(__x._M_t);
+        }
+
+
+        ////////////////////
+        // Element access //
+        ////////////////////
+
+        /**
          * @brief  Subscript ( @c [] ) access to %map data.
          * @param  __k  The key for which data should be retrieved.
          * @return  A reference to the data of the (key,data) %pair.
@@ -167,19 +224,6 @@ namespace art
             return NULL;
         }
 
-        ////////////
-        // Lookup //
-        ////////////
-
-        iterator find(const key_type &__k) {
-            return _M_t.find(__k);
-        }
-
-        // @TODO requries const find method & const iterator
-        size_type count(const key_type &__x) const {
-            return _M_t.find(__x) == _M_t.end() ? 0 : 1;
-        }
-
         /**
          *  @brief  Access to %map data.
          *  @param  __k  The key for which data should be retrieved.
@@ -194,6 +238,55 @@ namespace art
             return (*res).second;
         }
 
+        ////////////
+        // Lookup //
+        ////////////
+
+        // @TODO requries const find method & const iterator
+        size_type count(const key_type &__x) const {
+            return _M_t.find(__x) == _M_t.end() ? 0 : 1;
+        }
+
+        /**
+         *  @brief Tries to locate an element in a %map.
+         *  @param  __k  Key of (key, value) %pair to be located.
+         *  @return  Iterator pointing to sought-after element, or end() if not
+         *           found.
+         *
+         *  This function takes a key and tries to locate the element with which
+         *  the key matches.  If successful the function returns an iterator
+         *  pointing to the sought after %pair.  If unsuccessful it returns the
+         *  past-the-end ( @c end() ) iterator.
+         */
+        iterator find(const key_type &__k) {
+            return _M_t.find(__k);
+        }
+
+        /**
+         *  @brief Finds the beginning of a subsequence matching given key.
+         *  @param  __k  Key of (key, value) pair to be located.
+         *  @return  Iterator pointing to first element equal to or greater
+         *           than key, or end().
+         *
+         *  This function returns the first element of a subsequence of elements
+         *  that matches the given key.  If unsuccessful it returns an iterator
+         *  pointing to the first element that has a greater value than given key
+         *  or end() if no such element exists.
+         */
+        iterator lower_bound(const key_type &__k) {
+            return _M_t.lower_bound(__k);
+        }
+
+        /**
+         *  @brief Finds the end of a subsequence matching given key.
+         *  @param  __k  Key of (key, value) pair to be located.
+         *  @return Iterator pointing to the first element
+         *          greater than key, or end().
+         */
+        iterator upper_bound(const key_type &__k) {
+            return _M_t.upper_bound(__k);
+        }
+
         ///////////////
         // Iterators //
         ///////////////
@@ -202,7 +295,23 @@ namespace art
             return _M_t.begin();
         }
 
+        const_iterator begin() const {
+            return _M_t.begin();
+        }
+
+        const_iterator cbegin() const {
+            return _M_t.begin();
+        }
+
         iterator end() {
+            return _M_t.end();
+        }
+
+        const_iterator end() const {
+            return _M_t.end();
+        }
+
+        const_iterator cend() const {
             return _M_t.end();
         }
 
@@ -210,23 +319,17 @@ namespace art
             return _M_t.rbegin();
         }
 
+        const_reverse_iterator rbegin() const {
+            return _M_t.rbegin();
+        }
+
         reverse_iterator rend() {
             return _M_t.rend();
         }
 
-        /**
-
-        mapped_type &operator[](const key_type &__k) {
-
+        const_reverse_iterator rend() const {
+            return _M_t.rend();
         }
-
-        std::pair<iterator, bool>
-        insert(const value_type &__x) {
-            return _M_t.insert(__x);
-        }
-
-
-         */
     };
 
     //////////////////////////
@@ -298,6 +401,14 @@ namespace art
     operator>=(const radix_map<_Key, _Tp, _Key_transform> &__x,
                const radix_map<_Key, _Tp, _Key_transform> &__y) {
         return !(__x < __y);
+    }
+
+    // See radix_map::swap()
+    template<typename _Key, typename _Tp, typename _Key_transform>
+    inline bool
+    swap(radix_map<_Key, _Tp, _Key_transform> &__x,
+         radix_map<_Key, _Tp, _Key_transform> &__y) {
+        __x.swap(__y);
     }
 }
 

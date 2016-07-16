@@ -138,7 +138,7 @@ TEST_CASE("basic operations", "[art]") {
             REQUIRE((*art.find(v[i].first)).second == v[i].second);
     }
 
-    SECTION ("insert with initializer list") {
+    SECTION ("construct with initializer list") {
         art::radix_map<int, int> art;
         art.insert({{1,   3},
                     {2,   12},
@@ -149,6 +149,21 @@ TEST_CASE("basic operations", "[art]") {
         REQUIRE((*art.find(1)).second == 3);
         REQUIRE((*art.find(2)).second == 12);
         REQUIRE((*art.find(-20)).second == 1512);
+
+        SECTION ("assignment with initializer list") {
+            art = {{42,  721},
+                   {321, 521},
+                   {-51, 21},
+                   {-502, 22}};
+            REQUIRE(art.size() == 4);
+            REQUIRE(art.find(1) == art.end());
+            REQUIRE(art.find(2) == art.end());
+            REQUIRE(art.find(-20) == art.end());
+            REQUIRE((*art.find(42)).second == 721);
+            REQUIRE((*art.find(321)).second == 521);
+            REQUIRE((*art.find(-51)).second == 21);
+            REQUIRE((*art.find(-502)).second == 22);
+        }
     }
 
     SECTION ("lookup operations") {
