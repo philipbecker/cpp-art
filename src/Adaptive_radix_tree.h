@@ -36,9 +36,6 @@ namespace art
         typedef std::stack<std::pair<_Node *, unsigned>> parent_iter_stack;
 
     private:
-        size_t _M_count;
-        _Key_transform _M_key_transform;
-
         enum node_type : uint8_t {
             _leaf_t = 0, node_4_t = 1, node_16_t = 2,
             node_48_t = 3, node_256_t = 4, _dummy_node = 5
@@ -56,6 +53,8 @@ namespace art
 
         public:
             _Node(uint16_t count) : _count(count) { }
+
+            virtual void clear() = 0;
 
             virtual unsigned insert(const byte &key_byte, _Node *node) = 0;
 
@@ -132,6 +131,8 @@ namespace art
                     : _Node(1), key(key), value(value) {
             }
 
+            void clear() { }
+
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 return 0;
             }
@@ -189,6 +190,8 @@ namespace art
                       _leaf(new _Leaf(leaf->key, leaf->value)) {
             }
 
+            void clear() { }
+
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 return 0;
             }
@@ -235,7 +238,6 @@ namespace art
                 Key key = leaf->key;
                 keys[0] = key.chunks[depth];
                 children[0] = leaf;
-
             }
 
             _Node_4(_Node_16 *node) : _Node(4) {
@@ -244,12 +246,17 @@ namespace art
                 delete node;
             }
 
+            void clear() {
+                for (uint16_t i = 0; i < this->_count; i++) {
+                    children[i]->clear();
+                    delete children[i];
+                }
+            }
+
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 unsigned pos = 0;
-                for (; pos < this->_count && keys[pos] < key_byte; pos++) {
-
-                }
-                if (pos != this->_count) {
+                for (; pos < this->_count && keys[pos] < key_byte; pos++);
+                if (pos < this->_count) {
                     std::move(keys.begin() + pos, keys.begin() + this->_count, keys.begin() + pos + 1);
                     std::move(children.begin() + pos, children.begin() + this->_count, children.begin() + pos + 1);
                 }
@@ -263,7 +270,7 @@ namespace art
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
-                if (keys[pos] == key_byte)
+                if (pos < this->_count && keys[pos] == key_byte)
                     return std::pair<_Node **, unsigned>(&children[pos], pos);
                 return std::pair<_Node **, unsigned>(nullptr, 0);
             }
@@ -341,8 +348,14 @@ namespace art
                         pos++;
                     }
                 }
-
                 delete node;
+            }
+
+            void clear() {
+                for (uint16_t i = 0; i < this->_count; i++) {
+                    children[i]->clear();
+                    delete children[i];
+                }
             }
 
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
@@ -362,7 +375,7 @@ namespace art
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
-                if (keys[pos] == key_byte)
+                if (pos < this->_count && keys[pos] == key_byte)
                     return std::pair<_Node **, unsigned>(&children[pos], pos);
                 return std::pair<_Node **, unsigned>(nullptr, 0);
             }
@@ -451,6 +464,15 @@ namespace art
                 delete node;
             }
 
+            void clear() {
+                for (size_t i = 0; i < 256; i++) {
+                    if (child_index[i] != EMPTY_MARKER) {
+                        children[child_index[i]]->clear();
+                        delete children[child_index[i]];
+                    }
+                }
+            }
+
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
                 auto pos = this->_count;
                 child_index[key_byte] = pos;
@@ -496,8 +518,9 @@ namespace art
             }
 
             virtual void traverse(unsigned depth) override {
-                for (uint8_t i = 0; i < this->_count; i++)
-                    children[i]->traverse(depth + 1);
+                for (size_t i = 0; i < 256; i++)
+                    if (child_index[i] != EMPTY_MARKER)
+                        children[child_index[i]]->traverse(depth + 1);
             }
 
             virtual std::pair<bool, _Node *> successor(unsigned pos, parent_iter_stack &parents) override {
@@ -542,10 +565,13 @@ namespace art
                 delete node;
             }
 
-            ~_Node_256() {
-                for (int i = 0; i < 256; i++)
-                    if (children[i] != nullptr)
+            void clear() {
+                for (size_t i = 0; i < 256; i++) {
+                    if (children[i] != nullptr) {
+                        children[i]->clear();
                         delete children[i];
+                    }
+                }
             }
 
             virtual unsigned insert(const byte &key_byte, _Node *node) override {
@@ -631,14 +657,18 @@ namespace art
 
         };
 
+    private:
+        size_t _M_count;
 
-    public:
-        // Current root node of the radix tree
-        _Node *_M_root;
+        _Key_transform _M_key_transform;
 
         // Dummy node of special type to mark the right end of the container
         // Necessary as the end marker for iterators
         _Dummy_Node *_M_dummy_node;
+
+    public:
+        // Current root node of the radix tree
+        _Node *_M_root;
 
         Adaptive_radix_tree() : _M_count(0) {
             _M_root = nullptr;
@@ -954,7 +984,10 @@ namespace art
 
         // @TODO
         void clear() {
-            delete this->_M_root;
+            if (_M_root != nullptr) {
+                _M_root->clear();
+                delete _M_root;
+            }
         }
 
         // @TODO memory management?
@@ -1166,6 +1199,11 @@ namespace art
         void traverse() const {
             if (_M_root != nullptr)
                 _M_root->traverse(0);
+        }
+
+        ~Adaptive_radix_tree() {
+            clear();
+            delete _M_dummy_node;
         }
 
     private:

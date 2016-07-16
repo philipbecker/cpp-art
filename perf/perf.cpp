@@ -14,7 +14,7 @@ public:
 
         // We will run some total number of sets of tests all together.
         // Each one growing by a power of 2.
-        const int totalNumberOfTests = 10;
+        const int totalNumberOfTests = 8;
 
         for (int i = 0; i < totalNumberOfTests; i++) {
             // ExperimentValues is part of the base class and allows us to specify
@@ -53,7 +53,7 @@ CELERO_MAIN
 //
 // INSERTION
 //
-BASELINE_F(InsertionSignedInt64, Map, InsertFixture, 3, 5) {
+BASELINE_F(InsertInt64, Map, InsertFixture, 3, 5) {
     this->generate_data();
     std::map<int64_t, int64_t> map;
 
@@ -61,7 +61,7 @@ BASELINE_F(InsertionSignedInt64, Map, InsertFixture, 3, 5) {
         map.insert(d);
 }
 
-BENCHMARK_F(InsertionSignedInt64, UnorderedMap, InsertFixture, 3, 5) {
+BENCHMARK_F(InsertInt64, UnorderedMap, InsertFixture, 3, 5) {
     this->generate_data();
     std::unordered_map<int64_t, int64_t> map;
 
@@ -69,7 +69,7 @@ BENCHMARK_F(InsertionSignedInt64, UnorderedMap, InsertFixture, 3, 5) {
         map.insert(d);
 }
 
-BENCHMARK_F(InsertionSignedInt64, ArtMap, InsertFixture, 3, 5) {
+BENCHMARK_F(InsertInt64, ArtMap, InsertFixture, 3, 5) {
     this->generate_data();
     art::radix_map<int64_t, int64_t> map;
 

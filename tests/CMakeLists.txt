@@ -18,3 +18,5 @@ add_dependencies(tests catch)
 add_executable(stress_tests ${TEST_FILES} art_stress.cpp)
 target_link_libraries(stress_tests art)
 add_dependencies(stress_tests catch)
+
+add_subdirectory(memcheck)
