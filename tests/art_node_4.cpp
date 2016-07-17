@@ -13,7 +13,7 @@ typedef Adaptive_radix_tree<uint64_t, uint64_t>::_Node_256 node_256;
 SCENARIO ("given a node_4 with one element", "[nodes]") {
     uint64_t first_value = 261;
     Key key = {first_value};
-    _leaf *leaf_five = new _leaf(key, std::make_pair(first_value, first_value));
+    _leaf *leaf_five = new _leaf(key, std::make_pair(first_value, first_value), 0, nullptr);
     node_4 *node4 = new node_4(leaf_five, 0);
 
     REQUIRE(((_leaf *) node4->children[0])->key.chunks[0] == node4->keys[0]);
@@ -23,7 +23,7 @@ SCENARIO ("given a node_4 with one element", "[nodes]") {
         std::vector<uint64_t> data = {262, 263, 264};
         for (auto &&item : data) {
             Key key2 = {item};
-            _leaf *leaf2 = new _leaf(key2, std::make_pair(item, item));
+            _leaf *leaf2 = new _leaf(key2, std::make_pair(item, item), 0, nullptr);
             node4->insert(key2.chunks[0], leaf2);
         }
 
@@ -48,7 +48,7 @@ SCENARIO ("given a node_4 with one element", "[nodes]") {
         std::vector<uint64_t> data = {264, 263, 262};
         for (auto &&item : data) {
             Key key2 = {item};
-            _leaf *leaf2 = new _leaf(key2, std::make_pair(item, item));
+            _leaf *leaf2 = new _leaf(key2, std::make_pair(item, item), 0, nullptr);
             node4->insert(key2.chunks[0], leaf2);
         }
 
@@ -74,7 +74,7 @@ SCENARIO ("given a node_4 with one element", "[nodes]") {
         std::random_shuffle(data.begin(), data.end());
         for (auto &&item : data) {
             Key key2 = {item};
-            _leaf *leaf2 = new _leaf(key2, std::make_pair(item, item));
+            _leaf *leaf2 = new _leaf(key2, std::make_pair(item, item), 0, nullptr);
             node4->insert(key2.chunks[0], leaf2);
         }
 
