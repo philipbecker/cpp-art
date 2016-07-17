@@ -15,10 +15,10 @@ STL-like map, multimap and set container based on an Adaptive Radix Tree (ART) i
 * performance improvements:
     * implement prefix compression
     * consider different leaf implementations
-    * consider different iterator models
-#### keys
+    * leaf-to-leaf pointers (probably not worth it...)
+### keys
 * variable key length support
-* binary comparable key transform
+* binary comparable key transform for:
     * char*
     * std::string
     * float/double
@@ -37,8 +37,24 @@ STL-like map, multimap and set container based on an Adaptive Radix Tree (ART) i
     * deletion
     * iteration
     * (assignemnt, copy)
-* compare fat iterators, lightweight iterators & leaf-to-leaf pointers
 
 ### memory profil
 * find tool for memory profiling
 * compare with std rb-tree & hashmap
+
+## STL-compliance
+Container is not **thread safe** (yet)!!!
+### Concept: [Container](http://en.cppreference.com/w/cpp/concept/Container)
+Missing:
+* `a.swap(b)` and `swap(a, b)`
+* `max_size()` (not going to implement, not applicable)
+### Concept: [ReversibleContainer](http://en.cppreference.com/w/cpp/concept/ReversibleContainer)
+Done!
+### Concept: [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer)
+Not started implementing.
+### Concept: [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer)
+Missing:
+* `X::key_compare` .. ?
+* `X::value_compare`
+* no support for multiple equal keys
+* .... and lots of other things ;)
