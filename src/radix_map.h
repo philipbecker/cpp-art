@@ -220,8 +220,14 @@ namespace art
          *
          */
         mapped_type &operator[](const key_type &__k) {
-            // @TODO
-            return NULL;
+            // @TODO more efficient to write extra method to avoid 2 lookups
+            iterator it = _M_t.find(__k);
+            if (it != _M_t.end())
+                return (*it).second;
+
+            std::pair<iterator, bool> res = _M_t._M_insert_unique(
+                    std::pair<_Key, _Tp>(__k, mapped_type()));
+            return (*res.first).second;
         }
 
         /**
@@ -242,7 +248,7 @@ namespace art
         // Lookup //
         ////////////
 
-        // @TODO requries const find method & const iterator
+        // @TODO requires const find method & const iterator
         size_type count(const key_type &__x) const {
             return _M_t.find(__x) == _M_t.end() ? 0 : 1;
         }

@@ -1,3 +1,4 @@
+#include <map>
 #include "catch.hpp"
 #include "../src/Adaptive_radix_tree.h"
 #include "../src/radix_map.h"
@@ -183,4 +184,39 @@ TEST_CASE("basic operations", "[art]") {
             }
         }
     }
+}
+
+TEST_CASE("Operator[]", "[basic]") {
+    std::map<int, int> map;
+    art::radix_map<int, int> art;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(-100000, 100000);
+
+    for (int i = 0; i < 20000; i++) {
+        auto k = dis(gen);
+        map.insert(std::make_pair(k, 2*i));
+        art.insert(std::make_pair(k, 2*i));
+    }
+
+    for (int i = -100000; i <= 100000; i++) {
+        auto k = dis(gen);
+        if (map.find(k) != map.end()) {
+            // Overwrite existing value
+            map[k] = i;
+            art[k] = i;
+            REQUIRE(map[k] == art[k]);
+            REQUIRE((*art.find(k)).first == (*map.find(k)).first);
+            REQUIRE((*art.find(k)).second == (*map.find(k)).second);
+        } else {
+            // Insert new value
+            map[k] = i;
+            art[k] = i;
+            REQUIRE(map[k] == art[k]);
+            REQUIRE((*art.find(k)).first == (*map.find(k)).first);
+            REQUIRE((*art.find(k)).second == (*map.find(k)).second);
+        }
+    }
+
 }

@@ -1090,14 +1090,12 @@ namespace art
             throw; // unreachable
         }
 
-        // @TODO test this function
         std::pair<iterator, iterator> equal_range(const key_type &__k) {
             auto lower = lower_bound(__k);
             auto upper = upper_bound(__k);
             return std::pair<iterator, iterator>(lower, upper);
         };
 
-        // @TODO test this function
         std::pair<const_iterator, const_iterator> equal_range(const key_type &__k) const {
             auto lower = lower_bound(__k);
             auto upper = upper_bound(__k);
