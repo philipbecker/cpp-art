@@ -3,6 +3,10 @@ include_directories(${CELERO_INCLUDE_DIR})
 set(
         PERF_FILES
         perf.cpp
+        insert.cpp
+        lookup.cpp
+        iteration.cpp
+        parameters.h
 )
 message(STATUS $ENV{CELERO_INCLUDE_DIR})
 add_executable(benchmarks EXCLUDE_FROM_ALL ${PERF_FILES})

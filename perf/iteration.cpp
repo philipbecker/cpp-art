@@ -3,10 +3,11 @@
 #include <map>
 #include <unordered_map>
 #include "../src/radix_map.h"
+#include "parameters.h"
 
-class LookupFixture : public celero::TestFixture {
+class IterationFixture : public celero::TestFixture {
 public:
-    LookupFixture() {
+    IterationFixture() {
     }
 
     virtual std::vector<std::pair<int64_t, uint64_t>> getExperimentValues() const override {
@@ -69,30 +70,29 @@ public:
 };
 
 
-//
-// LOOKUP
-//
-BASELINE_F(LookupInt64, Map, LookupFixture, 3, 5) {
+BASELINE_F(IterationInt64, Map, IterationFixture, SAMPLES, ITERATIONS) {
     this->generate_data();
     this->build_map();
 
-
-    for (auto &d: this->data)
-        map.find(d.first);
+    long sum = 0;
+    for (auto &d: this->map)
+        sum += d.second;
 }
 
-BENCHMARK_F(LookupInt64, UnorderedMap, LookupFixture, 3, 5) {
+BENCHMARK_F(IterationInt64, UnorderedMap, IterationFixture, SAMPLES, ITERATIONS) {
     this->generate_data();
     this->build_unorderd_map();
 
-    for (auto &d: this->data)
-        unordered_map.find(d.first);
+    long sum = 0;
+    for (auto &d: this->unordered_map)
+        sum += d.second;
 }
 
-BENCHMARK_F(LookupInt64, ArtMap, LookupFixture, 3, 5) {
+BENCHMARK_F(IterationInt64, ArtMap, IterationFixture, SAMPLES, ITERATIONS) {
     this->generate_data();
     this->build_radix_map();
 
-    for (auto &d: this->data)
-        radix_map.find(d.first);
+    long sum = 0;
+    for (auto &d: this->radix_map)
+        sum += d.second;
 }

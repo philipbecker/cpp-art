@@ -3,10 +3,11 @@
 #include <map>
 #include <unordered_map>
 #include "../src/radix_map.h"
+#include "parameters.h"
 
-class InsertFixture : public celero::TestFixture {
+class LookupFixture : public celero::TestFixture {
 public:
-    InsertFixture() {
+    LookupFixture() {
     }
 
     virtual std::vector<std::pair<int64_t, uint64_t>> getExperimentValues() const override {
@@ -43,36 +44,53 @@ public:
         }
     }
 
+    void build_map() {
+        for (auto &d: this->data) {
+            map.insert(d);
+        }
+    }
+
+    void build_unorderd_map() {
+        for (auto &d: this->data) {
+            unordered_map.insert(d);
+        }
+    }
+
+    void build_radix_map() {
+        for (auto &d: this->data) {
+            radix_map.insert(d);
+        }
+    }
+
     std::vector<std::pair<int64_t, int64_t>> data;
+    std::map<int64_t, int64_t> map;
+    std::unordered_map<int64_t, int64_t> unordered_map;
+    art::radix_map<int64_t, int64_t> radix_map;
     int64_t arraySize;
 };
 
-CELERO_MAIN
 
-
-//
-// INSERTION
-//
-BASELINE_F(InsertInt64, Map, InsertFixture, 3, 5) {
+BASELINE_F(LookupInt64, Map, LookupFixture, SAMPLES, ITERATIONS) {
     this->generate_data();
-    std::map<int64_t, int64_t> map;
+    this->build_map();
+
 
     for (auto &d: this->data)
-        map.insert(d);
+        map.find(d.first);
 }
 
-BENCHMARK_F(InsertInt64, UnorderedMap, InsertFixture, 3, 5) {
+BENCHMARK_F(LookupInt64, UnorderedMap, LookupFixture, SAMPLES, ITERATIONS) {
     this->generate_data();
-    std::unordered_map<int64_t, int64_t> map;
+    this->build_unorderd_map();
 
     for (auto &d: this->data)
-        map.insert(d);
+        unordered_map.find(d.first);
 }
 
-BENCHMARK_F(InsertInt64, ArtMap, InsertFixture, 3, 5) {
+BENCHMARK_F(LookupInt64, ArtMap, LookupFixture, SAMPLES, ITERATIONS) {
     this->generate_data();
-    art::radix_map<int64_t, int64_t> map;
+    this->build_radix_map();
 
     for (auto &d: this->data)
-        map.insert(d);
+        radix_map.find(d.first);
 }
