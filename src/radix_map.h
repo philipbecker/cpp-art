@@ -277,6 +277,10 @@ namespace art
             return _M_t.lower_bound(__k);
         }
 
+        const_iterator lower_bound(const key_type &__k) const {
+            return _M_t.lower_bound(__k);
+        }
+
         /**
          *  @brief Finds the end of a subsequence matching given key.
          *  @param  __k  Key of (key, value) pair to be located.
@@ -284,6 +288,10 @@ namespace art
          *          greater than key, or end().
          */
         iterator upper_bound(const key_type &__k) {
+            return _M_t.upper_bound(__k);
+        }
+
+        const_iterator upper_bound(const key_type &__k) const {
             return _M_t.upper_bound(__k);
         }
 

@@ -179,7 +179,7 @@ TEST_CASE("basic operations", "[art]") {
 
         SECTION ("map.count(key)") {
             for (int i = 0; i < v.size(); i++) {
-                //    REQUIRE(art.count(v[i].first) == 1);
+                //REQUIRE(art.count(v[i].first) == 1);
             }
         }
     }

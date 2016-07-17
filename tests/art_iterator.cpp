@@ -18,9 +18,14 @@ SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") 
     art::radix_map<unsigned, unsigned> radix_map;
     std::map<unsigned, unsigned> std_map;
 
-    for (unsigned i = 5; i < 10000; i++) {
-        radix_map.insert(std::pair<unsigned, unsigned>(i, i));
-        std_map.emplace(i, i);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, 1000000);
+
+    for (unsigned i = 0; i < 10000; i++) {
+        auto k = dis(gen);
+        radix_map.insert(std::pair<unsigned, unsigned>(k, i));
+        std_map.emplace(k, i);
     }
 
     REQUIRE(radix_map.begin()->second == std_map.begin()->second);

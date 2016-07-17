@@ -64,7 +64,7 @@ namespace art
 
             virtual _Node *minimum() = 0;
 
-             virtual _Node *maximum() = 0;
+            virtual _Node *maximum() = 0;
 
             virtual void traverse(unsigned depth) = 0;
 
@@ -139,7 +139,6 @@ namespace art
             virtual _Node *maximum() override { return this; }
 
             virtual _Node *successor(const Key &key, int depth) override {
-                std::cout << "succesor leaf " << depth << ", value;" << value.second << std::endl;
                 return this;
             }
 
@@ -271,18 +270,18 @@ namespace art
 
             virtual _Node *successor(const Key &key, int depth) override {
                 unsigned pos = 0;
-                for (; pos < this->_count && keys[pos] < key.chunks[depth]; pos++);
-                if (pos + 1 < this->_count && keys[pos] == key.chunks[depth])
-                    return children[pos + 1]->minimum();
+                for (; pos < this->_count && keys[pos] <= key.chunks[depth]; pos++);
+                if (pos < this->_count)
+                    return children[pos]->minimum();
                 else
                     return this->_parent->successor(key, depth - 1);
             }
 
             virtual _Node *predecessor(const Key &key, int depth) override {
                 int pos = this->_count - 1;
-                for (; pos > 0 && keys[pos] > key.chunks[depth]; pos--);
-                if (pos - 1 >= 0 && keys[pos] == key.chunks[depth])
-                    return children[pos - 1]->maximum();
+                for (; pos >= 0 && keys[pos] >= key.chunks[depth]; pos--);
+                if (pos >= 0)
+                    return children[pos]->maximum();
                 else
                     return this->_parent->predecessor(key, depth - 1);
             }
@@ -368,18 +367,18 @@ namespace art
 
             virtual _Node *successor(const Key &key, int depth) override {
                 unsigned pos = 0;
-                for (; pos < this->_count && keys[pos] < key.chunks[depth]; pos++);
-                if (pos + 1 < this->_count && keys[pos] == key.chunks[depth])
-                    return children[pos + 1]->minimum();
+                for (; pos < this->_count && keys[pos] <= key.chunks[depth]; pos++);
+                if (pos < this->_count)
+                    return children[pos]->minimum();
                 else
                     return this->_parent->successor(key, depth - 1);
             }
 
             virtual _Node *predecessor(const Key &key, int depth) override {
                 int pos = this->_count - 1;
-                for (; pos > 0 && keys[pos] > key.chunks[depth]; pos--);
-                if (pos - 1 >= 0 && keys[pos] == key.chunks[depth])
-                    return children[pos - 1]->maximum();
+                for (; pos >= 0 && keys[pos] >= key.chunks[depth]; pos--);
+                if (pos >= 0)
+                    return children[pos]->maximum();
                 else
                     return this->_parent->predecessor(key, depth - 1);
             }
@@ -950,11 +949,11 @@ namespace art
 
             _Node **current_node = &_M_root;
             for (unsigned i = 0; i < key_size + 1; i++) {
-                if (current_node == nullptr || *current_node == nullptr)
+                if (current_node == nullptr)
                     return end();
 
                 if ((*current_node)->is_leaf()) {
-                    if (transformed_key.value == ((_Leaf *) *current_node)->key.value) {
+                    if (transformed_key.value == static_cast<_Leaf *>(*current_node)->key.value) {
                         return iterator(*current_node);
                     } else {
                         return end();
@@ -966,7 +965,11 @@ namespace art
             throw; // unreachable
         }
 
-        // @TODO test this function
+        const_iterator find(const key_type &__k) const {
+
+            throw; // unreachable
+        }
+
         iterator lower_bound(const key_type &__k) {
             Key transformed_key = {_M_key_transform(__k)};
             const auto key_size = sizeof(__k);
@@ -976,7 +979,6 @@ namespace art
 
             _Node **previous_node = nullptr;
             _Node **current_node = &_M_root;
-            unsigned pos = 0;
             for (unsigned i = 0; i < key_size + 1; i++) {
                 if (current_node == nullptr || *current_node == nullptr) {
                     auto successor = (*previous_node)->successor(transformed_key, i - 1);
@@ -984,7 +986,7 @@ namespace art
                 }
 
                 if ((*current_node)->is_leaf()) {
-                    if (((_Leaf *) *current_node)->key.value <= transformed_key.value) {
+                    if (transformed_key.value <= static_cast<_Leaf *>(*current_node)->key.value) {
                         return iterator(*current_node);
                     } else {
                         auto successor = (*previous_node)->successor(transformed_key, i - 1);
@@ -998,9 +1000,109 @@ namespace art
             throw; // unreachable
         }
 
-        iterator upper_bound(const key_type &__k) {
-            throw;
+        const_iterator lower_bound(const key_type &__k) const {
+            Key transformed_key = {_M_key_transform(__k)};
+            const auto key_size = sizeof(__k);
+
+            if (_M_root == nullptr)
+                return end();
+
+            _Node **previous_node = nullptr;
+            _Node **current_node = &_M_root;
+            for (unsigned i = 0; i < key_size + 1; i++) {
+                if (current_node == nullptr || *current_node == nullptr) {
+                    auto successor = (*previous_node)->successor(transformed_key, i - 1);
+                    return const_iterator(successor);
+                }
+
+                if ((*current_node)->is_leaf()) {
+                    if (transformed_key.value <= static_cast<_Leaf *>(*current_node)->key.value) {
+                        return const_iterator(*current_node);
+                    } else {
+                        auto successor = (*previous_node)->successor(transformed_key, i - 1);
+                        return const_iterator(successor);
+                    }
+                }
+
+                previous_node = current_node;
+                current_node = (*current_node)->find(transformed_key.chunks[i]);
+            }
+            throw; // unreachable
         }
+
+        iterator upper_bound(const key_type &__k) {
+            Key transformed_key = {_M_key_transform(__k)};
+            const auto key_size = sizeof(__k);
+
+            if (_M_root == nullptr)
+                return end();
+
+            _Node **previous_node = nullptr;
+            _Node **current_node = &_M_root;
+            for (unsigned i = 0; i < key_size + 1; i++) {
+                if (current_node == nullptr || *current_node == nullptr) {
+                    auto successor = (*previous_node)->successor(transformed_key, i - 1);
+                    return iterator(successor);
+                }
+
+                if ((*current_node)->is_leaf()) {
+                    if (transformed_key.value < static_cast<_Leaf *>(*current_node)->key.value) {
+                        return iterator(*current_node);
+                    } else {
+                        auto successor = (*previous_node)->successor(transformed_key, i - 1);
+                        return iterator(successor);
+                    }
+                }
+
+                previous_node = current_node;
+                current_node = (*current_node)->find(transformed_key.chunks[i]);
+            }
+            throw; // unreachable
+        }
+
+        const_iterator upper_bound(const key_type &__k) const {
+            Key transformed_key = {_M_key_transform(__k)};
+            const auto key_size = sizeof(__k);
+
+            if (_M_root == nullptr)
+                return end();
+
+            _Node **previous_node = nullptr;
+            _Node **current_node = &_M_root;
+            for (unsigned i = 0; i < key_size + 1; i++) {
+                if (current_node == nullptr || *current_node == nullptr) {
+                    auto successor = (*previous_node)->successor(transformed_key, i - 1);
+                    return const_iterator(successor);
+                }
+
+                if ((*current_node)->is_leaf()) {
+                    if (transformed_key.value < static_cast<_Leaf *>(*current_node)->key.value) {
+                        return const_iterator(*current_node);
+                    } else {
+                        auto successor = (*previous_node)->successor(transformed_key, i - 1);
+                        return const_iterator(successor);
+                    }
+                }
+
+                previous_node = current_node;
+                current_node = (*current_node)->find(transformed_key.chunks[i]);
+            }
+            throw; // unreachable
+        }
+
+        // @TODO test this function
+        std::pair<iterator, iterator> equal_range(const key_type &__k) {
+            auto lower = lower_bound(__k);
+            auto upper = upper_bound(__k);
+            return std::pair<iterator, iterator>(lower, upper);
+        };
+
+        // @TODO test this function
+        std::pair<const_iterator, const_iterator> equal_range(const key_type &__k) const {
+            auto lower = lower_bound(__k);
+            auto upper = upper_bound(__k);
+            return std::pair<const_iterator, const_iterator>(lower, upper);
+        };
 
         _Node *minimum() const {
             if (_M_root != nullptr)
