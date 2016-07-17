@@ -16,6 +16,7 @@ STL-like map, multimap and set container based on an Adaptive Radix Tree (ART) i
     * implement prefix compression
     * consider different leaf implementations
     * leaf-to-leaf pointers (probably not worth it...)
+
 ### keys
 * variable key length support
 * binary comparable key transform for:
@@ -48,10 +49,13 @@ Container is not **thread safe** (yet)!!!
 Missing:
 * `a.swap(b)` and `swap(a, b)`
 * `max_size()` (not going to implement, not applicable)
+
 ### Concept: [ReversibleContainer](http://en.cppreference.com/w/cpp/concept/ReversibleContainer)
 Done!
+
 ### Concept: [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer)
 Not started implementing.
+
 ### Concept: [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer)
 Missing:
 * `X::key_compare` .. ?
