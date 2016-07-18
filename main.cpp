@@ -14,29 +14,29 @@ struct custom_transform {
 };
 
 struct Employee {
-    uint64_t id;
+    int id;
     std::string first_name;
     std::string last_name;
 
 };
 
-std::ostream &operator<<(std::ostream& os, const Employee &e) {
+std::ostream &operator<<(std::ostream &os, const Employee &e) {
     os << e.first_name << " " << e.last_name << " (" << e.id << ")";
     return os;
 }
 
-namespace art {
+namespace art
+{
     template<>
     struct key_transform<Employee> {
-        uint64_t operator()(const Employee &e) const noexcept {
-            return e.id;
+        int operator()(const Employee &e) const noexcept {
+            return key_transform<int>()(e.id);
         }
     };
 }
 
 int main() {
     art::radix_map<int64_t, int64_t, custom_transform> map;
-
     map.insert(std::pair<int64_t, int64_t>(-2, 5));
     map.insert(std::pair<int64_t, int64_t>(0, 5));
     map.insert(std::pair<int64_t, int64_t>(7, 25));
@@ -45,11 +45,11 @@ int main() {
         std::cout << e.first << ", " << e.second << std::endl;
 
     Employee e1{1, "Alan", "Turing"};
-    Employee e2{2, "John", "Neumann"};
-    art::radix_map<int, int> employee_map;
-
-    employee_map[1] = 10;
-    employee_map.insert(std::pair<int, int>(e2.id, 20));
+    Employee e2{-5, "John", "Neumann"};
+    art::radix_map<Employee, int> employee_map = {
+            {{1, "Alan", "Turing"},  10},
+            {{-5, "John", "Neumann"}, 20}
+    };
 
     for (auto &e : employee_map)
         std::cout << e.first << ", " << e.second << std::endl;
@@ -62,6 +62,16 @@ int main() {
     std::cout << "Node 16\t\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_16) << std::endl;
     std::cout << "Node 48\t\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_48) << std::endl;
     std::cout << "Node 256\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_256) << std::endl;
+
+
+    art::radix_map<unsigned, unsigned> art;
+    std::map<unsigned, unsigned> std_map;
+
+    try {
+        auto w = art.at(5);
+    } catch (const std::out_of_range &e) {
+        std::cout << "\"Out-of-range\"-Exception: " << e.what() << std::endl;
+    }
 
     /**
     art::radix_map<unsigned, unsigned> art;

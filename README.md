@@ -85,3 +85,67 @@ std::cout << map.at(3) << std::endl; // -3
 std::cout << map.size() << std::endl; // 5
 std::cout << map.empty() << std::endl; // 0
 ```
+## Custom key transformation
+```C++
+// Signed int key transformation without signed bit flipt
+// Negative values are now larger than positive ones
+struct custom_transform {
+    int64_t operator()(const int64_t &key) const noexcept {
+        return art::is_big_endian() ? key : art::byte_swap(key);
+    }
+};
+
+int main() {
+    art::radix_map<int64_t, int64_t, custom_transform> map;
+    map.insert(std::pair<int64_t, int64_t>(-2, 5));
+    map.insert(std::pair<int64_t, int64_t>(0, 5));
+    map.insert(std::pair<int64_t, int64_t>(7, 25));
+
+    for (auto &e : map)
+        std::cout << e.first << ", " << e.second << std::endl;
+        
+     // 0, 5
+     // 7, 25
+     // -2, 5
+     
+     return 0;
+}
+
+```
+## Custom types as keys
+```C++
+struct Employee {
+    int id;
+    std::string first_name;
+    std::string last_name;
+
+};
+
+std::ostream &operator<<(std::ostream& os, const Employee &e) {
+    os << e.first_name << " " << e.last_name << " (" << e.id << ")";
+    return os;
+}
+
+namespace art {
+    template<>
+    struct key_transform<Employee> {
+        int operator()(const Employee &e) const noexcept {
+            return key_transform<int>()(e.id);
+        }
+    };
+}
+    
+int main() {
+    art::radix_map<Employee, int> employee_map = {
+                {{1, "Alan", "Turing"},  10},
+                {{-5, "John", "Neumann"}, 20}
+        };
+    
+        for (auto &e : employee_map)
+            std::cout << e.first << ", " << e.second << std::endl;
+    
+    // John Neumann (-5), 20        
+    // Alan Turing (1), 10
+    return 0;
+}
+```

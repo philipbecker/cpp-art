@@ -277,7 +277,7 @@ namespace art
         mapped_type &at(const key_type &__k) {
             iterator res = _M_t.find(__k);
             if (res == _M_t.end())
-                std::__throw_out_of_range("Radix map out of range");
+                std::__throw_out_of_range("radix_map::at");
             return (*res).second;
         }
 

@@ -40,9 +40,13 @@ namespace art
             node_48_t = 3, node_256_t = 4, _dummy_node = 5
         };
 
+        _Key_transform _M_key_transform;
+
+        typedef decltype(_M_key_transform(key_type())) transformed_key_type;
+
     public:
         union Key {
-            const key_type value;
+            const transformed_key_type value;
             const byte chunks[sizeof(key_type)];
         };
 
@@ -172,7 +176,7 @@ namespace art
 
             _Dummy_Node()
                     : _Node(0, nullptr), _root(nullptr),
-                      _leaf(new _Leaf(Key{0}, std::pair<key_type, mapped_type>(0, 0), 0, this)) {
+                      _leaf(new _Leaf(Key{0}, std::pair<key_type, mapped_type>(key_type(), mapped_type()), 0, this)) {
             }
 
             _Dummy_Node(_Node **root, _Leaf *leaf)
@@ -633,8 +637,6 @@ namespace art
 
     private:
         size_t _M_count;
-
-        _Key_transform _M_key_transform;
 
         // Dummy node of special type to mark the right end of the container
         // Necessary as the end marker for iterators
