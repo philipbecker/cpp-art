@@ -186,6 +186,53 @@ TEST_CASE("basic operations", "[art]") {
     }
 }
 
+TEST_CASE("Erase1", "[basic]") {
+    std::map<unsigned, unsigned> map;
+    art::radix_map<unsigned, unsigned> radix_map;
+
+    for (unsigned i = 0; i < 10000; i++) {
+        map.insert(std::make_pair(i, 2*i));
+        radix_map.insert(std::make_pair(i, 2*i));
+    }
+
+    SECTION ("erase equals std::map") {
+        for (unsigned i = 0; i < 10000; i++) {
+            auto std_res = map.erase(i);
+            auto art_res = radix_map.erase(i);
+            //std::cout << "deleted " << i << " " << (std_res ? "true" : "false")
+            //<< " " << (art_res ? "true" : "false") << std::endl;
+            REQUIRE(std_res == art_res);
+            REQUIRE(map.size() == radix_map.size());
+        }
+    }
+}
+
+TEST_CASE("Erase complex", "[basic]") {
+    std::map<int, int> map;
+    art::radix_map<int, int> radix_map;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(-100000, 100000);
+
+    for (int i = 0; i < 10000; i++) {
+        auto k = dis(gen);
+        map.insert(std::make_pair(k, 2*i));
+        radix_map.insert(std::make_pair(k, 2*i));
+    }
+
+    SECTION ("erase equals std::map") {
+        for (int i = -100000; i < 100000; i++) {
+            auto std_res = map.erase(i);
+            auto art_res = radix_map.erase(i);
+            //std::cout << "deleted " << i << " " << (std_res ? "true" : "false")
+            //<< " " << (art_res ? "true" : "false") << std::endl;
+            REQUIRE(std_res == art_res);
+            REQUIRE(map.size() == radix_map.size());
+        }
+    }
+}
+
 TEST_CASE("Operator[]", "[basic]") {
     std::map<int, int> map;
     art::radix_map<int, int> art;
@@ -218,5 +265,4 @@ TEST_CASE("Operator[]", "[basic]") {
             REQUIRE((*art.find(k)).second == (*map.find(k)).second);
         }
     }
-
 }

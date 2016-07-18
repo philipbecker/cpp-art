@@ -113,6 +113,8 @@ namespace art
              * Finding a predecessor takes O(k) time.
              */
             virtual _Node *predecessor(const Key &key, int depth) = 0;
+
+            virtual void debug() const = 0;
         };
 
         class _Leaf : public _Node {
@@ -162,7 +164,15 @@ namespace art
 
             bool is_leaf() override { return true; }
 
+            transformed_key_type transformed_key() const {
+                return transformed_key_type()(value.first);
+            }
+
             virtual node_type get_type() const override { return node_type::_leaf_t; }
+
+            virtual void debug() const override {
+                std::cout << "Leaf: " << value.first << " -> " << value.second << std::endl;
+            }
         };
 
         /**
@@ -216,6 +226,10 @@ namespace art
             virtual uint16_t max_size() const override { return 1; }
 
             virtual node_type get_type() const override { return node_type::_dummy_node; }
+
+            virtual void debug() const override {
+                std::cout << "Dummy Node debug" << std::endl;
+            }
         };
 
         class _Node_4 : public _Node {
@@ -319,6 +333,17 @@ namespace art
 
             virtual node_type get_type() const override { return node_type::node_4_t; }
 
+            virtual void debug() const override {
+                std::cout << "Node 4, count: " << size() << std::endl;
+                for (size_t i = 0; i < this->_count; i++) {
+                    std::cout << ((unsigned) keys[i]) << " | ";
+                }
+                std::cout << std::endl;
+                for (size_t i = 0; i < this->_count; i++) {
+                    std::cout << children[i] << " | ";
+                }
+                std::cout << std::endl;
+            }
         };
 
         class _Node_16 : public _Node {
@@ -428,6 +453,18 @@ namespace art
             virtual uint16_t max_size() const override { return 16; }
 
             virtual node_type get_type() const override { return node_type::node_16_t; }
+
+            virtual void debug() const override {
+                std::cout << "Node 16, count: " << size() << std::endl;
+                for (size_t i = 0; i < this->_count; i++) {
+                    std::cout << ((unsigned) keys[i]) << " | ";
+                }
+                std::cout << std::endl;
+                for (size_t i = 0; i < this->_count; i++) {
+                    std::cout << children[i] << " | ";
+                }
+                std::cout << std::endl;
+            }
         };
 
 
@@ -539,6 +576,19 @@ namespace art
             virtual uint16_t max_size() const override { return 48; }
 
             virtual node_type get_type() const override { return node_type::node_48_t; }
+
+            virtual void debug() const override {
+                std::cout << "Node 48, count: " << size() << std::endl;
+                for (size_t i = 0; i < 256; i++) {
+                    if (child_index[i] != EMPTY_MARKER)
+                        std::cout << i << " | ";
+                }
+                std::cout << std::endl;
+                for (size_t i = 0; i < this->_count; i++) {
+                    std::cout << i << ": " << children[i] << " | ";
+                }
+                std::cout << std::endl;
+            }
         };
 
         class _Node_256 : public _Node {
@@ -633,6 +683,23 @@ namespace art
 
             virtual node_type get_type() const override { return node_type::node_256_t; }
 
+            virtual void debug() const override {
+                std::cout << "Node 256, count: " << size() << std::endl;
+                for (size_t i = 0; i < 256; i++) {
+                    if (children[i] != nullptr)
+                        std::cout << i << " | ";
+                    else
+                        std::cout << "--" << " | ";
+                }
+                std::cout << std::endl;
+                for (size_t i = 0; i < 256; i++) {
+                    if (children[i] != nullptr)
+                        std::cout << i << ": " << children[i] << " | ";
+                    else
+                        std::cout << "--" << " | ";
+                }
+                std::cout << std::endl;
+            }
         };
 
     private:
@@ -909,6 +976,8 @@ namespace art
                 _M_root->clear();
                 delete _M_root;
             }
+            _M_root = nullptr;
+            _M_count = 0;
         }
 
         // @TODO memory management?
@@ -1000,36 +1069,54 @@ namespace art
                 _M_insert_unique(*__first);
         }
 
-        // @TODO implementation
         size_type erase_unique(const key_type &__k) {
             // Empty Tree
             if (_M_root == nullptr)
                 return 0;
 
-            Key transformed_key = {_M_key_transform(__k.first)};
-            const auto key_size = sizeof(__k.first);
+            Key transformed_key = {_M_key_transform(__k)};
+            const auto key_size = sizeof(__k);
+
+            if (_M_root->is_leaf()) {
+                delete _M_root;
+                _M_count--;
+                return 1;
+            }
 
             _Node **current_node = &_M_root;
-            _Node **previous_node = nullptr;
 
             for (unsigned i = 0; i < key_size + 1; i++) {
-                if (current_node != nullptr && *current_node != nullptr && (*current_node)->is_leaf()) {
-                    _Leaf *existing_leaf = static_cast<_Leaf *>(*current_node);
-                    if (transformed_key.value == existing_leaf->key.value) {
-                        (*previous_node)->erase(transformed_key.chunks[i - 1]);
-                        return 1;
-                    }
+                //std::cout << "depth " << i << std::endl;
+                if (current_node == nullptr || *current_node == nullptr)
                     return 0;
-                } else if (current_node != nullptr && *current_node != nullptr) {
-                    // traverse down the tree, shrink underfull nodes as we go
-                    if ((*current_node)->size() < (*current_node)->min_size()) {
-                        *current_node = shrink(*current_node);
+
+                _Node **child = (*current_node)->find(transformed_key.chunks[i]);
+                if (child == nullptr || *child == nullptr)
+                    return 0;
+
+                if ((*child)->is_leaf()) {
+                    _Leaf *existing_leaf = static_cast<_Leaf *>(*child);
+                    if (transformed_key.value == existing_leaf->key.value) {
+                        //(*current_node)->debug();
+                        //std::cout << "found leaf to delete" << std::endl;
+                        (*current_node)->erase(transformed_key.chunks[i]);
+                        //(*current_node)->debug();
+                        _M_count--;
+
+                        // @TODO THIS IS WRONG, need to recursively remove nodes if necessary !!!
+                        if ((*current_node)->size() < (*current_node)->min_size()
+                            && (*current_node)->size() > 0) {
+                            *current_node = shrink(*current_node);
+                        }
+                        return 1;
+                    } else {
+                        //std::cout << "key not in tree (leaf mismatch)" << std::endl;
+                        return 0;
                     }
-                    previous_node = current_node;
-                    current_node = (*current_node)->find(transformed_key.chunks[i]);
                 } else {
-                    return 0; // key not in tree
+                    current_node = child;
                 }
+
             }
             throw; // unreachable
         }
@@ -1255,8 +1342,26 @@ namespace art
             switch (type) {
                 case node_type::node_4_t: {
                     _Node_4 *node4 = static_cast<_Node_4 *>(old_node);
-                    _Node *node = node4->children[0];
-                    return node;
+
+                    // if remaining child is not a leaf, return this node
+                    // (this old_node one-way not will be skipped)
+                    //if (node4->size() <= 1) {
+                    //    std::cout << "SKIP THIS" << std::endl;
+                    //    _Node *next_node = node4->children[0];
+                    //   delete old_node;
+                    //    return next_node;
+                    //}
+
+                    if (node4->children[0]->is_leaf()) {
+                        //std::cout << "Shrink node 4 to leaf" << std::endl;
+                        _Node *node = node4->children[0];
+                        node->_parent = old_node->_parent;
+                        //std::cout << "value in leaf " << static_cast<_Leaf *>(node)->value.first <<
+                        //" -> " << static_cast<_Leaf *>(node)->value.second << std::endl;
+                        delete old_node;
+                        return node;
+                    }
+                    return old_node;
                 }
                 case node_type::node_16_t: {
                     _Node_16 *node16 = static_cast<_Node_16 *>(old_node);

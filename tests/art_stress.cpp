@@ -72,5 +72,4 @@ TEST_CASE("Stress tests 2", "[stress]") {
             }
         }
     }
-
 }
