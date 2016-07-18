@@ -7,7 +7,52 @@
 
 using namespace std;
 
+struct custom_transform {
+    int64_t operator()(const int64_t &key) const noexcept {
+        return art::is_big_endian() ? key : art::byte_swap(key);
+    }
+};
+
+struct Employee {
+    uint64_t id;
+    std::string first_name;
+    std::string last_name;
+
+};
+
+std::ostream &operator<<(std::ostream& os, const Employee &e) {
+    os << e.first_name << " " << e.last_name << " (" << e.id << ")";
+    return os;
+}
+
+namespace art {
+    template<>
+    struct key_transform<Employee> {
+        uint64_t operator()(const Employee &e) const noexcept {
+            return e.id;
+        }
+    };
+}
+
 int main() {
+    art::radix_map<int64_t, int64_t, custom_transform> map;
+
+    map.insert(std::pair<int64_t, int64_t>(-2, 5));
+    map.insert(std::pair<int64_t, int64_t>(0, 5));
+    map.insert(std::pair<int64_t, int64_t>(7, 25));
+
+    for (auto &e : map)
+        std::cout << e.first << ", " << e.second << std::endl;
+
+    Employee e1{1, "Alan", "Turing"};
+    Employee e2{2, "John", "Neumann"};
+    art::radix_map<int, int> employee_map;
+
+    employee_map[1] = 10;
+    employee_map.insert(std::pair<int, int>(e2.id, 20));
+
+    for (auto &e : employee_map)
+        std::cout << e.first << ", " << e.second << std::endl;
 
     std::cout << "Memory footprint" << std::endl;
     std::cout << "Node Type\t\t" << "Size" << std::endl;
@@ -17,44 +62,6 @@ int main() {
     std::cout << "Node 16\t\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_16) << std::endl;
     std::cout << "Node 48\t\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_48) << std::endl;
     std::cout << "Node 256\t\t" << sizeof(art::Adaptive_radix_tree<int, int>::_Node_256) << std::endl;
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-
-    std::vector<std::pair<int64_t, int64_t>> v;
-    for (int i = 2; i < 10; i++) {
-        auto candidate = dis(gen);
-        v.emplace_back(i, i);
-    }
-
-    art::radix_map<int64_t, int64_t> map;
-
-    for (auto &e: v)
-        map.insert(e);
-
-    int sum = 0;
-    for (auto &e: v)
-        sum += map.find(e.first)->second;
-
-    std::cout << sum << std::endl;
-
-
-    std::cout << "forward" << std::endl;
-    int count = 0;
-    for (auto it = map.begin(), end = map.end(); it != end; ++it) {
-        std::cout << (*it).second << ", ";
-        if (count > 20) break;
-        count++;
-    }
-
-    std::cout << std::endl << "backward" << std::endl;
-    count = 0;
-    for (auto it = map.rbegin(), end = map.rend(); it != end; ++it) {
-        std::cout << (*it).second << ", ";
-        if (count > 20) break;
-        count++;
-    }
 
     /**
     art::radix_map<unsigned, unsigned> art;

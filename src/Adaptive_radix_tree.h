@@ -60,6 +60,8 @@ namespace art
 
             virtual void insert(const byte &key_byte, _Node *node) = 0;
 
+            virtual void erase(const byte &key_byte) = 0;
+
             virtual _Node **find(const byte &key_byte) = 0;
 
             virtual _Node *minimum() = 0;
@@ -71,6 +73,8 @@ namespace art
             virtual bool is_leaf() { return false; }
 
             uint16_t size() const { return _count; }
+
+            virtual uint16_t min_size() const = 0;
 
             virtual uint16_t max_size() const = 0;
 
@@ -125,6 +129,8 @@ namespace art
 
             virtual void insert(const byte &key_byte, _Node *node) override { }
 
+            virtual void erase(const byte &key_byte) override { }
+
             virtual void traverse(unsigned depth) override {
                 std::cout << std::string(depth + 1, '-') << " leaf " << this << ": ("
                 << value.first << "," << value.second << ")" << std::endl;
@@ -146,9 +152,11 @@ namespace art
                 return this;
             }
 
-            bool is_leaf() override { return true; }
+            virtual uint16_t min_size() const override { return 0; }
 
-            uint16_t max_size() const override { return 1; }
+            virtual uint16_t max_size() const override { return 1; }
+
+            bool is_leaf() override { return true; }
 
             virtual node_type get_type() const override { return node_type::_leaf_t; }
         };
@@ -176,6 +184,8 @@ namespace art
 
             virtual void insert(const byte &key_byte, _Node *node) override { }
 
+            virtual void erase(const byte &key_byte) override { }
+
             virtual void traverse(unsigned depth) override { }
 
             virtual _Node **find(const byte &key_byte) override {
@@ -197,7 +207,9 @@ namespace art
                 return this->_leaf;
             }
 
-            uint16_t max_size() const override { return 1; }
+            virtual uint16_t min_size() const override { return 0; }
+
+            virtual uint16_t max_size() const override { return 1; }
 
             virtual node_type get_type() const override { return node_type::_dummy_node; }
         };
@@ -246,6 +258,17 @@ namespace art
                 this->_count++;
             }
 
+            virtual void erase(const byte &key_byte) override {
+                unsigned pos = 0;
+                for (; pos < this->_count && keys[pos] < key_byte; pos++);
+                if (pos < this->_count) {
+                    delete children[pos];
+                    std::move(keys.begin() + pos + 1, keys.begin() + this->_count, keys.begin() + pos);
+                    std::move(children.begin() + pos + 1, children.begin() + this->_count, children.begin() + pos);
+                    this->_count--;
+                }
+            }
+
             virtual _Node **find(const byte &key_byte) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
@@ -285,6 +308,8 @@ namespace art
                 else
                     return this->_parent->predecessor(key, depth - 1);
             }
+
+            virtual uint16_t min_size() const override { return 2; }
 
             virtual uint16_t max_size() const override { return 4; }
 
@@ -343,6 +368,17 @@ namespace art
                 this->_count++;
             }
 
+            virtual void erase(const byte &key_byte) override {
+                unsigned pos = 0;
+                for (; pos < this->_count && keys[pos] < key_byte; pos++);
+                if (pos < this->_count) {
+                    delete children[pos];
+                    std::move(keys.begin() + pos + 1, keys.begin() + this->_count, keys.begin() + pos);
+                    std::move(children.begin() + pos + 1, children.begin() + this->_count, children.begin() + pos);
+                    this->_count--;
+                }
+            }
+
             virtual _Node **find(const byte &key_byte) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
@@ -382,6 +418,8 @@ namespace art
                 else
                     return this->_parent->predecessor(key, depth - 1);
             }
+
+            virtual uint16_t min_size() const override { return 5; }
 
             virtual uint16_t max_size() const override { return 16; }
 
@@ -436,10 +474,18 @@ namespace art
             }
 
             virtual void insert(const byte &key_byte, _Node *node) override {
-                auto pos = this->_count;
+                unsigned pos = 0;
+                for (; children[pos] != nullptr; pos++);
                 child_index[key_byte] = pos;
                 children[pos] = node;
                 this->_count++;
+            }
+
+            virtual void erase(const byte &key_byte) override {
+                delete children[child_index[key_byte]];
+                children[child_index[key_byte]] = nullptr;
+                child_index[key_byte] = EMPTY_MARKER;
+                this->_count--;
             }
 
             virtual _Node **find(const byte &key_byte) override {
@@ -484,6 +530,8 @@ namespace art
                 return this->_parent->predecessor(key, depth - 1);
             }
 
+            virtual uint16_t min_size() const override { return 17; }
+
             virtual uint16_t max_size() const override { return 48; }
 
             virtual node_type get_type() const override { return node_type::node_48_t; }
@@ -518,6 +566,12 @@ namespace art
             virtual void insert(const byte &key_byte, _Node *node) override {
                 children[key_byte] = node;
                 this->_count++;
+            }
+
+            virtual void erase(const byte &key_byte) override {
+                delete children[key_byte];
+                children[key_byte] = nullptr;
+                this->_count--;
             }
 
             virtual _Node **find(const byte &key_byte) override {
@@ -569,6 +623,8 @@ namespace art
                 return this->_parent->predecessor(key, depth - 1);
             }
 
+            virtual uint16_t min_size() const override { return 49; }
+
             virtual uint16_t max_size() const override { return 256; }
 
             virtual node_type get_type() const override { return node_type::node_256_t; }
@@ -588,13 +644,20 @@ namespace art
         // Current root node of the radix tree
         _Node *_M_root;
 
-        Adaptive_radix_tree() : _M_count(0) {
-            _M_root = nullptr;
-            _M_dummy_node = new _Dummy_Node();
+        /**
+          *  @brief  Default constructor creates no elements.
+          */
+        Adaptive_radix_tree() {
+            init();
         }
 
         Adaptive_radix_tree(const _Key_transform &key_transformer)
-                : _M_count(0), _M_key_transform(key_transformer) {
+                : _M_key_transform(key_transformer) {
+            init();
+        }
+
+        void init() {
+            _M_count = 0;
             _M_root = nullptr;
             _M_dummy_node = new _Dummy_Node();
         }
@@ -830,6 +893,10 @@ namespace art
             return const_reverse_iterator(iterator(min));
         }
 
+        _Key_transform key_trans() const {
+            return _M_key_transform;
+        }
+
         ///////////////
         // Modifiers //
         ///////////////
@@ -929,6 +996,40 @@ namespace art
             _M_reset();
             for (; __first != __last; ++__first)
                 _M_insert_unique(*__first);
+        }
+
+        // @TODO implementation
+        size_type erase_unique(const key_type &__k) {
+            // Empty Tree
+            if (_M_root == nullptr)
+                return 0;
+
+            Key transformed_key = {_M_key_transform(__k.first)};
+            const auto key_size = sizeof(__k.first);
+
+            _Node **current_node = &_M_root;
+            _Node **previous_node = nullptr;
+
+            for (unsigned i = 0; i < key_size + 1; i++) {
+                if (current_node != nullptr && *current_node != nullptr && (*current_node)->is_leaf()) {
+                    _Leaf *existing_leaf = static_cast<_Leaf *>(*current_node);
+                    if (transformed_key.value == existing_leaf->key.value) {
+                        (*previous_node)->erase(transformed_key.chunks[i - 1]);
+                        return 1;
+                    }
+                    return 0;
+                } else if (current_node != nullptr && *current_node != nullptr) {
+                    // traverse down the tree, shrink underfull nodes as we go
+                    if ((*current_node)->size() < (*current_node)->min_size()) {
+                        *current_node = shrink(*current_node);
+                    }
+                    previous_node = current_node;
+                    current_node = (*current_node)->find(transformed_key.chunks[i]);
+                } else {
+                    return 0; // key not in tree
+                }
+            }
+            throw; // unreachable
         }
 
         // @TODO implementation

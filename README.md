@@ -63,8 +63,8 @@ Not started implementing.
 - [x] `X(i, j)`, `X a(i, j);` 
 - [x] `X(il);`
 - [x] `a = il`
-- [ ] `a.key_trans()`
-- [ ] `a.value_comp()`
+- [x] `a.key_trans()`
+- [ ] `a.value_comp()` ??
 - [ ] support for multiple equal keys
 
 ## Sample Code

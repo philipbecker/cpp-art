@@ -81,6 +81,24 @@ namespace art
         }
 
         /**
+         *  @brief  Builds a %map from an initializer_list.
+         *  @param  __l  An initializer_list.
+         *  @param  __comp  A comparison object.
+         *  @param  __a  An allocator object.
+         *
+         *  Create a %map consisting of copies of the elements in the
+         *  initializer_list @a __l.
+         *  This is linear in N if the range is already sorted, and NlogN
+         *  otherwise (where N is @a __l.size()).
+         */
+        radix_map(std::initializer_list<value_type> __l,
+                  const _Key_transform &__key_transformer = _Key_transform(),
+                  const allocator_type &__a = allocator_type())
+                : _M_t(__key_transformer /*, _Pair_alloc_type(__a) */) {
+            _M_t._M_insert_unique(__l.begin(), __l.end());
+        }
+
+        /**
          *  @brief  %Map assignment operator.
          *  @param  __x  A %map of identical element and allocator types.
          *
@@ -186,8 +204,27 @@ namespace art
 
         template<typename... _Args>
         std::pair<iterator, bool> emplace(_Args &&... __args) {
-            std::logic_error("function not yet implemented exception");
+            throw;
             //return _M_t._M_emplace_unique(std::forward<_Args>(__args)...);
+        }
+
+        size_type erase(const key_type &__k) {
+            return _M_t.erase_unique(__k);
+        }
+
+        // @TODO implementation
+        iterator erase(const_iterator __it) {
+            throw;
+
+            return NULL; // successor
+        }
+
+        // @TODO implementation
+        iterator erase(const_iterator __first, const_iterator __last) {
+            for (; __first != __last; ++__first)
+                _M_t.erase_unique(__first);
+
+            return NULL; // successor
         }
 
         /**
@@ -343,6 +380,14 @@ namespace art
 
         const_reverse_iterator rend() const {
             return _M_t.rend();
+        }
+
+        ///////////////
+        // Observers //
+        ///////////////
+
+        _Key_transform key_trans() const {
+            return _M_t.key_trans();
         }
     };
 
