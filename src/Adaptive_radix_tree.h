@@ -47,7 +47,7 @@ namespace art
     public:
         union Key {
             const transformed_key_type value;
-            const byte chunks[sizeof(key_type)];
+            const byte chunks[sizeof(transformed_key_type)];
         };
 
         class _Node {

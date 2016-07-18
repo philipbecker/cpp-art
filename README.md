@@ -87,7 +87,7 @@ std::cout << map.empty() << std::endl; // 0
 ```
 ## Custom key transformation
 ```C++
-// Signed int key transformation without signed bit flipt
+// Signed int key transformation without signed bit flip
 // Negative values are now larger than positive ones
 struct custom_transform {
     int64_t operator()(const int64_t &key) const noexcept {
