@@ -158,7 +158,7 @@ namespace art
                 return this;
             }
 
-            virtual uint16_t min_size() const override { return 0; }
+            virtual uint16_t min_size() const override { return 1; }
 
             virtual uint16_t max_size() const override { return 1; }
 
@@ -223,7 +223,7 @@ namespace art
 
             virtual uint16_t min_size() const override { return 0; }
 
-            virtual uint16_t max_size() const override { return 1; }
+            virtual uint16_t max_size() const override { return 0; }
 
             virtual node_type get_type() const override { return node_type::_dummy_node; }
 
@@ -287,6 +287,16 @@ namespace art
                 }
             }
 
+            void erase_key(const byte &key_byte) {
+                unsigned pos = 0;
+                for (; pos < this->_count && keys[pos] < key_byte; pos++);
+                if (pos < this->_count) {
+                    std::move(keys.begin() + pos + 1, keys.begin() + this->_count, keys.begin() + pos);
+                    std::move(children.begin() + pos + 1, children.begin() + this->_count, children.begin() + pos);
+                    this->_count--;
+                }
+            }
+
             virtual _Node **find(const byte &key_byte) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
@@ -335,14 +345,16 @@ namespace art
 
             virtual void debug() const override {
                 std::cout << "Node 4, count: " << size() << std::endl;
-                for (size_t i = 0; i < this->_count; i++) {
-                    std::cout << ((unsigned) keys[i]) << " | ";
+                if (size() > 0) {
+                    for (size_t i = 0; i < this->_count; i++) {
+                        std::cout << ((unsigned) keys[i]) << " | ";
+                    }
+                    std::cout << std::endl;
+                    for (size_t i = 0; i < this->_count; i++) {
+                        std::cout << children[i] << " | ";
+                    }
+                    std::cout << std::endl;
                 }
-                std::cout << std::endl;
-                for (size_t i = 0; i < this->_count; i++) {
-                    std::cout << children[i] << " | ";
-                }
-                std::cout << std::endl;
             }
         };
 
@@ -1071,47 +1083,80 @@ namespace art
 
         size_type erase_unique(const key_type &__k) {
             // Empty Tree
-            if (_M_root == nullptr)
+            if (_M_root == nullptr) {
                 return 0;
+            }
 
             Key transformed_key = {_M_key_transform(__k)};
             const auto key_size = sizeof(__k);
 
             if (_M_root->is_leaf()) {
-                delete _M_root;
-                _M_count--;
-                return 1;
+                if (transformed_key.value == static_cast<_Leaf*>(_M_root)->key.value) {
+                    delete _M_root;
+                    _M_root = nullptr;
+                    _M_count--;
+                    return 1;
+                }
+                return 0;
             }
 
             _Node **current_node = &_M_root;
 
-            for (unsigned i = 0; i < key_size + 1; i++) {
-                //std::cout << "depth " << i << std::endl;
+            for (int i = 0; i < key_size + 1; i++) {
                 if (current_node == nullptr || *current_node == nullptr)
                     return 0;
 
                 _Node **child = (*current_node)->find(transformed_key.chunks[i]);
+
                 if (child == nullptr || *child == nullptr)
                     return 0;
 
                 if ((*child)->is_leaf()) {
                     _Leaf *existing_leaf = static_cast<_Leaf *>(*child);
                     if (transformed_key.value == existing_leaf->key.value) {
-                        //(*current_node)->debug();
-                        //std::cout << "found leaf to delete" << std::endl;
+                        // Found the correct leaf to delete
                         (*current_node)->erase(transformed_key.chunks[i]);
-                        //(*current_node)->debug();
                         _M_count--;
 
-                        // @TODO THIS IS WRONG, need to recursively remove nodes if necessary !!!
-                        if ((*current_node)->size() < (*current_node)->min_size()
-                            && (*current_node)->size() > 0) {
+                        // Parent of deleted leaf now underfull?
+                        int j = 1;
+                        while ((*current_node)->size() < (*current_node)->min_size()) {
+                            auto old_current_node = *current_node;
                             *current_node = shrink(*current_node);
+
+                            // Cannot shrink node 4 to leaf, because parent is not a leaf
+                            if (old_current_node == *current_node)
+                                break;
+
+                            // As long as the node above the leaf is a one-way node, compress path
+                            while ((*current_node)->is_leaf() && (*current_node)->_parent->size() <= 1 && i - j >= -1) {
+                                _Node **parent = &(*current_node)->_parent;
+
+                                if ((*parent)->get_type() == node_type::_dummy_node) {
+                                    (*current_node)->_parent = _M_root->_parent;
+                                    _M_root = *current_node;
+                                    return 1;
+                                }
+
+                                _Node **grandparent = &((*parent)->_parent);
+                                if ((*grandparent)->get_type() == node_type::_dummy_node) {
+                                    (*current_node)->_parent = _M_root;
+                                    _M_root = *current_node;
+                                    return 1;
+                                }
+                                //static_cast<_Node_4 *>(*parent)->erase_key(transformed_key.chunks[i - j]);
+                                _Node **old_child = (*grandparent)->find(transformed_key.chunks[i - j - 1]);
+                                *old_child = *current_node;
+                                delete *parent;
+                                (*current_node)->_parent = *grandparent;
+                                j++;
+
+                            }
                         }
                         return 1;
                     } else {
                         //std::cout << "key not in tree (leaf mismatch)" << std::endl;
-                        return 0;
+                        return 0; // key not in tree (leaf mismatch)
                     }
                 } else {
                     current_node = child;
@@ -1343,23 +1388,10 @@ namespace art
                 case node_type::node_4_t: {
                     _Node_4 *node4 = static_cast<_Node_4 *>(old_node);
 
-                    // if remaining child is not a leaf, return this node
-                    // (this old_node one-way not will be skipped)
-                    //if (node4->size() <= 1) {
-                    //    std::cout << "SKIP THIS" << std::endl;
-                    //    _Node *next_node = node4->children[0];
-                    //   delete old_node;
-                    //    return next_node;
-                    //}
-
                     if (node4->children[0]->is_leaf()) {
-                        //std::cout << "Shrink node 4 to leaf" << std::endl;
-                        _Node *node = node4->children[0];
-                        node->_parent = old_node->_parent;
-                        //std::cout << "value in leaf " << static_cast<_Leaf *>(node)->value.first <<
-                        //" -> " << static_cast<_Leaf *>(node)->value.second << std::endl;
+                        node4->children[0]->_parent = old_node->_parent;
                         delete old_node;
-                        return node;
+                        return node4->children[0];
                     }
                     return old_node;
                 }

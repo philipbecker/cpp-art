@@ -225,8 +225,8 @@ TEST_CASE("Erase complex", "[basic]") {
         for (int i = -100000; i < 100000; i++) {
             auto std_res = map.erase(i);
             auto art_res = radix_map.erase(i);
-            //std::cout << "deleted " << i << " " << (std_res ? "true" : "false")
-            //<< " " << (art_res ? "true" : "false") << std::endl;
+            std::cout << "deleted " << i << " " << (std_res ? "true" : "false")
+            << " " << (art_res ? "true" : "false") << std::endl;
             REQUIRE(std_res == art_res);
             REQUIRE(map.size() == radix_map.size());
         }

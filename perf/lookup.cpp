@@ -14,13 +14,8 @@ public:
     virtual std::vector<std::pair<int64_t, uint64_t>> getExperimentValues() const override {
         std::vector<std::pair<int64_t, uint64_t>> problemSpace;
 
-        // We will run some total number of sets of tests all together.
-        // Each one growing by a power of 2.
         const int totalNumberOfTests = 8;
-
         for (int i = 0; i < totalNumberOfTests; i++) {
-            // ExperimentValues is part of the base class and allows us to specify
-            // some values to control various test runs to end up building a nice graph.
             problemSpace.push_back(std::make_pair(int64_t(pow(2, i + 15)), uint64_t(0)));
         }
 
@@ -39,15 +34,15 @@ public:
         std::random_shuffle(this->data.begin(), this->data.end());
     }
 
-    /// Before each iteration. A common utility function to push back random ints to sort.
     void generate_data() {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+        std::uniform_int_distribution<int64_t> dis(std::numeric_limits<int64_t>::min(),
+                                                   std::numeric_limits<int64_t>::max());
 
         for (int i = 0; i < this->arraySize; i++) {
-            auto candidate = dis(gen);
-            this->data.emplace_back(i, i);
+            int64_t candidate = dis(gen);
+            this->data.emplace_back(candidate, i);
         }
     }
 
