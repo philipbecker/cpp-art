@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <map>
 #include <unordered_map>
+#include "../libs/cpp-btree/btree_map.h"
 #include "../src/radix_map.h"
 #include "parameters.h"
 
@@ -49,7 +50,7 @@ public:
 };
 
 
-BASELINE_F(InsertInt64, Map, InsertFixture, SAMPLES, ITERATIONS) {
+BASELINE_F(InsertInt64, Map, InsertFixture, INSERT_SAMPLES, INSERT_ITERATIONS) {
     this->generate_data();
     std::map<int64_t, int64_t> map;
 
@@ -57,7 +58,7 @@ BASELINE_F(InsertInt64, Map, InsertFixture, SAMPLES, ITERATIONS) {
         map.insert(d);
 }
 
-BENCHMARK_F(InsertInt64, UnorderedMap, InsertFixture, SAMPLES, ITERATIONS) {
+BENCHMARK_F(InsertInt64, UnorderedMap, InsertFixture, INSERT_SAMPLES, INSERT_ITERATIONS) {
     this->generate_data();
     std::unordered_map<int64_t, int64_t> map;
 
@@ -65,9 +66,17 @@ BENCHMARK_F(InsertInt64, UnorderedMap, InsertFixture, SAMPLES, ITERATIONS) {
         map.insert(d);
 }
 
-BENCHMARK_F(InsertInt64, ArtMap, InsertFixture, SAMPLES, ITERATIONS) {
+BENCHMARK_F(InsertInt64, ArtMap, InsertFixture, INSERT_SAMPLES, INSERT_ITERATIONS) {
     this->generate_data();
     art::radix_map<int64_t, int64_t> map;
+
+    for (auto &d: this->data)
+        map.insert(d);
+}
+
+BENCHMARK_F(InsertInt64, BtreeMap, InsertFixture, INSERT_SAMPLES, INSERT_ITERATIONS) {
+    this->generate_data();
+    btree::btree_map<int64_t, int64_t> map;
 
     for (auto &d: this->data)
         map.insert(d);
