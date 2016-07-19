@@ -40,7 +40,7 @@ namespace art
         return !(*(char *) &num == 1);
     }
 
-    template<typename _Tp>
+    template<typename _Key>
     struct key_transform;
 
     // Unsigned integers are already binary comparable.

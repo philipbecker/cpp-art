@@ -212,20 +212,27 @@ namespace art
             return _M_t.erase_unique(__k);
         }
 
-        // @TODO implementation
-        iterator erase(const_iterator __it) {
-            throw;
-
-            return NULL; // successor
+        // Since C++17
+        iterator erase(iterator __it) {
+            return _M_t.erase(__it);
         }
 
-        // @TODO implementation
-        iterator erase(const_iterator __first, const_iterator __last) {
+        /*
+        // Since C++11
+        const_iterator erase(const_iterator __it) {
+            return _M_t.erase(__it);
+        }
+
+         */
+
+        // @TODO input should be const_iterator
+        iterator erase(iterator __first, iterator __last) {
             for (; __first != __last; ++__first)
-                _M_t.erase_unique(__first);
+                _M_t.erase(__first);
 
-            return NULL; // successor
+            return __last;
         }
+
 
         /**
          *  @brief  Swaps data with another %map.
@@ -302,6 +309,10 @@ namespace art
          *  past-the-end ( @c end() ) iterator.
          */
         iterator find(const key_type &__k) {
+            return _M_t.find(__k);
+        }
+
+        const_iterator find(const key_type &__k) const {
             return _M_t.find(__k);
         }
 

@@ -41,6 +41,20 @@ int main() {
     map.insert(std::pair<int64_t, int64_t>(0, 5));
     map.insert(std::pair<int64_t, int64_t>(7, 25));
 
+    art::radix_map<int64_t, int64_t, custom_transform>::const_iterator iter;
+    for ( iter = map.begin() ; iter != map.end() ; ++iter ) {
+        cout<< iter->first << ", " << iter->second <<endl;
+    }
+
+    for (auto &e : map)
+        std::cout << e.first << ", " << e.second << std::endl;
+
+    art::radix_map<int64_t, int64_t, custom_transform>::iterator miter;
+    for ( miter = map.begin() ; miter != map.end() ; ++miter ) {
+        cout<< miter->first << ", " << miter->second <<endl;
+        miter->second = 28;
+    }
+
     for (auto &e : map)
         std::cout << e.first << ", " << e.second << std::endl;
 
