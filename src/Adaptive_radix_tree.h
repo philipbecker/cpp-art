@@ -11,8 +11,7 @@
 #include <stack>
 #include "key_transform.h"
 
-namespace art
-{
+namespace art {
     typedef uint8_t byte;
     static const uint8_t EMPTY_MARKER = 48;
 
@@ -54,14 +53,37 @@ namespace art
         };
 
         class _Node {
-        protected:
+        public:
             uint16_t _count;
 
-        public:
             Node_ptr _parent;
 
             _Node(uint16_t count, Node_ptr parent)
                     : _count(count), _parent(parent) { }
+
+
+            // Copy constructor
+            _Node(const _Node &__x)
+                    : _count(__x._count), _parent(__x._parent) {
+            }
+
+            // Move constructor
+            _Node(const _Node &&__x)
+                    : _count(std::move(__x._count)), _parent(std::move(__x._parent)) { }
+
+            // Copy assignment
+            _Node &operator=(const _Node &__x) {
+                _count = __x._count;
+                _parent = __x._parent;
+                return *this;
+            }
+
+            // Move assignment
+            _Node &operator=(_Node &&__x) {
+                _count = std::move(__x._count);
+                _parent = std::move(__x._parent);
+                return *this;
+            }
 
             virtual void clear() = 0;
 
@@ -140,6 +162,38 @@ namespace art
 
             _Leaf(Key key, value_type value, int depth, Node_ptr parent)
                     : _Node(1, parent), key(key), value(value), depth(depth) {
+            }
+
+            // Copy constructor
+            _Leaf(const _Leaf &__x)
+                    : _Node(__x._count, __x._parent), key(__x.key),
+                      value(__x.value), depth(__x.depth) {
+            }
+
+            // Move constructor
+            _Leaf(const _Leaf &&__x)
+                    : _Node(std::move(__x)), key(std::move(__x.key)),
+                      value(std::move(__x.value)), depth(std::move(__x.depth)) {
+            }
+
+            // Copy assignment
+            _Leaf &operator=(const _Leaf &__x) {
+                this->_count = __x._count;
+                this->_parent = __x._parent;
+                key = __x.key;
+                value = __x.value;
+                depth = __x.depth;
+                return *this;
+            }
+
+            // Move assignment
+            _Leaf &operator=(_Leaf &&__x) {
+                this->_count = std::move(__x._count);
+                this->_parent = std::move(__x._parent);
+                key = std::move(__x.key);
+                value = std::move(__x.value);
+                depth = std::move(__x.depth);
+                return *this;
             }
 
             void clear() { }
@@ -276,6 +330,7 @@ namespace art
             std::array<byte, 4> keys{};
             std::array<Node_ptr, 4> children{};
 
+            // Grow constructor
             _Node_4(_Leaf *leaf, int depth)
                     : _Node(1, leaf->_parent) {
                 Key key = leaf->key;
@@ -286,6 +341,7 @@ namespace art
                 children[0]->_parent = this;
             }
 
+            // Shrink constructor
             _Node_4(_Node_16 *node) : _Node(4, node->_parent) {
                 std::copy(node->keys.begin(), node->keys.begin() + 4, keys.begin());
                 std::copy(node->children.begin(), node->children.begin() + 4, children.begin());
@@ -294,6 +350,37 @@ namespace art
                     children[i]->_parent = this;
 
                 delete node;
+            }
+
+            // Copy constructor
+            _Node_4(const _Node_4 &__n) : _Node(__n._count, __n._parent), keys(__n.keys) {
+                for (int i = 0; i < __n._count; i++) {
+                    children[i] = new _Node_4(*__n.children[i]);
+                }
+            }
+
+            // Move constructor
+            _Node_4(const _Node_4 &&__x) : _Node(std::move(__x)) {
+                keys = std::move(__x.keys);
+                children = std::move(__x.children);
+            }
+
+            // Copy assignment
+            _Node_4 &operator=(const _Node_4 &__x) {
+                this->_count = __x._count;
+                this->_parent = __x._parent;
+                keys = __x.keys;
+                children = __x.children;
+                return *this;
+            }
+
+            // Move assignment
+            _Node_4 &operator=(_Node_4 &&__x) {
+                this->_count = std::move(__x._count);
+                this->_parent = std::move(__x._parent);
+                keys = std::move(__x.keys);
+                children = std::move(__x.children);
+                return *this;
             }
 
             void clear() {
@@ -320,16 +407,6 @@ namespace art
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
                 if (pos < this->_count) {
                     delete children[pos];
-                    std::move(keys.begin() + pos + 1, keys.begin() + this->_count, keys.begin() + pos);
-                    std::move(children.begin() + pos + 1, children.begin() + this->_count, children.begin() + pos);
-                    this->_count--;
-                }
-            }
-
-            void erase_key(const byte &key_byte) {
-                unsigned pos = 0;
-                for (; pos < this->_count && keys[pos] < key_byte; pos++);
-                if (pos < this->_count) {
                     std::move(keys.begin() + pos + 1, keys.begin() + this->_count, keys.begin() + pos);
                     std::move(children.begin() + pos + 1, children.begin() + this->_count, children.begin() + pos);
                     this->_count--;
@@ -432,6 +509,7 @@ namespace art
             std::array<byte, 16> keys{};
             std::array<Node_ptr, 16> children{};
 
+            // Grow constructor
             _Node_16(_Node_4 *node) : _Node(4, node->_parent) {
                 assert(node->size() == 4);
 
@@ -444,6 +522,7 @@ namespace art
                 delete node;
             }
 
+            // Shrink constructor
             _Node_16(_Node_48 *node) : _Node(16, node->_parent) {
                 assert(node->size() == 16);
 
@@ -457,6 +536,37 @@ namespace art
                     }
                 }
                 delete node;
+            }
+
+            // Copy constructor
+            _Node_16(const _Node_16 &__n) : _Node(__n._count, __n._parent), keys(__n.keys) {
+                for (int i = 0; i < __n._count; i++) {
+                    children[i] = new _Node_16(*__n.children[i]);
+                }
+            }
+
+            // Move constructor
+            _Node_16(const _Node_16 &&__x) : _Node(std::move(__x)) {
+                keys = std::move(__x.keys);
+                children = std::move(__x.children);
+            }
+
+            // Copy assignment
+            _Node_16 &operator=(const _Node_16 &__x) {
+                this->_count = __x._count;
+                this->_parent = __x._parent;
+                keys = __x.keys;
+                children = __x.children;
+                return *this;
+            }
+
+            // Move assignment
+            _Node_16 &operator=(_Node_16 &&__x) {
+                this->_count = std::move(__x._count);
+                this->_parent = std::move(__x._parent);
+                keys = std::move(__x.keys);
+                children = std::move(__x.children);
+                return *this;
             }
 
             void clear() {
@@ -584,6 +694,7 @@ namespace art
             std::array<byte, 256> child_index;
             std::array<Node_ptr, 48> children{};
 
+            // Grow constructor
             _Node_48(_Node_16 *node) : _Node(16, node->_parent) {
                 assert(node->size() == 16);
 
@@ -598,6 +709,7 @@ namespace art
                 delete node;
             }
 
+            // Shrink constructor
             _Node_48(_Node_256 *node) : _Node(48, node->_parent) {
                 assert(node->size() == 48);
 
@@ -614,6 +726,40 @@ namespace art
                 }
 
                 delete node;
+            }
+
+            // Copy constructor
+            _Node_48(const _Node_48 &__x) : _Node(__x._count, __x._parent), child_index(__x.child_index) {
+                for (int i = 0; i < 256; i++) {
+                    if (__x.child_index[i] != EMPTY_MARKER) {
+                        children[i] = new _Node_4(__x.children[i]);
+                    }
+                }
+            }
+
+            // Move constructor
+            _Node_48(const _Node_48 &&__x) : _Node(std::move(__x)) {
+                child_index = std::move(__x.child_index);
+                children = std::move(__x.children);
+            }
+
+
+            // Copy assignment
+            _Node_48 &operator=(const _Node_48 &__x) {
+                this->_count = __x._count;
+                this->_parent = __x._parent;
+                child_index = __x.child_index;
+                children = __x.children;
+                return *this;
+            }
+
+            // Move assignment
+            _Node_48 &operator=(_Node_48 &&__x) {
+                this->_count = std::move(__x._count);
+                this->_parent = std::move(__x._parent);
+                child_index = std::move(__x.child_index);
+                children = std::move(__x.children);
+                return *this;
             }
 
             void clear() {
@@ -736,6 +882,7 @@ namespace art
         public:
             std::array<Node_ptr, 256> children{};
 
+            // Grow constructor
             _Node_256(_Node_48 *node) : _Node(48, node->_parent) {
                 assert(node->size() == 48);
 
@@ -747,6 +894,35 @@ namespace art
                 }
 
                 delete node;
+            }
+
+            // Copy constructor
+            _Node_256(const _Node_256 &__x) : _Node(__x._count, __x._parent) {
+                for (int i = 0; i < 256; i++) {
+                    if (__x.children[i] != nullptr) {
+                        children[i] = new _Node_4(__x.children[i]);
+                    }
+                }
+            }
+
+            // Move constructor
+            _Node_256(const _Node_256 &&__x) : _Node(std::move(__x)) {
+                children = std::move(__x.children);
+            }
+
+            // Copy assignment
+            _Node_256 &operator=(const _Node_256 &__x) {
+                this->_count = __x._count;
+                this->_parent = __x._parent;
+                return *this;
+            }
+
+            // Move assignment
+            _Node_256 &operator=(_Node_256 &&__x) {
+                this->_count = std::move(__x._count);
+                this->_parent = std::move(__x._parent);
+                children = std::move(__x.children);
+                return *this;
             }
 
             void clear() {
@@ -877,9 +1053,7 @@ namespace art
         // Current root node of the radix tree
         Node_ptr _M_root;
 
-        /**
-          *  @brief  Default constructor creates no elements.
-          */
+        // Default constructor
         Adaptive_radix_tree() {
             init();
         }
@@ -887,6 +1061,40 @@ namespace art
         Adaptive_radix_tree(const _Key_transform &key_transformer)
                 : _M_key_transform(key_transformer) {
             init();
+        }
+
+        // Copy constructor
+        Adaptive_radix_tree(const Adaptive_radix_tree &__x) : _M_root(__x._M_root) {
+            _M_count = __x._M_count;
+            _M_dummy_node = new _Dummy_Node();
+        }
+
+        // Move constructor
+        Adaptive_radix_tree(Adaptive_radix_tree &&__x) : _M_root(std::move(__x._M_root)) {
+            std::cout << "move art constructor" <<std::endl;
+            _M_count = __x._M_count;
+            _M_dummy_node = new _Dummy_Node();
+            if (_M_root != nullptr)
+                _M_root->_parent = _M_dummy_node;
+            __x._M_root = nullptr;
+            __x._M_count = 0;
+        }
+
+        // Copy assignment
+        Adaptive_radix_tree &operator=(const Adaptive_radix_tree &__x) {
+            _M_root = __x._M_root;
+            _M_count = __x._M_count;
+            _M_dummy_node = __x._M_dummy_node;
+            return *this;
+        }
+
+        // Move assignment
+        Adaptive_radix_tree &operator=(Adaptive_radix_tree &&__x) {
+            std::cout << "art move assignment" << std::endl;
+            _M_root = std::move(__x._M_root);
+            _M_count = std::move(__x._M_count);
+            _M_dummy_node = std::move(__x._M_dummy_node);
+            return *this;
         }
 
         void init() {
@@ -1356,9 +1564,11 @@ namespace art
             }
         }
 
-        // @TODO implementation
+        // @TODO test
         void swap(Adaptive_radix_tree &__x) {
-            throw;
+            std::swap(_M_root, __x._M_root);
+            std::swap(_M_count, __x._M_count);
+            std::swap(_M_dummy_node, _M_dummy_node);
         }
 
         ////////////

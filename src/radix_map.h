@@ -66,7 +66,7 @@ namespace art
         /**
          * @brief  Map move constructor.
          */
-        //map(map &&__x) : _M_t(std::move(__x._M_t)) { }
+        radix_map(radix_map &&__x) : _M_t(std::move(__x._M_t)) { }
 
         /**
          *  @brief  Builds a %map from a range.
@@ -106,14 +106,12 @@ namespace art
          *  constructor, the allocator object is not copied.
          */
         radix_map &operator=(const radix_map &__x) {
-            // @TODO implement art assignment operator
             _M_t = __x._M_t;
             return *this;
         }
 
-        /// Move assignment operator.
-        // @TODO implement art move assignment operator
-        radix_map &operator=(radix_map &&) = default;
+        // Move assignment operator.
+        radix_map &operator=(radix_map &&__x) = default;
 
         /**
          *  @brief  %Map list assignment operator.

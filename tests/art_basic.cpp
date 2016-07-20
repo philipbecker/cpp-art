@@ -186,6 +186,83 @@ TEST_CASE("basic operations", "[art]") {
     }
 }
 
+TEST_CASE("Move Constructor", "[basic]") {
+    art::radix_map<int, int> radix_map;
+    art::radix_map<int, int> reference_map;
+    for (int i = -1000; i < 1000; i++) {
+        radix_map.insert(std::make_pair(i, i));
+        reference_map.insert(std::make_pair(i, i));
+    }
+
+    art::radix_map<int, int> moved_map(std::move(radix_map));
+    REQUIRE(moved_map.size() == reference_map.size());
+    auto moved_it = moved_map.begin();
+    for (auto it = reference_map.begin(), end = reference_map.end(); it != end; it++, moved_it++) {
+        REQUIRE(moved_it->first == it->first);
+    }
+}
+
+TEST_CASE("Move Assignment", "[basic]") {
+    art::radix_map<int, int> radix_map;
+    art::radix_map<int, int> reference_map;
+    for (int i = -1000; i < 1000; i++) {
+        radix_map.insert(std::make_pair(i, i));
+        reference_map.insert(std::make_pair(i, i));
+    }
+
+    art::radix_map<int, int> moved_map = std::move(radix_map);
+    REQUIRE(moved_map.size() == reference_map.size());
+    auto moved_it = moved_map.begin();
+    for (auto it = reference_map.begin(), end = reference_map.end(); it != end; it++, moved_it++) {
+        REQUIRE(moved_it->first == it->first);
+    }
+}
+
+TEST_CASE("Swap", "[basic]") {
+    art::radix_map<int, int> radix_map_1;
+    std::map<int, int> reference_map_1;
+    for (int i = -1000; i < 1000; i++) {
+        radix_map_1.insert(std::make_pair(i, i));
+        reference_map_1.insert(std::make_pair(i, i));
+    }
+
+    art::radix_map<int, int> radix_map_2;
+    std::map<int, int> reference_map_2;
+
+    for (int i = -5000; i < 5000; i++) {
+        radix_map_2.insert(std::make_pair(i, i));
+        reference_map_2.insert(std::make_pair(i, i));
+    }
+
+    std::swap(radix_map_1, radix_map_2);
+    
+    REQUIRE(radix_map_1.size() == reference_map_2.size());
+    REQUIRE(radix_map_2.size() == reference_map_1.size());
+    auto it = radix_map_1.begin();
+    for (auto it_ref = reference_map_2.begin(), end = reference_map_2.end(); it_ref != end; it_ref++, it++) {
+        REQUIRE(it->first == it_ref->first);
+    }
+
+    it = radix_map_2.begin();
+    for (auto it_ref = reference_map_1.begin(), end = reference_map_1.end(); it_ref != end; it_ref++, it++) {
+        REQUIRE(it->first == it_ref->first);
+    }
+}
+
+TEST_CASE("Copy Constructor", "[basic]") {
+    art::radix_map<int, int> radix_map;
+    for (int i = -1000; i < 1000; i++) {
+        radix_map.insert(std::make_pair(i, 2*i));
+    }
+
+    art::radix_map<int, int> copied_map(radix_map);
+    REQUIRE(copied_map.size() == radix_map.size());
+    auto copied_it = copied_map.begin();
+    for (auto it = radix_map.begin(), end = radix_map.end(); it != end; it++, copied_it++) {
+        REQUIRE(copied_it->first == it->first);
+    }
+}
+
 TEST_CASE("Erase1", "[basic]") {
     std::map<unsigned, unsigned> map;
     art::radix_map<unsigned, unsigned> radix_map;
