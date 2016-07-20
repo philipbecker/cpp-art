@@ -11,7 +11,8 @@
 #include <stack>
 #include "key_transform.h"
 
-namespace art {
+namespace art
+{
     typedef uint8_t byte;
     static const uint8_t EMPTY_MARKER = 48;
 
@@ -39,7 +40,7 @@ namespace art {
 
         enum node_type : uint8_t {
             _leaf_t = 0, node_4_t = 1, node_16_t = 2,
-            node_48_t = 3, node_256_t = 4, _dummy_node = 5
+            node_48_t = 3, node_256_t = 4, _dummy_node_t = 5
         };
 
         _Key_transform _M_key_transform;
@@ -68,7 +69,7 @@ namespace art {
             }
 
             // Move constructor
-            _Node(const _Node &&__x)
+            _Node(_Node &&__x)
                     : _count(std::move(__x._count)), _parent(std::move(__x._parent)) { }
 
             // Copy assignment
@@ -84,6 +85,8 @@ namespace art {
                 _parent = std::move(__x._parent);
                 return *this;
             }
+
+            virtual ~_Node() { }
 
             virtual void clear() = 0;
 
@@ -166,12 +169,12 @@ namespace art {
 
             // Copy constructor
             _Leaf(const _Leaf &__x)
-                    : _Node(__x._count, __x._parent), key(__x.key),
+                    : _Node(__x._count, nullptr), key(__x.key),
                       value(__x.value), depth(__x.depth) {
             }
 
             // Move constructor
-            _Leaf(const _Leaf &&__x)
+            _Leaf(_Leaf &&__x)
                     : _Node(std::move(__x)), key(std::move(__x.key)),
                       value(std::move(__x.value)), depth(std::move(__x.depth)) {
             }
@@ -179,9 +182,9 @@ namespace art {
             // Copy assignment
             _Leaf &operator=(const _Leaf &__x) {
                 this->_count = __x._count;
-                this->_parent = __x._parent;
-                key = __x.key;
-                value = __x.value;
+                this->_parent = nullptr;
+                //key = __x.key;
+                //value(__x.value);
                 depth = __x.depth;
                 return *this;
             }
@@ -270,6 +273,34 @@ namespace art {
                       _leaf(new _Leaf(leaf->key, leaf->value, 0, this)) {
             }
 
+            // Move constructor
+            _Dummy_Node(_Dummy_Node &&__x) : _Node(std::move(__x)) {
+                _root = std::move(__x._root);
+                _leaf = std::move(__x._leaf);
+            }
+
+            // Copy constructor
+            _Dummy_Node(const _Dummy_Node &__x) : _Node(__x._count, __x._parent) {
+                *_leaf = *(__x._leaf);
+            }
+
+            // Copy assignment
+            _Dummy_Node &operator=(const _Dummy_Node &__x) {
+                this->_count = __x._count;
+                this->_parent = __x._parent;
+                *_leaf = *__x._leaf;
+                return *this;
+            }
+
+            // Move assignment
+            _Dummy_Node &operator=(_Dummy_Node &&__x) {
+                this->_count = std::move(__x._count);
+                this->_parent = std::move(__x._parent);
+                _root = std::move(__x._root);
+                _leaf = std::move(__x._leaf);
+                return *this;
+            }
+
             void clear() { }
 
             virtual void insert(const byte &key_byte, Node_ptr node) override { }
@@ -318,7 +349,7 @@ namespace art {
 
             virtual uint16_t max_size() const override { return 0; }
 
-            virtual node_type get_type() const override { return node_type::_dummy_node; }
+            virtual node_type get_type() const override { return node_type::_dummy_node_t; }
 
             virtual void debug() const override {
                 std::cout << "Dummy Node debug" << std::endl;
@@ -348,19 +379,40 @@ namespace art {
 
                 for (size_t i = 0; i < 4; i++)
                     children[i]->_parent = this;
-
-                delete node;
             }
 
             // Copy constructor
-            _Node_4(const _Node_4 &__n) : _Node(__n._count, __n._parent), keys(__n.keys) {
-                for (int i = 0; i < __n._count; i++) {
-                    children[i] = new _Node_4(*__n.children[i]);
+            _Node_4(const _Node_4 &__x) : _Node(__x._count, __x._parent), keys(__x.keys) {
+                for (int i = 0; i < __x._count; i++) {
+                    switch (__x.children[i]->get_type()) {
+                        case node_type::node_4_t:
+                            children[i] = new _Node_4(*static_cast<_Node_4 *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        case node_type::node_16_t:
+                            children[i] = new _Node_16(*static_cast<_Node_16 *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        case node_type::node_48_t:
+                            children[i] = new _Node_48(*static_cast<_Node_48 *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        case node_type::node_256_t:
+                            children[i] = new _Node_256(*static_cast<_Node_256 *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        case node_type::_leaf_t:
+                            children[i] = new _Leaf(*static_cast<_Leaf *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        default:
+                            throw;
+                    }
                 }
             }
 
             // Move constructor
-            _Node_4(const _Node_4 &&__x) : _Node(std::move(__x)) {
+            _Node_4(_Node_4 &&__x) : _Node(std::move(__x)) {
                 keys = std::move(__x.keys);
                 children = std::move(__x.children);
             }
@@ -518,8 +570,6 @@ namespace art {
 
                 for (size_t i = 0; i < 4; i++)
                     children[i]->_parent = this;
-
-                delete node;
             }
 
             // Shrink constructor
@@ -535,18 +585,41 @@ namespace art {
                         pos++;
                     }
                 }
-                delete node;
             }
 
             // Copy constructor
-            _Node_16(const _Node_16 &__n) : _Node(__n._count, __n._parent), keys(__n.keys) {
-                for (int i = 0; i < __n._count; i++) {
-                    children[i] = new _Node_16(*__n.children[i]);
+            _Node_16(const _Node_16 &__x) : _Node(__x._count, __x._parent), keys(__x.keys) {
+                for (int i = 0; i < __x._count; i++) {
+                    switch (__x.children[i]->get_type()) {
+                        case node_type::node_4_t:
+                            children[i] = new _Node_4(*static_cast<_Node_4 *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        case node_type::node_16_t:
+                            children[i] = new _Node_16(*static_cast<_Node_16 *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        case node_type::node_48_t:
+                            children[i] = new _Node_48(*static_cast<_Node_48 *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        case node_type::node_256_t:
+                            children[i] = new _Node_256(*static_cast<_Node_256 *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        case node_type::_leaf_t:
+                            children[i] = new _Leaf(*static_cast<_Leaf *>(__x.children[i]));
+                            children[i]->_parent = this;
+                            break;
+                        default:
+                            throw;
+                            break;
+                    }
                 }
             }
 
             // Move constructor
-            _Node_16(const _Node_16 &&__x) : _Node(std::move(__x)) {
+            _Node_16(_Node_16 &&__x) : _Node(std::move(__x)) {
                 keys = std::move(__x.keys);
                 children = std::move(__x.children);
             }
@@ -705,8 +778,6 @@ namespace art {
                     children[i] = node->children[i];
                     children[i]->_parent = this;
                 }
-
-                delete node;
             }
 
             // Shrink constructor
@@ -724,21 +795,43 @@ namespace art {
                         pos++;
                     }
                 }
-
-                delete node;
             }
 
             // Copy constructor
             _Node_48(const _Node_48 &__x) : _Node(__x._count, __x._parent), child_index(__x.child_index) {
                 for (int i = 0; i < 256; i++) {
                     if (__x.child_index[i] != EMPTY_MARKER) {
-                        children[i] = new _Node_4(__x.children[i]);
+                        switch (__x.children[child_index[i]]->get_type()) {
+                            case node_type::node_4_t:
+                                children[child_index[i]] = new _Node_4(*static_cast<_Node_4 *>(__x.children[i]));
+                                children[child_index[i]]->_parent = this;
+                                break;
+                            case node_type::node_16_t:
+                                children[child_index[i]] = new _Node_16(*static_cast<_Node_16 *>(__x.children[i]));
+                                children[child_index[i]]->_parent = this;
+                                break;
+                            case node_type::node_48_t:
+                                children[child_index[i]] = new _Node_48(*static_cast<_Node_48 *>(__x.children[i]));
+                                children[child_index[i]]->_parent = this;
+                                break;
+                            case node_type::node_256_t:
+                                children[child_index[i]] = new _Node_256(*static_cast<_Node_256 *>(__x.children[i]));
+                                children[child_index[i]]->_parent = this;
+                                break;
+                            case node_type::_leaf_t:
+                                children[child_index[i]] = new _Leaf(*static_cast<_Leaf *>(__x.children[i]));
+                                children[child_index[i]]->_parent = this;
+                                break;
+                            default:
+                                throw;
+                                break;
+                        }
                     }
                 }
             }
 
             // Move constructor
-            _Node_48(const _Node_48 &&__x) : _Node(std::move(__x)) {
+            _Node_48(_Node_48 &&__x) : _Node(std::move(__x)) {
                 child_index = std::move(__x.child_index);
                 children = std::move(__x.children);
             }
@@ -892,21 +985,43 @@ namespace art {
                         children[i]->_parent = this;
                     }
                 }
-
-                delete node;
             }
 
             // Copy constructor
             _Node_256(const _Node_256 &__x) : _Node(__x._count, __x._parent) {
                 for (int i = 0; i < 256; i++) {
                     if (__x.children[i] != nullptr) {
-                        children[i] = new _Node_4(__x.children[i]);
+                        switch (__x.children[i]->get_type()) {
+                            case node_type::node_4_t:
+                                children[i] = new _Node_4(*static_cast<_Node_4 *>(__x.children[i]));
+                                children[i]->_parent = this;
+                                break;
+                            case node_type::node_16_t:
+                                children[i] = new _Node_16(*static_cast<_Node_16 *>(__x.children[i]));
+                                children[i]->_parent = this;
+                                break;
+                            case node_type::node_48_t:
+                                children[i] = new _Node_48(*static_cast<_Node_48 *>(__x.children[i]));
+                                children[i]->_parent = this;
+                                break;
+                            case node_type::node_256_t:
+                                children[i] = new _Node_256(*static_cast<_Node_256 *>(__x.children[i]));
+                                children[i]->_parent = this;
+                                break;
+                            case node_type::_leaf_t:
+                                children[i] = new _Leaf(*static_cast<_Leaf *>(__x.children[i]));
+                                children[i]->_parent = this;
+                                break;
+                            default:
+                                throw;
+                                break;
+                        }
                     }
                 }
             }
 
             // Move constructor
-            _Node_256(const _Node_256 &&__x) : _Node(std::move(__x)) {
+            _Node_256(_Node_256 &&__x) : _Node(std::move(__x)) {
                 children = std::move(__x.children);
             }
 
@@ -1064,36 +1179,109 @@ namespace art {
         }
 
         // Copy constructor
-        Adaptive_radix_tree(const Adaptive_radix_tree &__x) : _M_root(__x._M_root) {
+        Adaptive_radix_tree(const Adaptive_radix_tree &__x) {
+            switch (__x._M_root->get_type()) {
+                case node_type::node_4_t:
+                    _M_root = new _Node_4(*static_cast<_Node_4 *>(__x._M_root));
+                    break;
+                case node_type::node_16_t:
+                    _M_root = new _Node_16(*static_cast<_Node_16 *>(__x._M_root));
+                    break;
+                case node_type::node_48_t:
+                    _M_root = new _Node_48(*static_cast<_Node_48 *>(__x._M_root));
+                    break;
+                case node_type::node_256_t:
+                    _M_root = new _Node_256(*static_cast<_Node_256 *>(__x._M_root));
+                    break;
+                case node_type::_leaf_t:
+                    _M_root = new _Leaf(*static_cast<_Leaf *>(__x._M_root));
+                    break;
+                default:
+                    _M_root = nullptr;
+                    break;
+            }
             _M_count = __x._M_count;
             _M_dummy_node = new _Dummy_Node();
+            if (_M_root != nullptr) {
+                _M_root->_parent = _M_dummy_node;
+                _M_dummy_node->_root = &_M_root;
+            }
+
+            _M_key_transform = __x._M_key_transform;
         }
 
         // Move constructor
-        Adaptive_radix_tree(Adaptive_radix_tree &&__x) : _M_root(std::move(__x._M_root)) {
-            std::cout << "move art constructor" <<std::endl;
-            _M_count = __x._M_count;
+        Adaptive_radix_tree(Adaptive_radix_tree &&__x) {
+            if (__x._M_root != nullptr) {
+                _M_root = std::move(__x._M_root);
+            } else {
+                _M_root = nullptr;
+            }
+
+            _M_count = std::move(__x._M_count);
+            _M_key_transform = std::move(__x._M_key_transform);
             _M_dummy_node = new _Dummy_Node();
-            if (_M_root != nullptr)
+            if (_M_root != nullptr) {
                 _M_root->_parent = _M_dummy_node;
+                _M_dummy_node->_root = &_M_root;
+            }
+
             __x._M_root = nullptr;
             __x._M_count = 0;
         }
 
         // Copy assignment
         Adaptive_radix_tree &operator=(const Adaptive_radix_tree &__x) {
-            _M_root = __x._M_root;
+            // remove old container contents
+            clear();
+
+            // Then do copy construction
+            switch (__x._M_root->get_type()) {
+                case node_type::node_4_t:
+                    _M_root = new _Node_4(*static_cast<_Node_4 *>(__x._M_root));
+                    break;
+                case node_type::node_16_t:
+                    _M_root = new _Node_16(*static_cast<_Node_16 *>(__x._M_root));
+                    break;
+                case node_type::node_48_t:
+                    _M_root = new _Node_48(*static_cast<_Node_48 *>(__x._M_root));
+                    break;
+                case node_type::node_256_t:
+                    _M_root = new _Node_256(*static_cast<_Node_256 *>(__x._M_root));
+                    break;
+                case node_type::_leaf_t:
+                    _M_root = new _Leaf(*static_cast<_Leaf *>(__x._M_root));
+                    break;
+                default:
+                    _M_root = nullptr;
+                    break;
+            }
             _M_count = __x._M_count;
-            _M_dummy_node = __x._M_dummy_node;
+            _M_dummy_node = new _Dummy_Node();
+            if (_M_root != nullptr) {
+                _M_root->_parent = _M_dummy_node;
+                _M_dummy_node->_root = &_M_root;
+            }
+            _M_key_transform = __x._M_key_transform;
             return *this;
         }
 
         // Move assignment
         Adaptive_radix_tree &operator=(Adaptive_radix_tree &&__x) {
-            std::cout << "art move assignment" << std::endl;
             _M_root = std::move(__x._M_root);
             _M_count = std::move(__x._M_count);
-            _M_dummy_node = std::move(__x._M_dummy_node);
+            _M_key_transform = std::move(__x._M_key_transform);
+
+            if (_M_dummy_node == nullptr)
+                _M_dummy_node = new _Dummy_Node();
+
+            if (_M_root != nullptr) {
+                _M_root->_parent = _M_dummy_node;
+                _M_dummy_node->_root = &_M_root;
+            }
+
+            __x._M_root = nullptr;
+            __x._M_count = 0;
             return *this;
         }
 
@@ -1531,32 +1719,33 @@ namespace art {
             // Parent of deleted leaf now underfull?
             int j = 1;
             while ((*node)->size() < (*node)->min_size()) {
-                auto old_current_node = *node;
-                *node = shrink(*node);
+                std::pair<Node_ptr, bool> p = shrink(*node);
 
-                // Cannot shrink node 4 to leaf, because parent is not a leaf
-                if (old_current_node == *node)
+                // Cannot shrink node 4 to leaf, because child is not a leaf
+                if (!p.second)
                     break;
+
+                *node = p.first;
 
                 // As long as the node above the leaf is a one-way node, compress path
                 while ((*node)->is_leaf() && (*node)->_parent->size() <= 1 && depth - j >= -1) {
-                    Node_ptr *parent = &(*node)->_parent;
 
-                    if ((*parent)->get_type() == _dummy_node) {
-                        (*node)->_parent = _M_root->_parent;
+                    Node_ptr *parent = &((*node)->_parent);
+                    if ((*parent)->get_type() == node_type::_dummy_node_t) {
+                        (*node)->_parent = _M_dummy_node;
                         _M_root = *node;
                         return;
                     }
 
                     Node_ptr *grandparent = &((*parent)->_parent);
-                    if ((*grandparent)->get_type() == _dummy_node) {
-                        (*node)->_parent = _M_root;
+                    if ((*grandparent)->get_type() == node_type::_dummy_node_t) {
+                        delete *parent;
+                        (*node)->_parent = *grandparent;
                         _M_root = *node;
                         return;
                     }
-                    //static_cast<_Node_4 *>(*parent)->erase_key(transformed_key.chunks[i - j]);
-                    Node_ptr *old_child = (*grandparent)->find(transformed_key.chunks[depth - j - 1]);
-                    *old_child = *node;
+                    Node_ptr *former_child = (*grandparent)->find(transformed_key.chunks[depth - j - 1]);
+                    *former_child = *node;
                     delete *parent;
                     (*node)->_parent = *grandparent;
                     j++;
@@ -1564,11 +1753,11 @@ namespace art {
             }
         }
 
-        // @TODO test
         void swap(Adaptive_radix_tree &__x) {
             std::swap(_M_root, __x._M_root);
             std::swap(_M_count, __x._M_count);
-            std::swap(_M_dummy_node, _M_dummy_node);
+            std::swap(_M_dummy_node, __x._M_dummy_node);
+            std::swap(_M_key_transform, __x._M_key_transform);
         }
 
         ////////////
@@ -1793,23 +1982,26 @@ namespace art {
                 case node_type::node_4_t: {
                     _Node_4 *node4 = static_cast<_Node_4 *>(old_node);
                     Node_ptr node = new _Node_16(node4);
+                    delete node4;
                     return node;
                 }
                 case node_type::node_16_t: {
                     _Node_16 *node16 = static_cast<_Node_16 *>(old_node);
                     Node_ptr node = new _Node_48(node16);
+                    delete node16;
                     return node;
                 }
                 case node_type::node_48_t: {
                     _Node_48 *node48 = static_cast<_Node_48 *>(old_node);
                     Node_ptr node = new _Node_256(node48);
+                    delete node48;
                     return node;
                 }
             }
             throw; // unreachable
         }
 
-        Node_ptr shrink(Node_ptr old_node) {
+        std::pair<Node_ptr, bool> shrink(Node_ptr old_node) {
             auto type = old_node->get_type();
             switch (type) {
                 case node_type::node_4_t: {
@@ -1817,25 +2009,28 @@ namespace art {
 
                     if (node4->children[0]->is_leaf()) {
                         node4->children[0]->_parent = old_node->_parent;
-                        delete old_node;
-                        return node4->children[0];
+                        delete node4;
+                        return {node4->children[0], true};
                     }
-                    return old_node;
+                    return {old_node, false};
                 }
                 case node_type::node_16_t: {
                     _Node_16 *node16 = static_cast<_Node_16 *>(old_node);
                     Node_ptr node = new _Node_4(node16);
-                    return node;
+                    delete node16;
+                    return {node, true};
                 }
                 case node_type::node_48_t: {
                     _Node_48 *node48 = static_cast<_Node_48 *>(old_node);
                     Node_ptr node = new _Node_16(node48);
-                    return node;
+                    delete node48;
+                    return {node, true};
                 }
                 case node_type::node_256_t: {
                     _Node_256 *node256 = static_cast<_Node_256 *>(old_node);
                     Node_ptr node = new _Node_48(node256);
-                    return node;
+                    delete node256;
+                    return {node, true};
                 }
             }
             throw; // unreachable

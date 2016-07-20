@@ -33,7 +33,7 @@ Container is not **thread safe** (yet)!!!
 ### Concept: [Container](http://en.cppreference.com/w/cpp/concept/Container)
 - [x] `C()` Constructor
 - [ ] `C(a)` Copy constructor
-- [ ] `a = b` Move assignment
+- [x] `a = b` Move assignment
 - [x] `(&a)->~C()` but not really happy with
 - [x] `a.begin()`
 - [x] `a.end()`
@@ -41,8 +41,8 @@ Container is not **thread safe** (yet)!!!
 - [x] `a.cend()`
 - [x] `a == b`
 - [x] `a != b`
-- [ ] `a.swap(b)` 
-- [ ] `swap(a, b)`
+- [x] `a.swap(b)` 
+- [x] `swap(a, b)`
 - [x] `a.size()`
 - [x] ~~`max_size()`~~ (not going to implement, not applicable)
 - [x] `a.empty()`
@@ -59,13 +59,12 @@ Not started implementing.
 - [ ] `X::value_compare`
 - [ ] `X(c)`, `X a(x)` Copy Constructor
 - [x] `X()`, `X a;`
-- [ ] `X(i, j, c)`, `X a(i, j, c);`
+- [x] `X(i, j, c)`, `X a(i, j, c);`
 - [x] `X(i, j)`, `X a(i, j);` 
 - [x] `X(il);`
 - [x] `a = il`
 - [x] `a.key_trans()`
 - [ ] `a.value_comp()` ??
-- [ ] support for multiple equal keys
 
 ## Sample Code
 ```C++

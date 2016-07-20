@@ -9,6 +9,7 @@ set(
         art_node_16.cpp
         art_node_48.cpp
         art_iterator.cpp
+        radix_map/move_and_copy.cpp
 )
 
 add_executable(tests ${TEST_FILES})
