@@ -19,11 +19,11 @@ TEST_CASE ("Insert into node 16", "[nodes]") {
 
 
     Key first_key = {data[0]};
-    _leaf *first_leaf = new _leaf(first_key, 0, nullptr);
-    node_4 *node4 = new node_4(first_leaf, 0);
+    _leaf *first_leaf = new _leaf(0, nullptr);
+    node_4 *node4 = new node_4(first_leaf, first_key.chunks[0]);
     for (int i = 1; i < 4; i++) {
         Key key = {data[i]};
-        _leaf *leaf = new _leaf(key, 0, nullptr);
+        _leaf *leaf = new _leaf(0, nullptr);
         node4->insert(key.chunks[0], leaf);
     }
 
@@ -31,7 +31,7 @@ TEST_CASE ("Insert into node 16", "[nodes]") {
 
     for (int i = 4; i < 16; i++) {
         Key key = {data[i]};
-        _leaf *leaf = new _leaf(key, 0, nullptr);
+        _leaf *leaf = new _leaf(0, nullptr);
         node16->insert(key.chunks[0], leaf);
     }
     REQUIRE(std::is_sorted(node16->keys.begin(), node16->keys.end()));

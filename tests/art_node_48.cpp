@@ -16,18 +16,18 @@ SCENARIO ("given a node 48 with 16 random elements", "[nodes]") {
     std::random_shuffle(data.begin(), data.end());
 
     Key first_key = {data[0]};
-    _leaf *first_leaf = new _leaf(first_key, 0, nullptr);
-    node_4 *node4 = new node_4(first_leaf, 0);
+    _leaf *first_leaf = new _leaf(0, nullptr);
+    node_4 *node4 = new node_4(first_leaf, first_key.chunks[0]);
     for (int i = 1; i < 4; i++) {
         Key key = {data[i]};
-        _leaf *leaf = new _leaf(key, 0, nullptr);
+        _leaf *leaf = new _leaf(0, nullptr);
         node4->insert(key.chunks[0], leaf);
     }
 
     node_16 *node16 = new node_16(node4);
     for (int i = 4; i < 16; i++) {
         Key key = {data[i]};
-        _leaf *leaf = new _leaf(key, 0, nullptr);
+        _leaf *leaf = new _leaf(0, nullptr);
         node16->insert(key.chunks[0], leaf);
     }
 
@@ -35,7 +35,7 @@ SCENARIO ("given a node 48 with 16 random elements", "[nodes]") {
         node_48 *node48 = new node_48(node16);
         for (int i = 16; i < 48; i++) {
             Key key = {data[i]};
-            _leaf *leaf = new _leaf(key, 0, nullptr);
+            _leaf *leaf = new _leaf(0, nullptr);
             node48->insert(key.chunks[0], leaf);
         }
         THEN ("the keys are inserted and the children are put at the right position") {

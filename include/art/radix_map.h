@@ -102,7 +102,7 @@ namespace art
         template<typename _InputIterator>
         radix_map(_InputIterator __first, _InputIterator __last)
                 : _M_t() {
-            _M_t._M_insert_unique(__first, __last);
+            _M_t.insert_unique(__first, __last);
         }
 
         /**
@@ -120,7 +120,7 @@ namespace art
                   const _Key_transform &__key_transformer = _Key_transform(),
                   const allocator_type &__a = allocator_type())
                 : _M_t(__key_transformer /*, _Pair_alloc_type(__a) */) {
-            _M_t._M_insert_unique(__l.begin(), __l.end());
+            _M_t.insert_unique(__l.begin(), __l.end());
         }
 
         /**
@@ -150,7 +150,7 @@ namespace art
          *  of elements assigned.  Old data may be lost.
          */
         radix_map &operator=(std::initializer_list<value_type> __l) {
-            _M_t._M_assign_unique(__l.begin(), __l.end());
+            _M_t.assign_unique(__l.begin(), __l.end());
             return *this;
         }
 
@@ -203,7 +203,7 @@ namespace art
          *  Insertion requires O(k) time.
          */
         std::pair<iterator, bool> insert(const value_type &__x) {
-            return _M_t._M_insert_unique(__x);
+            return _M_t.insert_unique(__x);
         }
 
         /**
@@ -216,7 +216,7 @@ namespace art
          */
         template<typename _InputIterator>
         void insert(_InputIterator __first, _InputIterator __last) {
-            _M_t._M_insert_unique(__first, __last);
+            _M_t.insert_unique(__first, __last);
         }
 
         /**
@@ -232,8 +232,7 @@ namespace art
 
         template<typename... _Args>
         std::pair<iterator, bool> emplace(_Args &&... __args) {
-            throw;
-            //return _M_t._M_emplace_unique(std::forward<_Args>(__args)...);
+            return _M_t.emplace_unique(std::forward<_Args>(__args)...);
         }
 
         size_type erase(const key_type &__k) {
@@ -297,7 +296,7 @@ namespace art
             if (it != _M_t.end())
                 return (*it).second;
 
-            std::pair<iterator, bool> res = _M_t._M_insert_unique(
+            std::pair<iterator, bool> res = _M_t.insert_unique(
                     std::pair<_Key, _Tp>(__k, mapped_type()));
             return (*res.first).second;
         }

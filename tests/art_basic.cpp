@@ -36,9 +36,9 @@ SCENARIO("given an empty art", "[art]") {
 
 TEST_CASE("Can tiebreak at level 1", "[art]") {
     art::adaptive_radix_tree<int, int> art;
-    art._M_insert_unique(std::make_pair(5, 5));
-    art._M_insert_unique(std::make_pair(6, 6));
-    art._M_insert_unique(std::make_pair(261, 261));
+    art.insert_unique(std::make_pair(5, 5));
+    art.insert_unique(std::make_pair(6, 6));
+    art.insert_unique(std::make_pair(261, 261));
     REQUIRE(art.find(5) != art.end());
     REQUIRE(art.find(6) != art.end());
     REQUIRE(art.find(261) != art.end());
@@ -56,7 +56,7 @@ SCENARIO("growing the root node", "[art]") {
 
     WHEN("first 5 values are inserted") {
         for (uint64_t i = 0; i < 5; i++) {
-            art._M_insert_unique(std::make_pair(data[i], data[i]));
+            art.insert_unique(std::make_pair(data[i], data[i]));
         }
 
         THEN("root grows to node 16") {
@@ -66,7 +66,7 @@ SCENARIO("growing the root node", "[art]") {
 
         AND_WHEN("12 more values are inserted") {
             for (uint64_t i = 5; i < 17; i++) {
-                art._M_insert_unique(std::make_pair(data[i], data[i]));
+                art.insert_unique(std::make_pair(data[i], data[i]));
             }
 
             THEN ("root has grown to node 48") {
@@ -75,7 +75,7 @@ SCENARIO("growing the root node", "[art]") {
             };
             AND_WHEN("32 more values are inserted") {
                 for (uint64_t i = 17; i < 49; i++) {
-                    art._M_insert_unique(std::make_pair(data[i], data[i]));
+                    art.insert_unique(std::make_pair(data[i], data[i]));
                 }
 
                 THEN ("root has grown to node 256") {
