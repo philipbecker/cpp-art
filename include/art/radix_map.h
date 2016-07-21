@@ -43,8 +43,6 @@ namespace art
 
         //typedef typename _Alloc_traits::pointer            pointer;
         //typedef typename _Alloc_traits::const_pointer      const_pointer;
-        //typedef typename _Alloc_traits::reference          reference;
-        //typedef typename _Alloc_traits::const_reference    const_reference;
         // Bidiretional iterator
         typedef typename _Rep_type::iterator iterator;
         typedef typename _Rep_type::const_iterator const_iterator;
@@ -68,14 +66,15 @@ namespace art
             typedef typename adaptive_radix_tree<_Key, _Tp, _Key_transform>::Key transformed_key_type;
 
             bool operator()(const value_type &__x, const value_type &__y) const {
-                transformed_key_type x1 = {key_transformer(__x)};
-                transformed_key_type x2 = {key_transformer(__x)};
+                transformed_key_type x_key = {key_transformer(__x.first)};
+                transformed_key_type y_key = {key_transformer(__y.first)};
                 for (int i = 0; i < sizeof(transformed_key_type); i++) {
-                    if (x1.chunks[i] < x2.chunks[i])
+                    if (x_key.chunks[i] < y_key.chunks[i])
                         return true;
-                    if (x1.chunks[i] > x2.chunks[i])
+                    if (x_key.chunks[i] > y_key.chunks[i])
                         return false;
                 }
+                return false;
             }
         };
 
@@ -321,7 +320,6 @@ namespace art
         // Lookup //
         ////////////
 
-        // @TODO requires const find method & const iterator
         size_type count(const key_type &__x) const {
             return _M_t.find(__x) == _M_t.end() ? 0 : 1;
         }
@@ -376,6 +374,15 @@ namespace art
 
         const_iterator upper_bound(const key_type &__k) const {
             return _M_t.upper_bound(__k);
+        }
+
+        // These functions are useless....
+        std::pair<iterator, iterator> equal_range(const key_type &__k) {
+            return _M_t.equal_range(__k);
+        }
+
+        std::pair<const_iterator, const_iterator> equal_range(const key_type &__k) const {
+            return _M_t.equal_range(__k);
         }
 
         ///////////////

@@ -14,7 +14,7 @@
 namespace art
 {
     typedef uint8_t byte;
-    static const uint8_t EMPTY_MARKER = 48;
+    static const byte EMPTY_MARKER = 63;
 
     template<typename _Key, typename _V,
             typename _Key_transform = key_transform<_Key>,
