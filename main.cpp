@@ -5,8 +5,61 @@
 #include "art/adaptive_radix_tree.h"
 #include "art/radix_map.h"
 
+struct Scientist {
+    int id;
+    std::string first_name;
+    std::string last_name;
+
+    Scientist() { }
+
+    Scientist(int id, std::string first_name, std::string last_name)
+            : id(id), first_name(first_name), last_name(last_name) { }
+};
+
+std::ostream &operator<<(std::ostream &os, const Scientist &s) {
+    os << s.first_name << " " << s.last_name << " (" << s.id << ")";
+    return os;
+}
 
 int main() {
+
+    art::radix_map<int, std::string> radix_map;
+
+    radix_map.insert(std::make_pair(4, "end"));
+    radix_map.insert(std::make_pair(2, "is"));
+    radix_map.insert(std::make_pair(1, "This"));
+    radix_map.insert(std::make_pair(3, "the"));
+    radix_map.insert(std::make_pair(5, "!!!"));
+
+    for (auto &e : radix_map)
+        std::cout << e.second << " ";
+    std::cout << std::endl;
+
+    std::map<int, Scientist> std_map_2;
+    art::radix_map<int, Scientist> radix_map_2;
+
+    Scientist s1 {142124253, "Alan", "Turing"};
+    Scientist s2 {799567878, "John", "Neumann"};
+
+    radix_map_2.insert(std::pair<int, Scientist>(1, s1));
+    radix_map_2.insert(std::pair<int, Scientist>(2, s2));
+
+    for (auto &e : radix_map_2)
+        std::cout << e.second.first_name << " " << e.second.last_name << std::endl;
+    std::cout << std::endl;
+
+    art::radix_map<int, Scientist *> radix_map_3;
+    std::map<int, Scientist *> std_map_3;
+
+    auto alan = new Scientist(142124253, "Alan", "Turing");
+    auto john = new Scientist(799567878, "Alan", "Neumann");
+
+    radix_map_3.insert(std::pair<int, Scientist *>(1, alan));
+    radix_map_3.insert(std::pair<int, Scientist *>(2, john));
+
+    for (auto &e : radix_map_2)
+        std::cout << e.second.first_name << " " << e.second.last_name << std::endl;
+    std::cout << std::endl;
 
     std::cout << "Memory footprint" << std::endl;
     std::cout << "Pair<int, int> \t\t" << sizeof(std::pair<int, int>) << std::endl;

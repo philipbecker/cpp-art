@@ -4,7 +4,7 @@
 #include "art/radix_map.h"
 
 
-TEST_CASE("Stress tests", "[stress]") {
+TEST_CASE("Stress test insert", "[stress]") {
     art::radix_map<int, int> art;
 
     std::random_device rd;
@@ -26,11 +26,40 @@ TEST_CASE("Stress tests", "[stress]") {
             REQUIRE(p.second);
         }
 
-
-
         SECTION ("can't insert duplicate values") {
             for (int i = 0; i < size; i++) {
                 auto p = art.insert(std::make_pair(data[i], data[i]));
+                REQUIRE_FALSE(p.second);
+            }
+        }
+    }
+}
+
+TEST_CASE("Stress test emplace", "[stress]") {
+    art::radix_map<int, int> art;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(-1000000, 1000000);
+
+    std::vector<int> data;
+    for (int i = 0; i < 100000; i++) {
+        auto candidate = dis(gen);
+        auto it = std::find(data.begin(), data.end(), candidate);
+        if (it == data.end())
+            data.push_back(candidate);
+    }
+
+    SECTION ("insertion of unqiue elements is successful") {
+        const auto size = data.size();
+        for (int i = 0; i < size; i++) {
+            auto p = art.emplace(data[i], i);
+            REQUIRE(p.second);
+        }
+
+        SECTION ("can't insert duplicate values") {
+            for (int i = 0; i < size; i++) {
+                auto p = art.emplace(data[i], i);
                 REQUIRE_FALSE(p.second);
             }
         }

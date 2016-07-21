@@ -34,7 +34,9 @@ int main() {
     for (auto &e : map)
         std::cout << e.first << ", " << e.second << std::endl;
 
+    // Output:
     // John Neumann (-5), 20        
     // Alan Turing (1), 10
+
     return 0;
 }

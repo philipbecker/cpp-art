@@ -13,12 +13,15 @@
 
 namespace art
 {
+    using std::pair;
+    using std::make_pair;
+
     typedef uint8_t byte;
     static const byte EMPTY_MARKER = 63;
 
     template<typename _Key, typename _V,
             typename _Key_transform = key_transform<_Key>,
-            typename _Alloc = std::allocator<std::pair<const _Key, _V> > >
+            typename _Alloc = std::allocator<pair<const _Key, _V> > >
     class adaptive_radix_tree {
     public:
         // Forward declaration for typedefs
@@ -32,7 +35,7 @@ namespace art
 
         typedef _Key key_type;
         typedef _V mapped_type;
-        typedef std::pair<const _Key, _V> value_type;
+        typedef pair<const _Key, _V> value_type;
 
     private:
         typedef _Node *Node_ptr;
@@ -55,9 +58,9 @@ namespace art
 
         class _Node {
         public:
-            uint16_t _count;
-
             Node_ptr _parent;
+
+            uint16_t _count;
 
             _Node(uint16_t count, Node_ptr parent)
                     : _count(count), _parent(parent) { }
@@ -155,16 +158,18 @@ namespace art
 
         class _Leaf : public _Node {
         public:
+            int32_t depth;
+
             value_type value;
-            int depth;
 
-            _Leaf(int depth, Node_ptr parent)
-                    : _Node(1, parent), depth(depth) {
-            }
+            _Leaf(value_type value)
+                    : _Node(1, nullptr), value(value), depth(0) { }
 
-            _Leaf(value_type value, int depth, Node_ptr parent)
-                    : _Node(1, parent), value(value), depth(depth) {
-            }
+            _Leaf(key_type key, mapped_type mapped_value)
+                    : _Node(1, nullptr), value(key, mapped_value), depth(0) { }
+
+            _Leaf(value_type value, uint32_t depth, Node_ptr parent)
+                    : _Node(1, parent), value(value), depth(depth) { }
 
             // Copy constructor
             _Leaf(const _Leaf &__x)
@@ -263,12 +268,12 @@ namespace art
 
             _Dummy_Node()
                     : _Node(0, nullptr), _root(nullptr),
-                      _leaf(new _Leaf(std::pair<key_type, mapped_type>(key_type(), mapped_type()), 0, this)) {
+                      _leaf(new _Leaf(value_type(), 0, this)) {
             }
 
             _Dummy_Node(Node_ptr *root, _Leaf *leaf)
                     : _Node(0, nullptr), _root(root),
-                      _leaf(new _Leaf(leaf->value, 0, this)) {
+                      _leaf(new _Leaf(value_type(), 0, this)) {
             }
 
             // Move constructor
@@ -354,15 +359,13 @@ namespace art
             }
         };
 
-        friend class _Node;
-        friend class _Node_4;
         class _Node_4 : public _Node {
         public:
             std::array<byte, 4> keys{};
             std::array<Node_ptr, 4> children{};
 
             // Grow constructor
-            _Node_4(_Leaf *leaf, const byte& key_byte)
+            _Node_4(_Leaf *leaf, const byte &key_byte)
                     : _Node(1, leaf->_parent) {
                 keys[0] = key_byte;
                 children[0] = leaf;
@@ -1298,8 +1301,8 @@ namespace art
         }
 
         size_t max_size() const {
-            if (sizeof(transformed_key_type) < sizeof(size_type))
-                return 1u << sizeof(transformed_key_type);
+            if (sizeof(Key) < sizeof(size_type))
+                return 1u << sizeof(Key);
             return std::numeric_limits<size_type>::max();
         }
 
@@ -1330,7 +1333,7 @@ namespace art
         ///////////////
 
         struct adapt_radix_tree_iterator {
-            typedef std::pair<const _Key, _V> value_type;
+            typedef pair<const _Key, _V> value_type;
             typedef value_type &reference;
             typedef value_type *pointer;
 
@@ -1367,7 +1370,7 @@ namespace art
             // predecrement
             _Self &operator--() {
                 _Link_type leaf = static_cast<_Link_type>(node);
-                node = leaf->_parent->predecessor({_Key_transform()(leaf->value.first)}, leaf->depth - 1);
+                node = node->_parent->predecessor({_Key_transform()(leaf->value.first)}, leaf->depth - 1);
                 return *this;
             }
 
@@ -1396,7 +1399,7 @@ namespace art
         };
 
         struct adapt_radix_tree_const_iterator {
-            typedef std::pair<const _Key, _V> value_type;
+            typedef pair<const _Key, _V> value_type;
             typedef const value_type &reference;
             typedef const value_type *pointer;
 
@@ -1546,15 +1549,15 @@ namespace art
             this->_M_count = 0;
         }
 
-                Node_ptr decrement(Node_ptr node) {
+        Node_ptr decrement(Node_ptr node) {
             _Leaf *leaf = static_cast<_Leaf *>(node);
             Key key = {_M_key_transform(leaf->value.first)};
             return node->_parent->predecessor(key, leaf->depth - 1);
         }
 
-        std::pair<iterator, bool> insert_unique(const value_type &__x) {
+        pair<iterator, bool> insert_unique(const value_type &__x) {
             Key transformed_key = {_M_key_transform(__x.first)};
-            const auto key_size = sizeof(__x.first);
+            const auto key_size = sizeof(Key);
 
             // Empty Tree
             if (_M_root == nullptr) {
@@ -1563,7 +1566,7 @@ namespace art
                 _M_count++;
 
                 _M_dummy_node->_root = &_M_root;
-                return std::make_pair(iterator(_M_root), true);
+                return make_pair(iterator(_M_root), true);
             }
 
             Node_ptr *current_node = &_M_root;
@@ -1576,7 +1579,7 @@ namespace art
                     Key existing_key = {_M_key_transform(existing_leaf->value.first)};
                     if (transformed_key.value == existing_key.value) {
                         // if it is a duplicate entry, ignore
-                        return std::make_pair(iterator(existing_leaf), false);
+                        return make_pair(iterator(existing_leaf), false);
                     } else {
                         // otherwise, the leaf needs to be replaced by a node 4
                         Key existing_key = {_M_key_transform(existing_leaf->value.first)};
@@ -1587,7 +1590,7 @@ namespace art
                             if (existing_key.chunks[j] == transformed_key.chunks[j]) {
                                 Node_ptr *old_child;
                                 old_child = (*current_node)->find(existing_key.chunks[j]);
-                                Node_ptr new_child = new _Node_4(existing_leaf, existing_key.chunks[j+1]);
+                                Node_ptr new_child = new _Node_4(existing_leaf, existing_key.chunks[j + 1]);
                                 *old_child = new_child;
                                 current_node = old_child;
                             } else {
@@ -1597,7 +1600,7 @@ namespace art
                                 _Leaf *new_leaf = new _Leaf(__x, j + 1, *current_node);
                                 (*current_node)->insert(transformed_key.chunks[j], new_leaf);
                                 _M_count++;
-                                return std::make_pair(iterator(new_leaf), true);
+                                return make_pair(iterator(new_leaf), true);
                             }
                         }
                         throw; // unreachable
@@ -1617,7 +1620,7 @@ namespace art
                     _Leaf *new_leaf = new _Leaf(__x, i, *previous_node);
                     (*previous_node)->insert(transformed_key.chunks[i - 1], new_leaf);
                     _M_count++;
-                    return std::make_pair(iterator(new_leaf), true);
+                    return make_pair(iterator(new_leaf), true);
                 }
             }
             throw; // unreachable
@@ -1637,37 +1640,105 @@ namespace art
         }
 
         template<typename... _Args>
-        std::pair<iterator, bool> emplace_unique(_Args &&... __args) {
-            throw;
-            /**
+        pair<iterator, bool> emplace_unique(_Args &&... __args) {
             _Leaf *leaf;
             try {
-                leaf = new _Leaf(std::forward<_Args>(__args)..., 0, nullptr);
+                leaf = new _Leaf(std::forward<_Args>(__args)...);
             } catch (...) {
-                delete *leaf;
-                leaf->~_Leaf();
+                delete leaf;
+                // leaf->~_Leaf();
                 throw;
             }
 
             try {
-                typedef std::pair<iterator, bool> res_type;
-                auto __res = get_insert_unique_pos(leaf->key);
-                if (__res.second)
-                    return res_type(insert_leaf(__res.first, __res.second, leaf), true);
+                Key key = {_M_key_transform(leaf->value.first)};
+                pair<Node_ptr, int> __res = get_insert_unique_pos(key);
+                if (__res.second >= 0)
+                    return pair<iterator, int>(insert_leaf(__res.first, __res.second, leaf, key), true);
 
-                delete *leaf;
-                return res_type(iterator(static_cast<_Link_type>(__res.first)), false);
+                delete leaf;
+                return pair<iterator, int>(iterator(__res.first), false);
+            } catch (...) {
+                delete leaf;
+                throw;
             }
-            catch (...) {
-                delete *leaf;
-                throw;;
-            }
-             */
         }
 
     private:
+        /**
+         * Helper function for emplace. It returns the node where the leaf will
+         * be inserted and the leaf's depth, if the key is not already in the tree.
+         * If the key exists already, it returns a nullptr and a depth of -1.
+         */
+        pair<Node_ptr, int> get_insert_unique_pos(const Key &__k) {
+            const auto key_size = sizeof(Key);
 
+            // Empty Tree
+            if (_M_root == nullptr)
+                return pair<Node_ptr, bool>(nullptr, 0);
 
+            Node_ptr *current_node = &_M_root;
+            Node_ptr *previous_node = nullptr;
+
+            for (unsigned i = 0; i < key_size + 1; i++) {
+                if (current_node != nullptr && *current_node != nullptr && (*current_node)->is_leaf()) {
+                    _Leaf *existing_leaf = reinterpret_cast<_Leaf *>(*current_node);
+                    Key existing_key = {_M_key_transform(existing_leaf->value.first)};
+                    if (__k.value == existing_key.value) {
+                        return pair<Node_ptr, int>(existing_leaf, -1);
+                    } else {
+                        // otherwise, the leaf needs to be replaced by a node 4
+                        *current_node = new _Node_4(existing_leaf, existing_key.chunks[i]);
+                        // if the keys are matching, go down all the way until we find a tiebreaker
+                        // insert node4's with one child all the way down until a final node 4 with 2 children
+                        for (unsigned j = i; j < key_size + 1; j++) {
+                            if (existing_key.chunks[j] == __k.chunks[j]) {
+                                Node_ptr *old_child;
+                                old_child = (*current_node)->find(existing_key.chunks[j]);
+                                Node_ptr new_child = new _Node_4(existing_leaf, existing_key.chunks[j + 1]);
+                                *old_child = new_child;
+                                current_node = old_child;
+                            } else {
+                                if ((*current_node)->size() == (*current_node)->max_size())
+                                    *current_node = grow(*current_node);
+
+                                return make_pair(*current_node, j + 1);
+                            }
+                        }
+                        throw; // unreachable
+                    }
+                } else if (current_node != nullptr && *current_node != nullptr) {
+                    // traverse down the tree
+                    previous_node = current_node;
+                    current_node = (*current_node)->find(__k.chunks[i]);
+                } else {
+                    // hit empty point, this can only happen if the inserted key
+                    // is not a prefix/equal to another key already in the tree
+                    // therefore we can just insert a new leaf
+                    // previous node might have to be grown before that
+                    if ((*previous_node)->size() == (*previous_node)->max_size())
+                        *previous_node = grow(*previous_node);
+
+                    return make_pair(*previous_node, i);
+                }
+            }
+            throw; // unreachable
+        }
+
+        /**
+         * Helper function for emplace. Inserts the leaf, given a parent and the depth.
+         */
+        iterator insert_leaf(Node_ptr parent, int depth, _Leaf *leaf, const Key &key) {
+            leaf->depth = depth;
+            leaf->_parent = parent;
+
+            if (depth > 0)
+                parent->insert(key.chunks[depth - 1], leaf);
+            else
+                _M_root = leaf;
+            _M_count++;
+            return iterator(leaf);
+        };
 
 
     public:
@@ -1679,7 +1750,7 @@ namespace art
             }
 
             Key transformed_key = {_M_key_transform(__k)};
-            const auto key_size = sizeof(__k);
+            const auto key_size = sizeof(Key);
 
             if (_M_root->is_leaf()) {
                 Key existing_key = {_M_key_transform(static_cast<_Leaf *>(_M_root)->value.first)};
@@ -1764,7 +1835,7 @@ namespace art
             // Parent of deleted leaf now underfull?
             int j = 1;
             while ((*node)->size() < (*node)->min_size()) {
-                std::pair<Node_ptr, bool> p = shrink(*node);
+                pair<Node_ptr, bool> p = shrink(*node);
 
                 // Cannot shrink node 4 to leaf, because child is not a leaf
                 if (!p.second)
@@ -1978,7 +2049,7 @@ namespace art
                     _Leaf *leaf = static_cast<_Leaf *>(*current_node);
                     Key existing_key = {_M_key_transform(leaf->value.first)};
                     if (transformed_key.value < existing_key.value) {
-                        
+
                         return const_iterator(*current_node);
                     } else {
                         auto successor = (*previous_node)->successor(transformed_key, i - 1);
@@ -1992,16 +2063,16 @@ namespace art
             throw; // unreachable
         }
 
-        std::pair<iterator, iterator> equal_range(const key_type &__k) {
+        pair<iterator, iterator> equal_range(const key_type &__k) {
             auto lower = lower_bound(__k);
             auto upper = upper_bound(__k);
-            return std::pair<iterator, iterator>(lower, upper);
+            return pair<iterator, iterator>(lower, upper);
         };
 
-        std::pair<const_iterator, const_iterator> equal_range(const key_type &__k) const {
+        pair<const_iterator, const_iterator> equal_range(const key_type &__k) const {
             auto lower = lower_bound(__k);
             auto upper = upper_bound(__k);
-            return std::pair<const_iterator, const_iterator>(lower, upper);
+            return pair<const_iterator, const_iterator>(lower, upper);
         };
 
         Node_ptr minimum() {
@@ -2060,7 +2131,7 @@ namespace art
             throw; // unreachable
         }
 
-        std::pair<Node_ptr, bool> shrink(Node_ptr old_node) {
+        pair<Node_ptr, bool> shrink(Node_ptr old_node) {
             auto type = old_node->get_type();
             switch (type) {
                 case node_type::node_4_t: {

@@ -20,7 +20,7 @@ SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") 
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 1000000);
+    std::uniform_int_distribution<unsigned> dis(0, 1000000);
 
     for (unsigned i = 0; i < 10000; i++) {
         auto k = dis(gen);
@@ -32,6 +32,7 @@ SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") 
     REQUIRE(radix_map.rbegin()->second == std_map.rbegin()->second);
 
     THEN ("forward iteration is equal to std::map") {
+        std::cout << "here" << std::endl;
         auto it_radix = radix_map.begin(), it_radix_end = radix_map.end();
         auto it_std = std_map.begin(), it_std_end = std_map.end();
         for (; it_std != it_std_end; ++it_radix, ++it_std) {
