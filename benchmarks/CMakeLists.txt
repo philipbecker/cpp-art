@@ -2,7 +2,7 @@ include_directories(${CELERO_INCLUDE_DIR})
 
 set(
         PERF_FILES
-        perf.cpp
+        benchmarks.cpp
         insert.cpp
         lookup.cpp
         iteration.cpp

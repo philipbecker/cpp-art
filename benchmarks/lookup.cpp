@@ -3,12 +3,12 @@
 #include <map>
 #include <unordered_map>
 #include "../libs/cpp-btree/btree_map.h"
-#include "../src/radix_map.h"
+#include "art/radix_map.h"
 #include "parameters.h"
 
-class IterationFixture : public celero::TestFixture {
+class LookupFixture : public celero::TestFixture {
 public:
-    IterationFixture() {
+    LookupFixture() {
     }
 
     virtual std::vector<std::pair<int64_t, uint64_t>> getExperimentValues() const override {
@@ -31,6 +31,7 @@ public:
         this->build_unorderd_map();
         this->build_radix_map();
         this->build_btree_map();
+        std::random_shuffle(this->data.begin(), this->data.end());
     }
 
     void generate_data() {
@@ -73,26 +74,23 @@ public:
     int64_t arraySize;
 };
 
-BASELINE_F(IterationInt64, Map, IterationFixture, ITERATION_SAMPLES, ITERATION_ITERATIONS) {
-    long sum = 0;
-    for (auto &d: this->map)
-        sum += d.second;
+
+BASELINE_F(LookupInt64, Map, LookupFixture, LOOKUP_SAMPLES, LOOKUP_ITERATIONS) {
+    for (auto &d: this->data)
+        map.find(d.first);
 }
 
-BENCHMARK_F(IterationInt64, UnorderedMap, IterationFixture, ITERATION_SAMPLES, ITERATION_ITERATIONS) {
-    long sum = 0;
-    for (auto &d: this->unordered_map)
-        sum += d.second;
+BENCHMARK_F(LookupInt64, UnorderedMap, LookupFixture, LOOKUP_SAMPLES, LOOKUP_ITERATIONS) {
+    for (auto &d: this->data)
+        unordered_map.find(d.first);
 }
 
-BENCHMARK_F(IterationInt64, ArtMap, IterationFixture, ITERATION_SAMPLES, ITERATION_ITERATIONS) {
-    long sum = 0;
-    for (auto &d: this->radix_map)
-        sum += d.second;
+BENCHMARK_F(LookupInt64, ArtMap, LookupFixture, LOOKUP_SAMPLES, LOOKUP_ITERATIONS) {
+    for (auto &d: this->data)
+        radix_map.find(d.first);
 }
 
-BENCHMARK_F(IterationInt64, BtreeMap, IterationFixture, ITERATION_SAMPLES, ITERATION_ITERATIONS) {
-    long sum = 0;
-    for (auto &d: this->btree_map)
-        sum += d.second;
+BENCHMARK_F(LookupInt64, BtreeMap, LookupFixture, LOOKUP_SAMPLES, LOOKUP_ITERATIONS) {
+    for (auto &d: this->data)
+        btree_map.find(d.first);
 }

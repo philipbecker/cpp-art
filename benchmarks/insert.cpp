@@ -3,7 +3,7 @@
 #include <map>
 #include <unordered_map>
 #include "../libs/cpp-btree/btree_map.h"
-#include "../src/radix_map.h"
+#include "art/radix_map.h"
 #include "parameters.h"
 
 class InsertFixture : public celero::TestFixture {

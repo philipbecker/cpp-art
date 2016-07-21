@@ -4,7 +4,7 @@ import numpy as np
 from csv import reader
 from collections import defaultdict
 
-file_name = '/home/philip/.CLion2016.1/system/cmake/generated/ART-85c3cfdd/85c3cfdd/Release/perf/results.csv'
+file_name = '/home/philip/.CLion2016.1/system/cmake/generated/ART-85c3cfdd/85c3cfdd/Release/benchmarks/results.csv'
 #file_name = '/media/philip/Data/Dropbox/art/lookup-int64-dense-16M.csv'
 
 with open(file_name, 'r') as f:

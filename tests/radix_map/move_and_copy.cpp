@@ -1,6 +1,6 @@
 #include <map>
 #include "catch.hpp"
-#include "../../src/radix_map.h"
+#include "art/radix_map.h"
 
 TEST_CASE("Move Constructor", "[map-move]") {
     art::radix_map<int, int> source;

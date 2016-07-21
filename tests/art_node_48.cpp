@@ -1,14 +1,14 @@
 #include "catch.hpp"
-#include "../src/Adaptive_radix_tree.h"
+#include "art/adaptive_radix_tree.h"
 
 using namespace art;
 
-typedef Adaptive_radix_tree<int, int>::Key Key;
-typedef Adaptive_radix_tree<int, int>::_Leaf _leaf;
-typedef Adaptive_radix_tree<int, int>::_Node_4 node_4;
-typedef Adaptive_radix_tree<int, int>::_Node_16 node_16;
-typedef Adaptive_radix_tree<int, int>::_Node_48 node_48;
-typedef Adaptive_radix_tree<int, int>::_Node_256 node_256;
+typedef adaptive_radix_tree<int, int>::Key Key;
+typedef adaptive_radix_tree<int, int>::_Leaf _leaf;
+typedef adaptive_radix_tree<int, int>::_Node_4 node_4;
+typedef adaptive_radix_tree<int, int>::_Node_16 node_16;
+typedef adaptive_radix_tree<int, int>::_Node_48 node_48;
+typedef adaptive_radix_tree<int, int>::_Node_256 node_256;
 
 SCENARIO ("given a node 48 with 16 random elements", "[nodes]") {
     std::vector<int> data(256);

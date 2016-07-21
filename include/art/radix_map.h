@@ -1,7 +1,7 @@
 #ifndef REFERENCE_ART_MAP_H
 #define REFERENCE_ART_MAP_H
 
-#include "Adaptive_radix_tree.h"
+#include "adaptive_radix_tree.h"
 
 namespace art
 {
@@ -35,7 +35,7 @@ namespace art
         // concept requirements
         typedef typename _Alloc::value_type _Alloc_value_type;
 
-        typedef Adaptive_radix_tree <key_type, mapped_type, _Key_transform> _Rep_type;
+        typedef adaptive_radix_tree <key_type, mapped_type, _Key_transform> _Rep_type;
 
         _Rep_type _M_t;
 
@@ -52,6 +52,32 @@ namespace art
         typedef typename _Rep_type::difference_type difference_type;
         typedef typename _Rep_type::reverse_iterator reverse_iterator;
         typedef typename _Rep_type::const_reverse_iterator const_reverse_iterator;
+
+
+        class value_compare : public std::binary_function<value_type, value_type, bool> {
+
+            friend class radix_map<_Key, _Tp, _Key_transform, _Alloc>;
+
+        protected:
+            _Key_transform key_transformer;
+
+            value_compare(_Key_transform __key_transformer)
+                    : key_transformer(__key_transformer) { }
+
+        public:
+            typedef typename adaptive_radix_tree<_Key, _Tp, _Key_transform>::Key transformed_key_type;
+
+            bool operator()(const value_type &__x, const value_type &__y) const {
+                transformed_key_type x1 = {key_transformer(__x)};
+                transformed_key_type x2 = {key_transformer(__x)};
+                for (int i = 0; i < sizeof(transformed_key_type); i++) {
+                    if (x1.chunks[i] < x2.chunks[i])
+                        return true;
+                    if (x1.chunks[i] > x2.chunks[i])
+                        return false;
+                }
+            }
+        };
 
         /**
          * @brief  Default constructor creates no elements.
@@ -137,6 +163,11 @@ namespace art
          * Returns the size of the map.
          */
         size_type size() const { return _M_t.size(); }
+
+        /**
+         * Returns the maximum size of the map.
+         */
+        size_type max_size() const { return _M_t.max_size(); }
 
         /**
          * Returns true if the map is empty.  (Thus begin() would equal
@@ -398,6 +429,18 @@ namespace art
         _Key_transform key_trans() const {
             return _M_t.key_trans();
         }
+
+        value_compare value_comp() const {
+            return value_compare(_M_t.key_trans());
+        }
+
+        template<typename _K1, typename _T1, typename _C1>
+        friend bool operator==(const radix_map<_K1, _T1, _C1> &,
+                               const radix_map<_K1, _T1, _C1> &);
+
+        template<typename _K1, typename _T1, typename _C1>
+        friend bool operator<(const radix_map<_K1, _T1, _C1> &,
+                              const radix_map<_K1, _T1, _C1> &);
     };
 
     //////////////////////////

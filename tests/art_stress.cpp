@@ -1,7 +1,7 @@
 #include <map>
 #include "catch.hpp"
-#include "../src/Adaptive_radix_tree.h"
-#include "../src/radix_map.h"
+#include "art/adaptive_radix_tree.h"
+#include "art/radix_map.h"
 
 
 TEST_CASE("Stress tests", "[stress]") {

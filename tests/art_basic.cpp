@@ -1,59 +1,41 @@
 #include <map>
 #include "catch.hpp"
-#include "../src/Adaptive_radix_tree.h"
-#include "../src/radix_map.h"
+#include "art/adaptive_radix_tree.h"
+#include "art/radix_map.h"
 
 
 SCENARIO("given an empty art", "[art]") {
-    art::Adaptive_radix_tree<int, int> art;
+    art::radix_map<int32_t , int32_t> art;
 
     THEN("its size is 0") {
         REQUIRE(art.size() == 0);
     }
+    THEN("its empty") {
+        REQUIRE(art.empty());
+    }
     WHEN("an element is inserted") {
-        art._M_insert_unique(std::make_pair(5, 5));
+        art.insert(std::make_pair(5, 27));
         THEN("its size is 1 and the inserted value is correct") {
             REQUIRE(art.size() == 1);
+            REQUIRE_FALSE(art.empty());
             REQUIRE(art.find(5) != art.end());
+            REQUIRE(art.find(5)->second == 27);
         }
 
         AND_WHEN("the same element is inserted again") {
-            auto p = art._M_insert_unique(std::make_pair(5, 5));
+            auto p = art.insert(std::make_pair(5 , 27));
             THEN("the insertion failed and its size is still 1") {
                 REQUIRE_FALSE(p.second);
                 REQUIRE(art.size() == 1);
                 REQUIRE(art.find(5) != art.end());
+                REQUIRE(art.find(5)->second == 27);
             }
-        }
-    }
-
-    WHEN("two elements with an equal first prefix chunk are inserted") {
-        auto p1 = art._M_insert_unique(std::make_pair(5, 5));
-        auto p2 = art._M_insert_unique(std::make_pair(261, 261));
-        THEN("both elements were inserted successfully") {
-            REQUIRE(p1.second);
-            REQUIRE(p2.second);
-            REQUIRE(art.find(5) != art.end());
-            REQUIRE(art.find(261) != art.end());
-            REQUIRE(art.size() == 2);
-        }
-    }
-
-    WHEN("two elements with three equal prefix chunks are inserted") {
-        auto p1 = art._M_insert_unique(std::make_pair(5, 5));
-        auto p2 = art._M_insert_unique(std::make_pair(16777221, 16777221));
-        THEN("both elements were inserted successfully") {
-            REQUIRE(p1.second);
-            REQUIRE(p2.second);
-            REQUIRE(art.find(5) != art.end());
-            REQUIRE(art.find(16777221) != art.end());
-            REQUIRE(art.size() == 2);
         }
     }
 }
 
 TEST_CASE("Can tiebreak at level 1", "[art]") {
-    art::Adaptive_radix_tree<int, int> art;
+    art::adaptive_radix_tree<int, int> art;
     art._M_insert_unique(std::make_pair(5, 5));
     art._M_insert_unique(std::make_pair(6, 6));
     art._M_insert_unique(std::make_pair(261, 261));
@@ -62,9 +44,8 @@ TEST_CASE("Can tiebreak at level 1", "[art]") {
     REQUIRE(art.find(261) != art.end());
 }
 
-
 SCENARIO("growing the root node", "[art]") {
-    art::Adaptive_radix_tree<uint64_t, uint64_t> art;
+    art::adaptive_radix_tree<uint64_t, uint64_t> art;
 
     std::vector<uint64_t> data(256);
     std::iota(data.begin(), data.end(), 0);

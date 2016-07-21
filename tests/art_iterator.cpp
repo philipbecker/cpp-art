@@ -1,6 +1,6 @@
 #include <map>
 #include "catch.hpp"
-#include "../src/radix_map.h"
+#include "art/radix_map.h"
 
 
 SCENARIO("given an empty container", "[iterator]") {

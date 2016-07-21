@@ -16,7 +16,7 @@ int main() {
     std::cout << art2.size() << std::endl;
     std::cout << art3.size() << std::endl;
 
-    for (int i = 0; i < 100000; i++)
+    for (int i = 0; i < 10; i++)
         art.erase(i);
 
 

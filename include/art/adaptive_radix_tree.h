@@ -19,7 +19,7 @@ namespace art
     template<typename _Key, typename _V,
             typename _Key_transform = key_transform<_Key>,
             typename _Alloc = std::allocator<std::pair<const _Key, _V> > >
-    class Adaptive_radix_tree {
+    class adaptive_radix_tree {
     public:
         // Forward declaration for typedefs
         class _Node;
@@ -53,7 +53,7 @@ namespace art
             const byte chunks[sizeof(transformed_key_type)];
         };
 
-        class _Node {
+                class _Node {
         public:
             uint16_t _count;
 
@@ -1169,17 +1169,17 @@ namespace art
         Node_ptr _M_root;
 
         // Default constructor
-        Adaptive_radix_tree() {
+        adaptive_radix_tree() {
             init();
         }
 
-        Adaptive_radix_tree(const _Key_transform &key_transformer)
+        adaptive_radix_tree(const _Key_transform &key_transformer)
                 : _M_key_transform(key_transformer) {
             init();
         }
 
         // Copy constructor
-        Adaptive_radix_tree(const Adaptive_radix_tree &__x) {
+        adaptive_radix_tree(const adaptive_radix_tree &__x) {
             switch (__x._M_root->get_type()) {
                 case node_type::node_4_t:
                     _M_root = new _Node_4(*static_cast<_Node_4 *>(__x._M_root));
@@ -1211,7 +1211,7 @@ namespace art
         }
 
         // Move constructor
-        Adaptive_radix_tree(Adaptive_radix_tree &&__x) {
+        adaptive_radix_tree(adaptive_radix_tree &&__x) {
             if (__x._M_root != nullptr) {
                 _M_root = std::move(__x._M_root);
             } else {
@@ -1231,7 +1231,7 @@ namespace art
         }
 
         // Copy assignment
-        Adaptive_radix_tree &operator=(const Adaptive_radix_tree &__x) {
+        adaptive_radix_tree &operator=(const adaptive_radix_tree &__x) {
             // remove old container contents
             clear();
 
@@ -1267,7 +1267,7 @@ namespace art
         }
 
         // Move assignment
-        Adaptive_radix_tree &operator=(Adaptive_radix_tree &&__x) {
+        adaptive_radix_tree &operator=(adaptive_radix_tree &&__x) {
             _M_root = std::move(__x._M_root);
             _M_count = std::move(__x._M_count);
             _M_key_transform = std::move(__x._M_key_transform);
@@ -1297,6 +1297,12 @@ namespace art
 
         size_t size() const {
             return _M_count;
+        }
+
+        size_t max_size() const {
+            if (sizeof(transformed_key_type) < sizeof(size_type))
+                return 1u << sizeof(transformed_key_type);
+            return std::numeric_limits<size_type>::max();
         }
 
         bool empty() const {
@@ -1753,7 +1759,7 @@ namespace art
             }
         }
 
-        void swap(Adaptive_radix_tree &__x) {
+        void swap(adaptive_radix_tree &__x) {
             std::swap(_M_root, __x._M_root);
             std::swap(_M_count, __x._M_count);
             std::swap(_M_dummy_node, __x._M_dummy_node);
@@ -1970,7 +1976,7 @@ namespace art
             return nullptr;
         }
 
-        ~Adaptive_radix_tree() {
+        ~adaptive_radix_tree() {
             clear();
             delete _M_dummy_node;
         }
@@ -2043,8 +2049,8 @@ namespace art
 
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator==(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
-               const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
+    operator==(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
+               const adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
         return lhs.size() == rhs.size()
                && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
@@ -2052,15 +2058,15 @@ namespace art
     // Based on operator==
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator!=(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
-               const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
+    operator!=(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
+               const adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
         return !(lhs == rhs);
     }
 
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator<(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
-              const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+    operator<(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
+              const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
         return std::lexicographical_compare(__x.begin(), __x.end(),
                                             __y.begin(), __y.end());
     }
@@ -2068,24 +2074,24 @@ namespace art
     // Based on operator<
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator>(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
-              const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+    operator>(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
+              const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
         return __y < __x;
     }
 
     // Based on operator<
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator<=(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
-               const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+    operator<=(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
+               const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
         return !(__y < __x);
     }
 
     // Based on operator<
     template<typename _Key, typename _Tp, typename _Key_transform>
     inline bool
-    operator>=(const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
-               const Adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+    operator>=(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
+               const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
         return !(__x < __y);
     }
 }

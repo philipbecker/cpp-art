@@ -1,14 +1,14 @@
 #include "catch.hpp"
-#include "../src/Adaptive_radix_tree.h"
+#include "art/adaptive_radix_tree.h"
 
 using namespace art;
 
-typedef Adaptive_radix_tree<uint64_t, uint64_t>::Key Key;
-typedef Adaptive_radix_tree<uint64_t, uint64_t>::_Leaf _leaf;
-typedef Adaptive_radix_tree<uint64_t, uint64_t>::_Node_4 node_4;
-typedef Adaptive_radix_tree<uint64_t, uint64_t>::_Node_16 node_16;
-typedef Adaptive_radix_tree<uint64_t, uint64_t>::_Node_48 node_48;
-typedef Adaptive_radix_tree<uint64_t, uint64_t>::_Node_256 node_256;
+typedef adaptive_radix_tree<uint64_t, uint64_t>::Key Key;
+typedef adaptive_radix_tree<uint64_t, uint64_t>::_Leaf _leaf;
+typedef adaptive_radix_tree<uint64_t, uint64_t>::_Node_4 node_4;
+typedef adaptive_radix_tree<uint64_t, uint64_t>::_Node_16 node_16;
+typedef adaptive_radix_tree<uint64_t, uint64_t>::_Node_48 node_48;
+typedef adaptive_radix_tree<uint64_t, uint64_t>::_Node_256 node_256;
 
 SCENARIO ("given a node_4 with one element", "[nodes]") {
     uint64_t first_value = 261;

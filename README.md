@@ -4,7 +4,7 @@ STL-like map, multimap and set container based on an Adaptive Radix Tree (ART) i
 ## TODO
 ### art
 * API:
-    * emplace, erase, operator=
+    * emplace
 * Allocator: allocation, deallocation, memory leaks...
 * performance improvements:
     * implement prefix compression
@@ -12,59 +12,21 @@ STL-like map, multimap and set container based on an Adaptive Radix Tree (ART) i
 
 ### keys
 * variable key length support
-* binary comparable key transform for: char*, std::string, * float/double (meh)
+* binary comparable key transform for: char*, std::string
 
 ### interfaces
-* for now: map
-* for later: set & multimap
+- [ ] map
+- [ ] set
 
-### tests
-* add lots of stress tests to ensure equality of behaviour with std::map
-
-### benchmarks
-* for all key types, compare with std::map, std::unordered_map (and google btree)
-    * insertion, lookup, deletion, iteration, (assignemnt, copy)
-
-### memory profiling
-* compare with std::map, std::unordered_map  and (and google btree)
+### benchmarks & memory profiling
+* compare with std::map, std::unordered_map and google cpp-btree
 
 ## STL-compliance
 Container is not **thread safe** (yet)!!!
-### Concept: [Container](http://en.cppreference.com/w/cpp/concept/Container)
-- [x] `C()` Constructor
-- [ ] `C(a)` Copy constructor
-- [x] `a = b` Move assignment
-- [x] `(&a)->~C()` but not really happy with
-- [x] `a.begin()`
-- [x] `a.end()`
-- [x] `a.cbegin()`
-- [x] `a.cend()`
-- [x] `a == b`
-- [x] `a != b`
-- [x] `a.swap(b)` 
-- [x] `swap(a, b)`
-- [x] `a.size()`
-- [x] ~~`max_size()`~~ (not going to implement, not applicable)
-- [x] `a.empty()`
 
-### Concept: [ReversibleContainer](http://en.cppreference.com/w/cpp/concept/ReversibleContainer)
-Done!
+art::radix_map meets the requirements of [Container](http://en.cppreference.com/w/cpp/concept/Container), [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) (for the most part, there is a key_transform instead of key_comp) and [ReversibleContainer](http://en.cppreference.com/w/cpp/concept/ReversibleContainer). 
 
-### Concept: [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer)
-Not started implementing.
-
-### Concept: [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer)
-- [x] `X::key_type`
-- [x] `X::key_transformer`
-- [ ] `X::value_compare`
-- [ ] `X(c)`, `X a(x)` Copy Constructor
-- [x] `X()`, `X a;`
-- [x] `X(i, j, c)`, `X a(i, j, c);`
-- [x] `X(i, j)`, `X a(i, j);` 
-- [x] `X(il);`
-- [x] `a = il`
-- [x] `a.key_trans()`
-- [ ] `a.value_comp()` ??
+[AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) is on the roadmap.
 
 ## Sample Code
 ```C++
