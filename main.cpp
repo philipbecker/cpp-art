@@ -13,14 +13,14 @@ struct custom_transform {
     }
 };
 
-struct Employee {
+struct Scientist {
     int id;
     std::string first_name;
     std::string last_name;
 
 };
 
-std::ostream &operator<<(std::ostream &os, const Employee &e) {
+std::ostream &operator<<(std::ostream &os, const Scientist &e) {
     os << e.first_name << " " << e.last_name << " (" << e.id << ")";
     return os;
 }
@@ -28,8 +28,8 @@ std::ostream &operator<<(std::ostream &os, const Employee &e) {
 namespace art
 {
     template<>
-    struct key_transform<Employee> {
-        int operator()(const Employee &e) const noexcept {
+    struct key_transform<Scientist> {
+        int operator()(const Scientist &e) const noexcept {
             return key_transform<int>()(e.id);
         }
     };
@@ -58,9 +58,9 @@ int main() {
     for (auto &e : map)
         std::cout << e.first << ", " << e.second << std::endl;
 
-    Employee e1{1, "Alan", "Turing"};
-    Employee e2{-5, "John", "Neumann"};
-    art::radix_map<Employee, int> employee_map = {
+    Scientist e1{1, "Alan", "Turing"};
+    Scientist e2{-5, "John", "Neumann"};
+    art::radix_map<Scientist, int> employee_map = {
             {{1, "Alan", "Turing"},  10},
             {{-5, "John", "Neumann"}, 20}
     };
