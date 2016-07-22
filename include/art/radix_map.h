@@ -6,7 +6,7 @@
 namespace art
 {
     /**
-     * @brief A standard container made up of (key,value) pairs, which can be
+     * @brief A container made up of (key,value) pairs, which can be
      * retrieved based on a key, in linear time in size of the key.
      *
      *  @tparam _Key  Type of key objects.
@@ -16,15 +16,15 @@ namespace art
      *  @tparam _Alloc  Allocator type, defaults to
      *                  allocator<pair<const _Key, _Tp>.
      */
-    template<typename _Key, typename _Tp,
+    template<typename _Key, typename _T,
             typename _Key_transform = key_transform <_Key>,
-            typename _Alloc = std::allocator<std::pair<const _Key, _Tp> > >
+            typename _Alloc = std::allocator<std::pair<const _Key, _T> > >
     class radix_map {
 
     public:
         typedef _Key key_type;
-        typedef _Tp mapped_type;
-        typedef std::pair<const _Key, _Tp> value_type;
+        typedef _T mapped_type;
+        typedef std::pair<const _Key, _T> value_type;
         typedef _Key_transform key_transformer;
         typedef _Alloc allocator_type;
         typedef value_type &reference;
@@ -54,7 +54,7 @@ namespace art
 
         class value_compare : public std::binary_function<value_type, value_type, bool> {
 
-            friend class radix_map<_Key, _Tp, _Key_transform, _Alloc>;
+            friend class radix_map<_Key, _T, _Key_transform, _Alloc>;
 
         protected:
             _Key_transform key_transformer;
@@ -63,7 +63,7 @@ namespace art
                     : key_transformer(__key_transformer) { }
 
         public:
-            typedef typename adaptive_radix_tree<_Key, _Tp, _Key_transform>::Key transformed_key_type;
+            typedef typename adaptive_radix_tree<_Key, _T, _Key_transform>::Key transformed_key_type;
 
             bool operator()(const value_type &__x, const value_type &__y) const {
                 transformed_key_type x_key = {key_transformer(__x.first)};
@@ -111,10 +111,6 @@ namespace art
          *  @param  __comp  A comparison object.
          *  @param  __a  An allocator object.
          *
-         *  Create a %map consisting of copies of the elements in the
-         *  initializer_list @a __l.
-         *  This is linear in N if the range is already sorted, and NlogN
-         *  otherwise (where N is @a __l.size()).
          */
         radix_map(std::initializer_list<value_type> __l,
                   const _Key_transform &__key_transformer = _Key_transform(),
@@ -125,29 +121,25 @@ namespace art
 
         /**
          *  @brief  %Map assignment operator.
-         *  @param  __x  A %map of identical element and allocator types.
+         *  @param  __x  A %map with identical elements.
          *
-         *  All the elements of @a __x are copied, but unlike the copy
-         *  constructor, the allocator object is not copied.
          */
         radix_map &operator=(const radix_map &__x) {
             _M_t = __x._M_t;
             return *this;
         }
 
-        // Move assignment operator.
+        /**
+         * @brief  Move assignment operator.
+         */
         radix_map &operator=(radix_map &&__x) = default;
 
         /**
          *  @brief  %Map list assignment operator.
          *  @param  __l  An initializer_list.
          *
-         *  This function fills a %map with copies of the elements in the
-         *  initializer list @a __l.
-         *
-         *  Note that the assignment completely changes the %map and
-         *  that the resulting %map's size is the same as the number
-         *  of elements assigned.  Old data may be lost.
+         *  Fills the map with the contents of an initializer_list.
+         *  Already existing elements in a map will be lost.
          */
         radix_map &operator=(std::initializer_list<value_type> __l) {
             _M_t.assign_unique(__l.begin(), __l.end());
@@ -179,18 +171,14 @@ namespace art
         ///////////////
 
         /**
-         *  Erases all elements in a %map.  Note that this function only
-         *  erases the elements, and that if the elements themselves are
-         *  pointers, the pointed-to memory is not touched in any way.
-         *  Managing the pointer is the user's responsibility.
+         *  Erases all elements in a %map.
          */
         void clear() { _M_t.clear(); }
 
         /**
          *  @brief Attempts to insert a std::pair into the %map.
 
-         *  @param __x Pair to be inserted (see std::make_pair for easy
-         *	     creation of pairs).
+         *  @param __x Pair to be inserted.
          *
          *  @return  A pair, of which the first element is an iterator that
          *           points to the possibly inserted pair, and the second is
@@ -207,12 +195,9 @@ namespace art
         }
 
         /**
-         *  @brief Template function that attempts to insert a range of elements.
-         *  @param  __first  Iterator pointing to the start of the range to be
-         *                   inserted.
+         *  @brief Attempts to insert a range of elements.
+         *  @param  __first  Iterator pointing to the start of the range.
          *  @param  __last  Iterator pointing to the end of the range.
-         *
-         *  Complexity similar to that of the range constructor.
          */
         template<typename _InputIterator>
         void insert(_InputIterator __first, _InputIterator __last) {
@@ -223,8 +208,6 @@ namespace art
          *  @brief Attempts to insert a list of std::pairs into the %map.
          *  @param  __list  A std::initializer_list<value_type> of pairs to be
          *                  inserted.
-         *
-         *  Complexity similar to that of the range constructor.
          */
         void insert(std::initializer_list<value_type> __list) {
             insert(__list.begin(), __list.end());
@@ -239,7 +222,6 @@ namespace art
             return _M_t.erase_unique(__k);
         }
 
-        // Since C++17
         iterator erase(iterator __it) {
             return _M_t.erase(__it);
         }
@@ -249,10 +231,8 @@ namespace art
         const_iterator erase(const_iterator __it) {
             return _M_t.erase(__it);
         }
+        */
 
-         */
-
-        // @TODO input should be const_iterator
         iterator erase(iterator __first, iterator __last) {
             for (; __first != __last; ++__first)
                 _M_t.erase(__first);
@@ -265,8 +245,7 @@ namespace art
          *  @brief  Swaps data with another %map.
          *  @param  __x  A %map of the same element and allocator types.
          *
-         *  This exchanges the elements between two maps in constant
-         *  time.
+         *  This exchanges the elements between two maps in constant time.
          */
         void swap(radix_map &__x) {
             _M_t.swap(__x._M_t);
@@ -296,8 +275,7 @@ namespace art
             if (it != _M_t.end())
                 return (*it).second;
 
-            std::pair<iterator, bool> res = _M_t.insert_unique(
-                    std::pair<_Key, _Tp>(__k, mapped_type()));
+            std::pair<iterator, bool> res = _M_t.emplace_unique(__k, mapped_type());
             return (*res.first).second;
         }
 

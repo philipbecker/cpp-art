@@ -32,7 +32,6 @@ SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") 
     REQUIRE(radix_map.rbegin()->second == std_map.rbegin()->second);
 
     THEN ("forward iteration is equal to std::map") {
-        std::cout << "here" << std::endl;
         auto it_radix = radix_map.begin(), it_radix_end = radix_map.end();
         auto it_std = std_map.begin(), it_std_end = std_map.end();
         for (; it_std != it_std_end; ++it_radix, ++it_std) {

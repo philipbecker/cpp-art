@@ -19,10 +19,7 @@ set(
 add_library(art STATIC ${SOURCE_FILES})
 set_target_properties(art PROPERTIES LINKER_LANGUAGE CXX)
 
-# CLION needs this
 include_directories(${ART_INCLUDE_DIR})
-include_directories(${CATCH_INCLUDE_DIR})
-include_directories(${CELERO_INCLUDE_DIR})
 
 # TESTS
 add_subdirectory(${EXT_PROJECTS_DIR}/catch)
@@ -36,6 +33,10 @@ add_subdirectory(benchmarks)
 add_executable(main ${SOURCE_FILES} main.cpp)
 target_link_libraries(main art)
 add_dependencies(main art)
+
+# CLION needs this
+include_directories(${CATCH_INCLUDE_DIR})
+include_directories(${CELERO_INCLUDE_DIR})
 
 add_custom_target(full)
 add_dependencies(
