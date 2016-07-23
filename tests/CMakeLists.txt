@@ -4,10 +4,11 @@ enable_testing(true)
 set(
         TEST_FILES
         test.cpp
-        art_basic.cpp
-        art_node_4.cpp
-        art_node_16.cpp
-        art_node_48.cpp
+        art/growing_and_tiebreaking.cpp
+        art/node_4.cpp
+        art/node_16.cpp
+        art/node_48.cpp
+        radix_map/modification.cpp
         radix_map/iterator.cpp
         radix_map/move_and_copy.cpp
         radix_map/relational_operators.cpp

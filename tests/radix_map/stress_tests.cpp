@@ -65,6 +65,7 @@ TEST_CASE("Stress test emplace", "[stress]") {
             for (; it_std != it_std_end; ++it_radix, ++it_std) {
                 REQUIRE(it_radix->second == it_std->second);
             }
+            REQUIRE(it_radix == it_radix_end);
         }
 
         SECTION ("can't insert duplicate values") {
@@ -118,6 +119,7 @@ TEST_CASE("Stress test erase by key", "[stress]") {
         for (; it_std != it_std_end; ++it_radix, ++it_std) {
             REQUIRE(it_radix->second == it_std->second);
         }
+        REQUIRE(it_radix == it_radix_end);
     }
 }
 
@@ -163,6 +165,7 @@ TEST_CASE("Stress test erase by iterator", "[stress]") {
         for (; it_std != it_std_end; ++it_radix, ++it_std) {
             REQUIRE(it_radix->second == it_std->second);
         }
+        REQUIRE(it_radix == it_radix_end);
     }
 }
 
