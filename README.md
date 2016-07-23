@@ -6,18 +6,17 @@ STL-like map, multimap and set container based on an Adaptive Radix Tree (ART) i
 * Allocator: allocation, deallocation, memory leaks...
 * performance improvements:
     * implement path compression
-    * consider different leaf implementations
-
-### keys
 * variable key length support
 * binary comparable key transform for: char*, std::string
 
 ### interfaces
-- [ ] map
+- [x] map
 - [ ] set
 
 ### Open Issues
 * Mapped type needs to be default constructible due to stupid dummy node implementation
+* Erase by iterator only works with non const iterator
+* Erase by key has invalid write in edge case
 
 ### benchmarks & memory profiling
 * compare with std::map, std::unordered_map and google cpp-btree
