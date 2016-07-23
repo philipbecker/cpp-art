@@ -154,18 +154,62 @@ TEST_CASE("Copy container assignment is valid after source has been destroyed", 
     }
 }
 
-/**
-TEST_CASE("Assign construct with empty source", "[map-move]") {
+TEST_CASE("Copy construct with empty source", "[map-move]") {
     art::radix_map<int, int> reference;
     art::radix_map<int, int> source;
     art::radix_map<int, int> target(source);
 
-
     REQUIRE(target.size() == reference.size());
+    source.emplace(1, 2);
+    REQUIRE(target.size() == reference.size());
+    target.emplace(4, 2);
     source.clear();
-    REQUIRE(target.size() == reference.size());
-    source.insert(std::make_pair(1, 2));
-    REQUIRE(target.size() == reference.size());
-
+    REQUIRE(target.size() == 1);
+    REQUIRE(source.size() == 0);
 }
- */
+
+TEST_CASE("Copy assign with empty source", "[map-move]") {
+    art::radix_map<int, int> reference;
+    art::radix_map<int, int> source;
+    art::radix_map<int, int> target;
+    target = source;
+
+    REQUIRE(target.size() == reference.size());
+    source.emplace(1, 2);
+    REQUIRE(target.size() == reference.size());
+    target.emplace(4, 2);
+    source.clear();
+    REQUIRE(target.size() == 1);
+    REQUIRE(source.size() == 0);
+}
+
+TEST_CASE("Move construct with empty source", "[map-move]") {
+    art::radix_map<int, int> reference;
+    art::radix_map<int, int> source;
+    art::radix_map<int, int> target(std::move(source));
+
+
+    REQUIRE(target.size() == reference.size());
+    source.emplace(1, 2);
+    REQUIRE(target.size() == reference.size());
+    target.emplace(4, 2);
+    source.clear();
+    REQUIRE(target.size() == 1);
+    REQUIRE(source.size() == 0);
+}
+
+TEST_CASE("Move assign with empty source", "[map-move]") {
+    art::radix_map<int, int> reference;
+    art::radix_map<int, int> source;
+    art::radix_map<int, int> target;
+    target = std::move(source);
+
+    REQUIRE(target.size() == reference.size());
+    source.emplace(1, 2);
+    REQUIRE(target.size() == reference.size());
+    target.emplace(4, 2);
+    source.clear();
+    REQUIRE(target.size() == 1);
+    REQUIRE(source.size() == 0);
+}
+

@@ -4,11 +4,9 @@
 #include <stddef.h>
 #include <assert.h>
 #include <iterator>
-#include <bits/unique_ptr.h>
 #include <utility>
 #include <bitset>
 #include <iostream>
-#include <stack>
 #include "key_transform.h"
 
 namespace art
@@ -45,6 +43,7 @@ namespace art
         typedef _Node *Node_ptr;
         typedef const _Node *Const_Node_ptr;
         typedef _Leaf *Leaf_ptr;
+        typedef const _Leaf *Const_Leaf_ptr;
 
         enum node_type : uint8_t {
             _leaf_t = 0, node_4_t = 1, node_16_t = 2,
@@ -366,6 +365,10 @@ namespace art
 
             virtual void debug() const override {
                 std::cout << "Dummy Node debug" << std::endl;
+            }
+
+            ~_Dummy_Node() {
+                delete _leaf;
             }
         };
 
@@ -1190,6 +1193,12 @@ namespace art
 
         // Copy constructor
         adaptive_radix_tree(const adaptive_radix_tree &__x) {
+            if (__x.empty()) {
+                // Nothing to copy
+                init();
+                return;
+            }
+
             switch (__x._M_root->get_type()) {
                 case node_type::node_4_t:
                     _M_root = new _Node_4(*static_cast<_Node_4 *>(__x._M_root));
@@ -1207,8 +1216,7 @@ namespace art
                     _M_root = new _Leaf(*static_cast<Leaf_ptr>(__x._M_root));
                     break;
                 default:
-                    _M_root = nullptr;
-                    break;
+                    throw;
             }
             _M_count = __x._M_count;
             _M_dummy_node = new _Dummy_Node();
@@ -1222,20 +1230,17 @@ namespace art
 
         // Move constructor
         adaptive_radix_tree(adaptive_radix_tree &&__x) {
-            if (__x._M_root != nullptr) {
-                _M_root = std::move(__x._M_root);
-            } else {
-                _M_root = nullptr;
-            }
-
+            _M_root = std::move(__x._M_root);
             _M_count = std::move(__x._M_count);
             _M_key_transform = std::move(__x._M_key_transform);
+
             _M_dummy_node = new _Dummy_Node();
             if (_M_root != nullptr) {
                 _M_root->_parent = _M_dummy_node;
                 _M_dummy_node->_root = &_M_root;
             }
 
+            // Leaf move source in a valid state
             __x._M_root = nullptr;
             __x._M_count = 0;
         }
@@ -1244,6 +1249,12 @@ namespace art
         adaptive_radix_tree &operator=(const adaptive_radix_tree &__x) {
             // remove old container contents
             clear();
+
+            if (__x.empty()) {
+                // Nothing to copy
+                init();
+                return *this;
+            }
 
             // Then do copy construction
             switch (__x._M_root->get_type()) {
@@ -1263,11 +1274,9 @@ namespace art
                     _M_root = new _Leaf(*static_cast<Leaf_ptr>(__x._M_root));
                     break;
                 default:
-                    _M_root = nullptr;
-                    break;
+                    throw;
             }
             _M_count = __x._M_count;
-            _M_dummy_node = new _Dummy_Node();
             if (_M_root != nullptr) {
                 _M_root->_parent = _M_dummy_node;
                 _M_dummy_node->_root = &_M_root;
@@ -1281,9 +1290,6 @@ namespace art
             _M_root = std::move(__x._M_root);
             _M_count = std::move(__x._M_count);
             _M_key_transform = std::move(__x._M_key_transform);
-
-            if (_M_dummy_node == nullptr)
-                _M_dummy_node = new _Dummy_Node();
 
             if (_M_root != nullptr) {
                 _M_root->_parent = _M_dummy_node;
