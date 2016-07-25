@@ -1393,10 +1393,6 @@ namespace art
 
         reverse_iterator rend() {
             return reverse_iterator(begin());
-            Node_ptr min = minimum();
-            if (min == nullptr)
-                return reverse_iterator(iterator(_M_dummy_node->_leaf));
-            return reverse_iterator(iterator(min));
         }
 
         const_reverse_iterator rend() const {
@@ -1511,7 +1507,7 @@ namespace art
 
         template<typename _InputIterator>
         void assign_unique(_InputIterator __first, _InputIterator __last) {
-            reset();
+            clear();
             for (; __first != __last; ++__first)
                 insert_unique(*__first);
         }
