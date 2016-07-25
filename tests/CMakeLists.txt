@@ -8,6 +8,7 @@ set(
         art/node_4.cpp
         art/node_16.cpp
         art/node_48.cpp
+        radix_map/capacity.cpp
         radix_map/modification.cpp
         radix_map/iterator.cpp
         radix_map/move_and_copy.cpp

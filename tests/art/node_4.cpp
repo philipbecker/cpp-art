@@ -16,7 +16,7 @@ SCENARIO ("given a node_4 with one element", "[nodes]") {
     _leaf *leaf_five = new _leaf(std::make_pair(first_value, first_value), 0, nullptr);
     node_4 *node4 = new node_4(leaf_five, key.chunks[0]);
 
-    REQUIRE(((_leaf *) node4->children[0])->value.second == first_value);
+    REQUIRE(((_leaf *) node4->children[0])->_value.second == first_value);
 
     WHEN ("when 3 elements are inserted in order") {
         std::vector<uint64_t> data = {262, 263, 264};
@@ -37,7 +37,7 @@ SCENARIO ("given a node_4 with one element", "[nodes]") {
         }
         THEN ("the children are stored at the correct index and contain the right value") {
             for (int i = 0; i < 4; i++) {
-                REQUIRE(((_leaf *) node4->children[0])->value.second == data[0]);
+                REQUIRE(((_leaf *) node4->children[0])->_value.second == data[0]);
             }
         }
     }
@@ -61,7 +61,7 @@ SCENARIO ("given a node_4 with one element", "[nodes]") {
         }
         THEN ("the children are stored at the correct index and contain the right value") {
             for (int i = 0; i < 4; i++) {
-                REQUIRE(((_leaf *) node4->children[i])->value.second == data[i]);
+                REQUIRE(((_leaf *) node4->children[i])->_value.second == data[i]);
             }
         }
     }
@@ -86,7 +86,7 @@ SCENARIO ("given a node_4 with one element", "[nodes]") {
         }
         THEN ("the children are stored at the correct index and contain the right value") {
             for (int i = 0; i < 4; i++) {
-                REQUIRE(((_leaf *) node4->children[i])->value.second == data[i]);
+                REQUIRE(((_leaf *) node4->children[i])->_value.second == data[i]);
             }
         }
     }

@@ -12,6 +12,17 @@ SCENARIO("given an empty container", "[iterator]") {
     THEN ("iterator's reverse begin is equal to its reverse end") {
         REQUIRE(map.rbegin() == map.rend());
     }
+    WHEN("one element is inserted") {
+        map.emplace(1, 5);
+        THEN("begin can be dereferenced") {
+            REQUIRE(map.begin()->first == 1);
+            REQUIRE(map.begin()->second == 5);
+        }
+        THEN("rbegin can be dereferenced") {
+            REQUIRE(map.rbegin()->first == 1);
+            REQUIRE(map.rbegin()->second == 5);
+        }
+    }
 }
 
 SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") {
@@ -37,6 +48,7 @@ SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") 
         for (; it_std != it_std_end; ++it_radix, ++it_std) {
             REQUIRE(it_radix->second == it_std->second);
         }
+        REQUIRE(it_radix == it_radix_end);
     }
     THEN ("reverse iteration is equal to std::map") {
         auto it_radix_reverse = radix_map.rbegin(), it_radix_rend = radix_map.rend();
@@ -44,6 +56,7 @@ SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") 
         for (; it_std_reverse != it_std_rend; ++it_radix_reverse, ++it_std_reverse) {
             REQUIRE(it_radix_reverse->second == it_std_reverse->second);
         }
+        REQUIRE(it_radix_reverse == it_radix_rend);
     }
 }
 
