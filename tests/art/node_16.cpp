@@ -20,7 +20,7 @@ TEST_CASE ("Insert into node 16", "[nodes]") {
 
     Key first_key = {data[0]};
     _leaf *first_leaf = new _leaf(std::make_pair(data[0], 0));
-    node_4 *node4 = new node_4(first_leaf, first_key.chunks[0]);
+    node_4 *node4 = new node_4(first_leaf, first_key.chunks[0], 0);
     for (int i = 1; i < 4; i++) {
         Key key = {data[i]};
         _leaf *leaf = new _leaf(std::make_pair(data[i], i));

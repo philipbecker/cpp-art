@@ -68,7 +68,7 @@ int main() {
                                                std::numeric_limits<int64_t>::max());
 
     std::vector<std::pair<int64_t, int64_t> > data;
-    const int size = 16000000;
+    const int size = 8000000;
     for (int i = 0; i < size; i++) {
         int64_t candidate = dis(gen);
         data.emplace_back(candidate, i);
@@ -78,7 +78,7 @@ int main() {
 
     double basline_vm, basline_rss;
     process_mem_usage(basline_vm, basline_rss);
-    cout << "-- VM: " << basline_vm << "; RSS: " << basline_rss << endl;
+    cout << "Baseline VM: " << basline_vm << "; RSS: " << basline_rss << endl;
 
     {
         //std::map<int64_t, int64_t> map;
@@ -90,6 +90,7 @@ int main() {
 
         double vm, rss;
         process_mem_usage(vm, rss);
+        cout << "Afterwards VM: " << vm << "; RSS: " << rss << endl;
         double byte_overhead = ((vm - basline_vm) * 1024) / ((double) size);
         cout << "Overhead/Key in Byte: " << byte_overhead << endl;
     }
