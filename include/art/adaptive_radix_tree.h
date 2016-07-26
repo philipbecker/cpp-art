@@ -214,7 +214,7 @@ namespace art
                 return *this;
             }
 
-            void clear() {}
+            void clear() override {}
 
             virtual void insert(const byte &key_byte, Node_ptr node) override {}
 
@@ -303,7 +303,7 @@ namespace art
                 return *this;
             }
 
-            void clear() {}
+            void clear() override {}
 
             virtual void insert(const byte &key_byte, Node_ptr node) override {}
 
@@ -434,7 +434,7 @@ namespace art
                 return *this;
             }
 
-            void clear() {
+            void clear() override {
                 for (size_t i = 0; i < this->_count; i++) {
                     children[i]->clear();
                     delete children[i];
@@ -558,8 +558,9 @@ namespace art
             virtual node_type get_type() const override { return node_type::node_4_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Node 4, count: " << size() << ", parent " << this->_parent << std::endl;
-                if (size() > 0) {
+                std::cout << this << " Node 4, count: " << this->size()
+                          << ", parent " << this->_parent << std::endl;
+                if (this->size() > 0) {
                     for (size_t i = 0; i < this->_count; i++) {
                         std::cout << ((unsigned) keys[i]) << " | ";
                     }
@@ -647,7 +648,7 @@ namespace art
                 return *this;
             }
 
-            void clear() {
+            void clear() override {
                 for (size_t i = 0; i < this->_count; i++) {
                     children[i]->clear();
                     delete children[i];
@@ -771,7 +772,8 @@ namespace art
             virtual node_type get_type() const override { return node_type::node_16_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Node 16, count: " << size() << ", parent " << this->_parent << std::endl;
+                std::cout << this << " Node 16, count: " << this->size()
+                          << ", parent " << this->_parent << std::endl;
                 for (size_t i = 0; i < this->_count; i++) {
                     std::cout << ((unsigned) keys[i]) << " | ";
                 }
@@ -865,7 +867,7 @@ namespace art
                 return *this;
             }
 
-            void clear() {
+            void clear() override {
                 for (size_t i = 0; i < 256; i++) {
                     if (child_index[i] != EMPTY_MARKER) {
                         children[child_index[i]]->clear();
@@ -979,7 +981,8 @@ namespace art
             virtual node_type get_type() const override { return node_type::node_48_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Node 48, count: " << size() << ", parent " << this->_parent << std::endl;
+                std::cout << this << " Node 48, count: " << this->size()
+                          << ", parent " << this->_parent << std::endl;
                 for (size_t i = 0; i < 256; i++) {
                     if (child_index[i] != EMPTY_MARKER)
                         std::cout << i << " | ";
@@ -1050,7 +1053,7 @@ namespace art
                 return *this;
             }
 
-            void clear() {
+            void clear() override {
                 for (size_t i = 0; i < 256; i++) {
                     if (children[i] != nullptr) {
                         children[i]->clear();
@@ -1160,7 +1163,8 @@ namespace art
             virtual node_type get_type() const override { return node_type::node_256_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Node 256, count: " << size() << ", parent " << this->_parent << std::endl;
+                std::cout << this << " Node 256, count: " << this->size()
+                          << ", parent " << this->_parent << std::endl;
                 for (size_t i = 0; i < 256; i++) {
                     if (children[i] != nullptr)
                         std::cout << i << " | ";
@@ -2157,6 +2161,8 @@ namespace art
                     delete node48;
                     return node;
                 }
+                default:
+                    throw;
             }
             throw; // unreachable
         }
@@ -2193,6 +2199,8 @@ namespace art
                     delete node256;
                     return pair<Node_ptr, bool>(node, true);
                 }
+                default:
+                    throw;
             }
             throw; // unreachable
         }

@@ -1,0 +1,16 @@
+language: cpp
+sudo: required
+dist: trusty
+compiler:
+  - gcc
+  - clang
+
+before_script:
+    - BUILD_DIR=`pwd`/build
+    - mkdir -p ${BUILD_DIR}
+    - cd ${BUILD_DIR}
+    - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${CXX} ..
+script:
+    - cd ${BUILD_DIR}
+    - make stress_tests
+    - cd ${BUILD_DIR}/tests && ./stress_tests > /dev/null

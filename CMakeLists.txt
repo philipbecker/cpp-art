@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 2.8)
 project(ART)
 
 set(EXT_PROJECTS_DIR libs)
 
-
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_CXX_FLAGS_DEBUG "-DMY_DEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")

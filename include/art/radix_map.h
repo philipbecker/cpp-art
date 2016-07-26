@@ -500,7 +500,7 @@ namespace art
 
     // See radix_map::swap()
     template<typename _Key, typename _Tp, typename _Key_transform>
-    inline bool
+    inline void
     swap(radix_map<_Key, _Tp, _Key_transform> &__x,
          radix_map<_Key, _Tp, _Key_transform> &__y) {
         __x.swap(__y);
