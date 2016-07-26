@@ -21,7 +21,19 @@ std::ostream &operator<<(std::ostream &os, const Scientist &s) {
     return os;
 }
 
+union Key_Test_Union {
+    const char value[50];
+    const uint8_t chunks[50];
+};
+
 int main() {
+    Key_Test_Union k {"ich bin ein depp yeaaaaaaaaaaah"};
+
+    std::cout << k.value << std::endl;
+    for (int i = 0; i < 50; i++) {
+        std::cout << k.chunks[i] << ",";
+    }
+    std::cout << std::endl;
 
     art::radix_map<int, std::string> radix_map;
 

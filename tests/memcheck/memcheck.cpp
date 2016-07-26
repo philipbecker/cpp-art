@@ -6,32 +6,15 @@ int main() {
     art::radix_map<int, int> art;
     //std::map<int, int> map;
 
-    const size_t elements = 10000;
-    for (int i = 0; i < elements; i++)
-       art.insert(std::make_pair(i, 1));
-
-    art::radix_map<int, int> art2(art);
-    art::radix_map<int, int> art3(std::move(art));
-
-    std::cout << art.size() << std::endl;
-    std::cout << art2.size() << std::endl;
-    std::cout << art3.size() << std::endl;
-
-    art = std::move(art3);
-
-    std::cout << art.size() << std::endl;
-    std::cout << art2.size() << std::endl;
-    std::cout << art3.size() << std::endl;
-
-    art3 = art;
-
-    std::cout << art.size() << std::endl;
-    std::cout << art2.size() << std::endl;
-    std::cout << art3.size() << std::endl;
+    const size_t elements = 2;
+    for (int i = 0; i < elements; i++) {
+        //art.insert(std::make_pair(i, 1));
+        art.emplace(i, 1);
+    }
 
     for (int i = 0; i < elements; i++) {
-        art.erase(art.find(i));
-        //art.erase(i);
+        //art.erase(art.find(i));
+        art.erase(i);
     }
 
     return 0;

@@ -23,8 +23,7 @@ The containers can almsot seamlessly replace the stl-version, the interface is a
 * binary comparable key transform for: char*, std::string
 
 ### Open Issues
-* Mapped type needs to be default constructible due to stupid dummy node implementation
-* Erase by key has invalid write in edge case
+* Mapped type needs to be default constructible
 
 ### benchmarks & memory profiling
 * compare with std::map, std::unordered_map and google cpp-btree

@@ -27,7 +27,7 @@ public:
         this->arraySize = experimentValue;
         this->data.reserve(this->arraySize);
         this->generate_data();
-        this->build_map();
+        //this->build_map();
         this->build_unorderd_map();
         this->build_radix_map();
         this->build_btree_map();
@@ -74,13 +74,13 @@ public:
     int64_t arraySize;
 };
 
-
+/*
 BASELINE_F(LookupInt64, Map, LookupFixture, LOOKUP_SAMPLES, LOOKUP_ITERATIONS) {
     for (auto &d: this->data)
         map.find(d.first);
 }
-
-BENCHMARK_F(LookupInt64, UnorderedMap, LookupFixture, LOOKUP_SAMPLES, LOOKUP_ITERATIONS) {
+*/
+BASELINE_F(LookupInt64, UnorderedMap, LookupFixture, LOOKUP_SAMPLES, LOOKUP_ITERATIONS) {
     for (auto &d: this->data)
         unordered_map.find(d.first);
 }
