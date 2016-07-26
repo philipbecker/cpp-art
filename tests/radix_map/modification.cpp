@@ -267,3 +267,31 @@ TEST_CASE("Operator at", "[basic]") {
         }
     }
 }
+
+TEST_CASE("lower_bound", "[basic]") {
+    art::radix_map<int, int> art;
+
+    art.emplace(-5, -5);
+    art.emplace(5, 5);
+
+    REQUIRE(art.lower_bound(-255)->first == -5);
+    REQUIRE(art.lower_bound(-6)->first == -5);
+    REQUIRE(art.lower_bound(-5)->first == -5);
+    REQUIRE(art.lower_bound(-4)->first == 5);
+    REQUIRE(art.lower_bound(0)->first == 5);
+    REQUIRE(art.lower_bound(5)->first == 5);
+}
+
+TEST_CASE("upper_bound", "[basic]") {
+    art::radix_map<int, int> art;
+
+    art.emplace(-5, -5);
+    art.emplace(5, 5);
+
+    REQUIRE(art.upper_bound(-255)->first == -5);
+    REQUIRE(art.upper_bound(-6)->first == -5);
+    REQUIRE(art.upper_bound(-5)->first == 5);
+    REQUIRE(art.upper_bound(-4)->first == 5);
+    REQUIRE(art.upper_bound(0)->first == 5);
+    REQUIRE(art.upper_bound(5) == art.end());
+}

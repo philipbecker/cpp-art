@@ -1929,12 +1929,14 @@ namespace art
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(leaf->_value.first)};
-                    if (transformed_key.value <= existing_key.value) {
-                        return iterator(current_node);
-                    } else {
-                        auto successor = previous_node->successor(transformed_key, i - 1);
-                        return iterator(successor);
+
+                    for (unsigned j = i; j < key_size; j++) {
+                        if (transformed_key.chunks[j] > existing_key.chunks[j]) {
+                            auto successor = previous_node->successor(transformed_key, i - 1);
+                            return iterator(successor);
+                        }
                     }
+                    return iterator(current_node);
                 }
 
                 previous_node = current_node;
@@ -1961,12 +1963,14 @@ namespace art
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(leaf->_value.first)};
-                    if (transformed_key.value <= existing_key.value) {
-                        return const_iterator(current_node);
-                    } else {
-                        auto successor = previous_node->successor(transformed_key, i - 1);
-                        return const_iterator(successor);
+
+                    for (unsigned j = i; j < key_size; j++) {
+                        if (transformed_key.chunks[j] > existing_key.chunks[j]) {
+                            auto successor = previous_node->successor(transformed_key, i - 1);
+                            return const_iterator(successor);
+                        }
                     }
+                    return const_iterator(current_node);
                 }
 
                 previous_node = current_node;
@@ -1976,7 +1980,7 @@ namespace art
         }
 
         iterator upper_bound(const key_type &__k) {
-            Key transformed_key = {_M_key_transform(__k)};
+            Key transformed_key {_M_key_transform(__k)};
             const auto key_size = sizeof(__k);
 
             if (_M_root == nullptr)
@@ -1993,12 +1997,13 @@ namespace art
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(leaf->_value.first)};
-                    if (transformed_key.value < existing_key.value) {
-                        return iterator(current_node);
-                    } else {
-                        auto successor = previous_node->successor(transformed_key, i - 1);
-                        return iterator(successor);
-                    }
+
+                    for (unsigned j = i; j < key_size; j++)
+                        if (transformed_key.chunks[j] < existing_key.chunks[j])
+                            return iterator(current_node);
+
+                    auto successor = previous_node->successor(transformed_key, i - 1);
+                    return iterator(successor);
                 }
 
                 previous_node = current_node;
@@ -2025,13 +2030,13 @@ namespace art
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(leaf->_value.first)};
-                    if (transformed_key.value < existing_key.value) {
 
-                        return const_iterator(current_node);
-                    } else {
-                        auto successor = previous_node->successor(transformed_key, i - 1);
-                        return const_iterator(successor);
-                    }
+                    for (unsigned j = i; j < key_size; j++)
+                        if (transformed_key.chunks[j] < existing_key.chunks[j])
+                            return const_iterator(current_node);
+
+                    auto successor = previous_node->successor(transformed_key, i - 1);
+                    return const_iterator(successor);
                 }
 
                 previous_node = current_node;

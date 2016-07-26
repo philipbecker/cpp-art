@@ -14,7 +14,7 @@ public:
     virtual std::vector<std::pair<int64_t, uint64_t>> getExperimentValues() const override {
         std::vector<std::pair<int64_t, uint64_t>> problemSpace;
 
-        const int totalNumberOfTests = 8;
+        const int totalNumberOfTests = 10;
         for (int i = 0; i < totalNumberOfTests; i++) {
             problemSpace.push_back(std::make_pair(int64_t(pow(2, i + 15)), uint64_t(0)));
         }
