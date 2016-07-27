@@ -4,9 +4,13 @@
 #include <fstream>
 #include <random>
 #include <map>
+#include <set>
 #include <unordered_map>
+#include <unordered_set>
 #include <art/radix_map.h>
+#include <art/radix_set.h>
 #include "../../libs/cpp-btree/btree_map.h"
+#include "../../libs/cpp-btree/btree_set.h"
 
 // Source: http://stackoverflow.com/a/671389/1311693
 
@@ -74,8 +78,6 @@ int main() {
         data.emplace_back(candidate, i);
     }
 
-    double key_value_size = size * sizeof(std::pair<int64_t, int64_t>);
-
     double basline_vm, basline_rss;
     process_mem_usage(basline_vm, basline_rss);
     cout << "Baseline VM: " << basline_vm << "; RSS: " << basline_rss << endl;
@@ -85,13 +87,20 @@ int main() {
         //std::unordered_map<int64_t, int64_t> map;
         //btree::btree_map<int64_t, int64_t> map;
         art::radix_map<int64_t, int64_t> map;
-        for (auto &d : data)
+        //std::set<int64_t> set;
+        //std::unordered_set<int64_t> set;
+        //btree::btree_set<int64_t> set;
+        //art::radix_set<int64_t> set;
+        for (auto &d : data) {
             map.insert(d);
+            //set.insert(d.second);
+        }
 
         double vm, rss;
         process_mem_usage(vm, rss);
         cout << "Afterwards VM: " << vm << "; RSS: " << rss << endl;
-        double byte_overhead = ((vm - basline_vm) * 1024) / ((double) size);
+        double byte_overhead = (((vm - basline_vm) * 1024) / ((double) size)) - sizeof(std::pair<int64_t, int64_t>);
+        //double byte_overhead = (((vm - basline_vm) * 1024) / ((double) size)) - sizeof(int64_t);
         cout << "Overhead/Key in Byte: " << byte_overhead << endl;
     }
 }

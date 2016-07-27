@@ -398,11 +398,19 @@ namespace art
             return _M_t.rbegin();
         }
 
+        const_reverse_iterator crbegin() const {
+            return _M_t.rbegin();
+        }
+
         reverse_iterator rend() {
             return _M_t.rend();
         }
 
         const_reverse_iterator rend() const {
+            return _M_t.rend();
+        }
+
+        const_reverse_iterator crend() const {
             return _M_t.rend();
         }
 
