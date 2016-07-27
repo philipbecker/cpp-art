@@ -17,8 +17,7 @@ namespace art
      *                  allocator<pair<const _Key, _Tp>.
      */
     template<typename _Key, typename _T,
-            typename _Key_transform = key_transform <_Key>,
-            typename _Alloc = std::allocator<std::pair<const _Key, _T> > >
+            typename _Key_transform = key_transform<_Key> >
     class radix_map {
 
     public:
@@ -26,16 +25,14 @@ namespace art
         typedef _T mapped_type;
         typedef std::pair<const _Key, _T> value_type;
         typedef _Key_transform key_transformer;
-        typedef _Alloc allocator_type;
+        //typedef _Alloc allocator_type;
         typedef value_type &reference;
         typedef const value_type &const_reference;
 
     private:
-        // @TODO what is this?
-        // concept requirements
-        typedef typename _Alloc::value_type _Alloc_value_type;
+        //typedef typename _Alloc::value_type _Alloc_value_type;
 
-        typedef adaptive_radix_tree <key_type, mapped_type, _Key_transform> _Rep_type;
+        typedef adaptive_radix_tree<key_type, mapped_type, _Key_transform> _Rep_type;
 
         _Rep_type _M_t;
 
@@ -54,13 +51,13 @@ namespace art
 
         class value_compare : public std::binary_function<value_type, value_type, bool> {
 
-            friend class radix_map<_Key, _T, _Key_transform, _Alloc>;
+            friend class radix_map<_Key, _T, _Key_transform>;
 
         protected:
             _Key_transform key_transformer;
 
             value_compare(_Key_transform __key_transformer)
-                    : key_transformer(__key_transformer) { }
+                    : key_transformer(__key_transformer) {}
 
         public:
             typedef typename adaptive_radix_tree<_Key, _T, _Key_transform>::Key transformed_key_type;
@@ -81,17 +78,17 @@ namespace art
         /**
          * @brief  Default constructor creates no elements.
          */
-        radix_map() : _M_t() { }
+        radix_map() : _M_t() {}
 
         /**
          * @brief  Map copy constructor.
          */
-        radix_map(const radix_map &__x) : _M_t(__x._M_t) { }
+        radix_map(const radix_map &__x) : _M_t(__x._M_t) {}
 
         /**
          * @brief  Map move constructor.
          */
-        radix_map(radix_map &&__x) : _M_t(std::move(__x._M_t)) { }
+        radix_map(radix_map &&__x) : _M_t(std::move(__x._M_t)) {}
 
         /**
          *  @brief  Builds a %map from a range.
@@ -109,12 +106,10 @@ namespace art
          *  @brief  Builds a %map from an initializer_list.
          *  @param  __l  An initializer_list.
          *  @param  __comp  A comparison object.
-         *  @param  __a  An allocator object.
          *
          */
         radix_map(std::initializer_list<value_type> __l,
-                  const _Key_transform &__key_transformer = _Key_transform(),
-                  const allocator_type &__a = allocator_type())
+                  const _Key_transform &__key_transformer = _Key_transform())
                 : _M_t(__key_transformer /*, _Pair_alloc_type(__a) */) {
             _M_t.insert_unique(__l.begin(), __l.end());
         }

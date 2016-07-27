@@ -9,8 +9,8 @@
 #include <unordered_set>
 #include <art/radix_map.h>
 #include <art/radix_set.h>
-#include "../../libs/cpp-btree/btree_map.h"
-#include "../../libs/cpp-btree/btree_set.h"
+#include "btree_map.h"
+#include "btree_set.h"
 
 // Source: http://stackoverflow.com/a/671389/1311693
 
