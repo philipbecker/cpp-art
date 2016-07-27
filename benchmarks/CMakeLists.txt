@@ -1,28 +1,52 @@
 include_directories(${CELERO_INCLUDE_DIR})
+include_directories(${GBENCHMARK_INCLUDE_DIR})
 
+# CELERO BENCHMARK SUITE
 set(
         PERF_FILES
-        benchmarks.cpp
-        insert.cpp
-        lookup.cpp
-        iteration.cpp
-        parameters.h
+        celeros/benchmarks.cpp
+        celeros/insert.cpp
+        celeros/lookup.cpp
+        celeros/iteration.cpp
+        celeros/parameters.h
 )
-message(STATUS $ENV{CELERO_INCLUDE_DIR})
-add_executable(benchmarks EXCLUDE_FROM_ALL ${PERF_FILES})
+
+add_executable(celeros_suite EXCLUDE_FROM_ALL ${PERF_FILES})
 
 target_link_libraries(
-        benchmarks
+        celeros_suite
         art
         ${CELERO_LIBRARY}
 )
 
 add_dependencies(
-        benchmarks
+        celeros_suite
         art
         Celero
 )
 
+# GOOGLE BENCHMARK SUITE
+set(
+        GBENCH_FILES
+        gbench/gbenchmarks.cpp
+)
+
+add_executable(gbench_suite EXCLUDE_FROM_ALL ${GBENCH_FILES})
+
+target_link_libraries(
+        gbench_suite
+        art
+        ${GBENCHMARK_LIBRARY}
+        pthread
+)
+
+add_dependencies(
+        gbench_suite
+        art
+        benchmark
+)
+
+# MEMORY USAGE
 set(
         MEM_FILES
         memusage/memusage.cpp

@@ -21,12 +21,16 @@ set_target_properties(art PROPERTIES LINKER_LANGUAGE CXX)
 
 include_directories(${ART_INCLUDE_DIR})
 
+set(BTREE_INCLUDE_DIR ${EXT_PROJECTS_DIR}/cpp-btree)
+include_directories(${BTREE_INCLUDE_DIR})
+
 # TESTS
 add_subdirectory(${EXT_PROJECTS_DIR}/catch)
 add_subdirectory(tests)
 
 # BENCHMARKS
 add_subdirectory(${EXT_PROJECTS_DIR}/celero)
+add_subdirectory(${EXT_PROJECTS_DIR}/benchmark)
 add_subdirectory(benchmarks)
 
 # SANDBOX MAIN
@@ -37,11 +41,4 @@ add_dependencies(main art)
 # CLION needs this
 include_directories(${CATCH_INCLUDE_DIR})
 include_directories(${CELERO_INCLUDE_DIR})
-
-add_custom_target(full)
-add_dependencies(
-        full
-        main
-        tests
-        benchmarks
-)
+include_directories(${GBENCHMARK_INCLUDE_DIR})
