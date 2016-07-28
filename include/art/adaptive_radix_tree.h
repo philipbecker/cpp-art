@@ -266,7 +266,7 @@ namespace art
          */
         struct _Dummy_Node : public _Node {
         public:
-            Node_ptr *_root;
+            Node_ptr _root;
 
             Leaf_ptr _leaf;
 
@@ -275,7 +275,7 @@ namespace art
                       _leaf(new _Leaf(value_type(key_type(), mapped_type()), this)) {
             }
 
-            _Dummy_Node(Node_ptr *root, Leaf_ptr leaf)
+            _Dummy_Node(Node_ptr root, Leaf_ptr leaf)
                     : _Node(this), _root(root),
                       _leaf(new _Leaf(value_type(key_type(), mapped_type()), this)) {
             }
@@ -311,7 +311,7 @@ namespace art
             }
 
             virtual void update_child_ptr(const byte &key_byte, Node_ptr node) override {
-                *_root = node;
+                _root = node;
             }
 
             virtual Node_ptr minimum() override { return this; }
@@ -332,14 +332,14 @@ namespace art
 
             virtual Node_ptr predecessor(const Key &key) override {
                 if (_root != nullptr)
-                    return (*_root)->maximum();
+                    return _root->maximum();
 
                 return this->_leaf;
             }
 
             virtual Const_Node_ptr predecessor(const Key &key) const override {
                 if (_root != nullptr)
-                    return (*_root)->maximum();
+                    return _root->maximum();
 
                 return this->_leaf;
             }
@@ -1213,7 +1213,7 @@ namespace art
             _M_dummy_node = new _Dummy_Node();
             if (_M_root != nullptr) {
                 _M_root->_parent = _M_dummy_node;
-                _M_dummy_node->_root = &_M_root;
+                _M_dummy_node->_root = _M_root;
             }
 
             _M_key_transform = __x._M_key_transform;
@@ -1228,7 +1228,7 @@ namespace art
             _M_dummy_node = new _Dummy_Node();
             if (_M_root != nullptr) {
                 _M_root->_parent = _M_dummy_node;
-                _M_dummy_node->_root = &_M_root;
+                _M_dummy_node->_root = _M_root;
             }
 
             // Leaf move source in a valid state
@@ -1271,7 +1271,7 @@ namespace art
                 _M_count = __x._M_count;
                 if (_M_root != nullptr) {
                     _M_root->_parent = _M_dummy_node;
-                    _M_dummy_node->_root = &_M_root;
+                    _M_dummy_node->_root = _M_root;
                 }
                 _M_key_transform = __x._M_key_transform;
             }
@@ -1286,7 +1286,7 @@ namespace art
 
             if (_M_root != nullptr) {
                 _M_root->_parent = _M_dummy_node;
-                _M_dummy_node->_root = &_M_root;
+                _M_dummy_node->_root = _M_root;
             }
 
             __x._M_root = nullptr;
@@ -1538,35 +1538,41 @@ namespace art
                 _M_root = new_leaf;
                 _M_count++;
 
-                _M_dummy_node->_root = &_M_root;
+                _M_dummy_node->_root = _M_root;
                 return make_pair(iterator(_M_root), true);
             }
 
-            Node_ptr *current_node = &_M_root;
-            Node_ptr *previous_node = nullptr;
+            Node_ptr current_node = _M_root;
+            Node_ptr previous_node = _M_dummy_node;
 
             for (unsigned i = 0; i < key_size + 1; i++) {
-                if (current_node != nullptr && *current_node != nullptr) {
-                    if ((*current_node)->is_leaf()) {
+                if (current_node != nullptr) {
+                    if (current_node->is_leaf()) {
                         // Hit an existing leaf
-                        Leaf_ptr existing_leaf = reinterpret_cast<Leaf_ptr>(*current_node);
+                        Leaf_ptr existing_leaf = reinterpret_cast<Leaf_ptr>(current_node);
                         Key existing_key = {_M_key_transform(existing_leaf->_value.first)};
                         if (transformed_key.value == existing_key.value) {
                             // if it is a duplicate entry, ignore
                             return make_pair(iterator(existing_leaf), false);
                         } else {
                             // otherwise, the leaf needs to be replaced by a node 4
-                            *current_node = new _Node_4(existing_leaf, existing_key.chunks[i], i);
+                            current_node = new _Node_4(existing_leaf, existing_key.chunks[i], i);
+
+                            if (i == 0)
+                                replace_root(current_node);
+                            else
+                                current_node->_parent->update_child_ptr(existing_key.chunks[i - 1], current_node);
+
                             // if the keys are matching, go down all the way until we find a tiebreaker
                             // insert node4's with one child all the way down until a final node 4 with 2 children
                             for (unsigned j = i; j < key_size; j++) {
                                 if (existing_key.chunks[j] == transformed_key.chunks[j]) {
-                                    Node_ptr *child_ref = (*current_node)->find_ref(existing_key.chunks[j]);
-                                    *child_ref = new _Node_4(existing_leaf, existing_key.chunks[j + 1], j + 1);
-                                    current_node = child_ref;
+                                    Node_ptr new_child = new _Node_4(existing_leaf, existing_key.chunks[j + 1], j + 1);
+                                    current_node->update_child_ptr(existing_key.chunks[j], new_child);
+                                    current_node = new_child;
                                 } else {
-                                    Leaf_ptr new_leaf = new _Leaf(__x, *current_node);
-                                    (*current_node)->insert(transformed_key.chunks[j], new_leaf);
+                                    Leaf_ptr new_leaf = new _Leaf(__x, current_node);
+                                    current_node->insert(transformed_key.chunks[j], new_leaf);
                                     _M_count++;
                                     return make_pair(iterator(new_leaf), true);
                                 }
@@ -1576,18 +1582,24 @@ namespace art
                     } else {
                         // traverse down the tree
                         previous_node = current_node;
-                        current_node = (*current_node)->find_ref(transformed_key.chunks[i]);
+                        current_node = current_node->find(transformed_key.chunks[i]);
                     }
                 } else {
                     // hit empty point, this can only happen if the inserted key
                     // is not a prefix/equal to another key already in the tree
                     // therefore we can just insert a new leaf
                     // previous node might have to be grown before that
-                    if ((*previous_node)->size() == (*previous_node)->max_size())
-                        *previous_node = grow(*previous_node);
+                    if (previous_node->size() == previous_node->max_size()) {
+                        previous_node = grow(previous_node);
 
-                    Leaf_ptr new_leaf = new _Leaf(__x, *previous_node);
-                    (*previous_node)->insert(transformed_key.chunks[i - 1], new_leaf);
+                        if (i - 1 == 0)
+                            replace_root(previous_node);
+                        else
+                            previous_node->_parent->update_child_ptr(transformed_key.chunks[i - 2], previous_node);
+                    }
+
+                    Leaf_ptr new_leaf = new _Leaf(__x, previous_node);
+                    previous_node->insert(transformed_key.chunks[i - 1], new_leaf);
                     _M_count++;
                     return make_pair(iterator(new_leaf), true);
                 }
@@ -1646,28 +1658,34 @@ namespace art
             if (_M_root == nullptr)
                 return pair<Node_ptr, bool>(_M_dummy_node, 0);
 
-            Node_ptr *current_node = &_M_root;
-            Node_ptr *previous_node = nullptr;
+            Node_ptr previous_node = _M_dummy_node;
+            Node_ptr current_node = _M_root;
 
             for (int32_t i = 0; i < key_size + 1; i++) {
-                if (current_node != nullptr && *current_node != nullptr) {
-                    if ((*current_node)->is_leaf()) {
-                        Leaf_ptr existing_leaf = reinterpret_cast<Leaf_ptr >(*current_node);
+                if (current_node != nullptr) {
+                    if (current_node->is_leaf()) {
+                        Leaf_ptr existing_leaf = reinterpret_cast<Leaf_ptr>(current_node);
                         Key existing_key = {_M_key_transform(existing_leaf->_value.first)};
                         if (__k.value == existing_key.value) {
                             return pair<Node_ptr, int>(existing_leaf, -1);
                         } else {
                             // otherwise, the leaf needs to be replaced by a node 4
-                            *current_node = new _Node_4(existing_leaf, existing_key.chunks[i], i);
+                            current_node = new _Node_4(existing_leaf, existing_key.chunks[i], i);
+
+                            if (i == 0)
+                                replace_root(current_node);
+                            else
+                                current_node->_parent->update_child_ptr(existing_key.chunks[i - 1], current_node);
+
                             // if the keys are matching, go down all the way until we find a tiebreaker
                             // insert node4's with one child all the way down until a final node 4 with 2 children
                             for (int32_t j = i; j < key_size + 1; j++) {
                                 if (existing_key.chunks[j] == __k.chunks[j]) {
-                                    Node_ptr *child_ref = (*current_node)->find_ref(existing_key.chunks[j]);
-                                    *child_ref = new _Node_4(existing_leaf, existing_key.chunks[j + 1], j + 1);
-                                    current_node = child_ref;
+                                    Node_ptr new_child = new _Node_4(existing_leaf, existing_key.chunks[j + 1], j + 1);
+                                    current_node->update_child_ptr(existing_key.chunks[j], new_child);
+                                    current_node = new_child;
                                 } else {
-                                    return make_pair(*current_node, j + 1);
+                                    return make_pair(current_node, j + 1);
                                 }
                             }
                             throw; // unreachable
@@ -1675,17 +1693,23 @@ namespace art
                     } else {
                         // traverse down the tree
                         previous_node = current_node;
-                        current_node = (*current_node)->find_ref(__k.chunks[i]);
+                        current_node = (current_node)->find(__k.chunks[i]);
                     }
                 } else {
                     // hit empty point, this can only happen if the inserted key
                     // is not a prefix/equal to another key already in the tree
                     // therefore we can just insert a new leaf
                     // previous node might have to be grown before that
-                    if ((*previous_node)->size() == (*previous_node)->max_size())
-                        *previous_node = grow(*previous_node);
+                    if (previous_node->size() == previous_node->max_size()) {
+                        previous_node = grow(previous_node);
 
-                    return make_pair(*previous_node, i);
+                        if (i - 1 == 0)
+                            replace_root(previous_node);
+                        else
+                            previous_node->_parent->update_child_ptr(__k.chunks[i - 2], previous_node);
+                    }
+
+                    return make_pair(previous_node, i);
                 }
             }
             throw; // unreachable
@@ -1701,11 +1725,16 @@ namespace art
                 parent->insert(key.chunks[depth - 1], leaf);
             } else {
                 _M_root = leaf;
-                _M_dummy_node->_root = &_M_root;
+                _M_dummy_node->_root = _M_root;
             }
             _M_count++;
             return iterator(leaf);
         };
+
+        inline void replace_root(Node_ptr current_node) {
+            _M_root = current_node;
+            _M_dummy_node->_root = _M_root;
+        }
 
     public:
 
@@ -1728,26 +1757,24 @@ namespace art
                 return 0;
             }
 
-            Node_ptr *current_node = &_M_root;
+            Node_ptr current_node = _M_root;
 
-            for (int32_t i = 0; i < key_size + 1; i++) {
-                Node_ptr *child = (*current_node)->find_ref(transformed_key.chunks[i]);
+            for (int32_t depth = 0; depth < key_size + 1; depth++) {
+                Node_ptr child = current_node->find(transformed_key.chunks[depth]);
 
-                if (child == nullptr || *child == nullptr)
+                if (child == nullptr)
                     return 0;
 
-                if ((*child)->is_leaf()) {
-                    Leaf_ptr existing_leaf = static_cast<Leaf_ptr >(*child);
+                if (child->is_leaf()) {
+                    Leaf_ptr existing_leaf = static_cast<Leaf_ptr>(child);
                     Key existing_key = {_M_key_transform(existing_leaf->_value.first)};
                     if (transformed_key.value == existing_key.value) {
                         // Delete the leaf
-                        (*current_node)->erase(transformed_key.chunks[i]);
+                        current_node->erase(transformed_key.chunks[depth]);
                         _M_count--;
 
-                        // @TODO: ugly edge case handling
-                        Node_ptr node = fix_after_erase(transformed_key, *current_node, i);
-                        if (node != _M_root)
-                            *current_node = node;
+                        fix_after_erase(current_node, depth, transformed_key);
+
                         return 1;
                     } else {
                         return 0; // key not in tree (leaf mismatch)
@@ -1781,18 +1808,40 @@ namespace art
             inner_node->erase(transformed_key.chunks[depth]);
             _M_count--;
 
-            int32_t parent_depth;
-            std::tie(inner_node, parent_depth) = fix_after_erase_it(transformed_key, inner_node, depth);
-            if (parent_depth >= 0) {
-                Node_ptr *former_child = inner_node->_parent->find_ref(transformed_key.chunks[parent_depth]);
-                *former_child = inner_node;
-            }
+            fix_after_erase(inner_node, depth, transformed_key);
 
             return __result;
         }
 
     private:
-        Node_ptr fix_after_erase(const Key &transformed_key, Node_ptr node, int32_t depth) {
+        void fix_after_erase(Node_ptr current_node, int32_t depth, const Key &transformed_key) {
+            // Shrink node if necessary & delete obsolete nodes
+            Node_ptr shrunk_node = shrink_after_erase(current_node, depth, transformed_key);
+
+            // Node wasn't changed
+            if (shrunk_node == current_node)
+                return;
+
+            // Update child pointer in parent of inner_node
+            current_node = shrunk_node;
+            Node_ptr parent = current_node->_parent;
+
+            if (parent->get_type() != _dummy_node_t)
+                parent->update_child_ptr(
+                        transformed_key.chunks[static_cast<Inner_Node_ptr>(parent)->_depth],
+                        current_node);
+            else
+                replace_root(current_node);
+        }
+
+        /**
+         * @brief Attempts to shrink the node and recursively remove one-way parents above it.
+         * @param node Node that might be shrunk and whose one-way parents are dropped.
+         * @param depth
+         * @param key
+         * @return A pointer to the unchanged or shrunk node.
+         */
+        Node_ptr shrink_after_erase(Node_ptr node, int32_t depth, const Key &key) {
             // Parent of deleted leaf now underfull?
             int32_t j = 1;
             while (node->size() < node->min_size()) {
@@ -1809,63 +1858,22 @@ namespace art
                     Node_ptr parent = node->_parent;
                     if (parent->get_type() == node_type::_dummy_node_t) {
                         node->_parent = _M_dummy_node;
-                        _M_root = node;
                         return node;
                     }
 
                     Node_ptr grandparent = parent->_parent;
                     if (grandparent->get_type() == node_type::_dummy_node_t) {
+                        node->_parent = _M_dummy_node;
                         delete parent;
-                        node->_parent = grandparent;
-                        _M_root = node;
                         return node;
                     }
-                    Node_ptr *former_child = grandparent->find_ref(transformed_key.chunks[depth - j - 1]);
-                    *former_child = node;
+                    grandparent->update_child_ptr(key.chunks[depth - j - 1], node);
                     node->_parent = grandparent;
                     delete parent;
                     j++;
                 }
             }
             return node;
-        }
-
-        pair<Node_ptr, int32_t> fix_after_erase_it(const Key &transformed_key, Node_ptr node, int32_t depth) {
-            // Parent of deleted leaf now underfull?
-            int32_t j = 1;
-            while (node->size() < node->min_size()) {
-                pair<Node_ptr, bool> p = shrink(node);
-
-                // Cannot shrink node 4 to leaf, because child is not a leaf
-                if (!p.second)
-                    return pair<Node_ptr, int32_t>(node, depth - j);
-
-                node = p.first;
-
-                // As long as the node above the leaf is a one-way node, compress path
-                while (node->is_leaf() && node->_parent->size() <= 1 && depth - j >= -1) {
-                    Node_ptr parent = node->_parent;
-                    if (parent->get_type() == node_type::_dummy_node_t) {
-                        node->_parent = _M_dummy_node;
-                        _M_root = node;
-                        return pair<Node_ptr, int32_t>(node, -1);
-                    }
-
-                    Node_ptr grandparent = parent->_parent;
-                    if (grandparent->get_type() == node_type::_dummy_node_t) {
-                        node->_parent = grandparent;
-                        _M_root = node;
-                        delete parent;
-                        return pair<Node_ptr, int32_t>(node, -1);
-                    }
-                    Node_ptr *former_child = grandparent->find_ref(transformed_key.chunks[depth - j - 1]);
-                    *former_child = node;
-                    node->_parent = grandparent;
-                    delete parent;
-                    j++;
-                }
-            }
-            return pair<Node_ptr, int32_t>(node, depth - j);
         }
 
     public:

@@ -26,6 +26,32 @@ int main() {
     using std::cout;
     using std::endl;
 
+    art::radix_map<uint32_t, uint32_t> m;
+    for (uint32_t i = 1; i < 2500; i++) {
+        auto res = m.insert(std::make_pair(i << 16, i));
+        if (res.second)
+            cout << res.first->first << " -> " << res.first->second << endl;
+        else
+            cout << "no success with " << i << endl;
+    }
+
+    cout << "size: " << m.size() << endl;
+
+    for (uint32_t i = 1; i < 2500; i++) {
+        auto it = m.erase(i<< 16);
+        cout << "erase " << i << " was " << it << endl;
+    }
+
+    cout << "size: " << m.size() << endl;
+
+    for (uint32_t i = 1; i < 250; i++) {
+        auto res = m.insert(std::make_pair(i << 16, i));
+        if (res.second)
+            cout << res.first->first << " -> " << res.first->second << endl;
+        else
+            cout << "no success with " << i << endl;
+    }
+
 
     cout << "Memory footprint" << endl;
     cout << "Pair<int, int> \t\t" << sizeof(std::pair<int, int>) << endl;
