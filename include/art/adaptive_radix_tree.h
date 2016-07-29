@@ -1,10 +1,12 @@
 #ifndef ART_ADAPT_RADIX_TREE_H
 #define ART_ADAPT_RADIX_TREE_H
 
+#include <array>
 #include <stddef.h>
 #include <iterator>
 #include <utility>
 #include <iostream>
+#include <limits>
 #include "key_transform.h"
 
 namespace art
@@ -253,7 +255,7 @@ namespace art
             virtual node_type get_type() const override { return node_type::_leaf_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Leaf: " << _KeyOfValue()(_value)
+                std::cout << this << " Leaf: "
                           << ", parent " << this->_parent << std::endl;
             }
         };

@@ -2,7 +2,6 @@
 #define ART_RADIX_SET_H
 
 #include "art/adaptive_radix_tree.h"
-#include <set>
 
 namespace art
 {
