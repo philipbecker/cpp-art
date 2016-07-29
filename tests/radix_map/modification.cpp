@@ -2,7 +2,7 @@
 #include "catch.hpp"
 #include "art/radix_map.h"
 
-SCENARIO("given an empty art", "[art]") {
+SCENARIO("given an empty art", "[radix-map]") {
     art::radix_map<int32_t, int32_t> art;
 
     THEN("its size is 0") {
@@ -32,7 +32,7 @@ SCENARIO("given an empty art", "[art]") {
     }
 }
 
-TEST_CASE("basic operations", "[art]") {
+TEST_CASE("basic operations", "[radix-map]") {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(std::numeric_limits<int>::min(),
@@ -112,7 +112,7 @@ TEST_CASE("basic operations", "[art]") {
     }
 }
 
-TEST_CASE("Erase all elements", "[basic]") {
+TEST_CASE("Erase all elements", "[radix-map]") {
     std::map<unsigned, unsigned> map;
     art::radix_map<unsigned, unsigned> radix_map;
 
@@ -131,7 +131,7 @@ TEST_CASE("Erase all elements", "[basic]") {
     }
 }
 
-TEST_CASE("Erase all elements and keys not in map", "[basic]") {
+TEST_CASE("Erase all elements and keys not in map", "[radix-map]") {
     std::map<int, int> map;
     art::radix_map<int, int> radix_map;
 
@@ -156,7 +156,7 @@ TEST_CASE("Erase all elements and keys not in map", "[basic]") {
 }
 
 
-TEST_CASE("Erase with iterators", "[basic]") {
+TEST_CASE("Erase with iterators", "[radix-map]") {
     std::map<int, int> map;
     art::radix_map<int, int> radix_map;
 
@@ -204,7 +204,7 @@ TEST_CASE("Erase with iterators", "[basic]") {
     }
 }
 
-TEST_CASE("Operator[]", "[basic]") {
+TEST_CASE("Operator[]", "[radix-map]") {
     std::map<int, int> map;
     art::radix_map<int, int> art;
 
@@ -238,7 +238,7 @@ TEST_CASE("Operator[]", "[basic]") {
     }
 }
 
-TEST_CASE("Operator at", "[basic]") {
+TEST_CASE("Operator at", "[radix-map]") {
     std::map<int, int> map;
     art::radix_map<int, int> art;
 
@@ -268,7 +268,7 @@ TEST_CASE("Operator at", "[basic]") {
     }
 }
 
-TEST_CASE("lower_bound", "[basic]") {
+TEST_CASE("lower_bound", "[radix-map]") {
     art::radix_map<int, int> art;
 
     art.emplace(-5, -5);
@@ -282,7 +282,7 @@ TEST_CASE("lower_bound", "[basic]") {
     REQUIRE(art.lower_bound(5)->first == 5);
 }
 
-TEST_CASE("upper_bound", "[basic]") {
+TEST_CASE("upper_bound", "[radix-map]") {
     art::radix_map<int, int> art;
 
     art.emplace(-5, -5);

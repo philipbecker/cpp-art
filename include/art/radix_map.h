@@ -5,6 +5,21 @@
 
 namespace art
 {
+    namespace detail
+    {
+        template<typename _Pair>
+        struct Select1st : public std::unary_function<_Pair, typename _Pair::first_type> {
+
+            typename _Pair::first_type &operator()(_Pair &__x) const {
+                return __x.first;
+            }
+
+            const typename _Pair::first_type &operator()(const _Pair &__x) const {
+                return __x.first;
+            }
+        };
+    }
+
     /**
      * @brief A container made up of (key,value) pairs, which can be
      * retrieved based on a key, in linear time in size of the key.
@@ -13,8 +28,12 @@ namespace art
      *  @tparam  _Tp  Type of mapped objects.
      *  @tparam _Key_transform  Key transformation function object type,
      *                          defaults to key_transform<_Key>.
-     *  @tparam _Alloc  Allocator type, defaults to
-     *                  allocator<pair<const _Key, _Tp>.
+     *
+     *  Meets the requirements of a <a href="tables.html#65">container</a>, a
+     *  <a href="tables.html#66">reversible container</a>, and an
+     *  <a href="tables.html#69">associative container</a> (using unique keys).
+     *
+     *  Maps support bidirectional iterators.
      */
     template<typename _Key, typename _T,
             typename _Key_transform = key_transform<_Key> >
@@ -32,7 +51,8 @@ namespace art
     private:
         //typedef typename _Alloc::value_type _Alloc_value_type;
 
-        typedef adaptive_radix_tree<key_type, mapped_type, _Key_transform> _Rep_type;
+        typedef adaptive_radix_tree<key_type, value_type,
+                detail::Select1st<value_type>, _Key_transform> _Rep_type;
 
         _Rep_type _M_t;
 
@@ -40,7 +60,7 @@ namespace art
 
         //typedef typename _Alloc_traits::pointer            pointer;
         //typedef typename _Alloc_traits::const_pointer      const_pointer;
-        // Bidiretional iterator
+        // Bidirectional iterator
         typedef typename _Rep_type::iterator iterator;
         typedef typename _Rep_type::const_iterator const_iterator;
         typedef typename _Rep_type::size_type size_type;
@@ -91,7 +111,7 @@ namespace art
         radix_map(radix_map &&__x) : _M_t(std::move(__x._M_t)) {}
 
         /**
-         *  @brief  Builds a %map from a range.
+         *  @brief  Builds a map from a range.
          *  @param  __first  An input iterator.
          *  @param  __last  An input iterator.
          *
@@ -103,20 +123,20 @@ namespace art
         }
 
         /**
-         *  @brief  Builds a %map from an initializer_list.
+         *  @brief  Builds a map from an initializer_list.
          *  @param  __l  An initializer_list.
-         *  @param  __comp  A comparison object.
+         *  @param  __key_transformer  A key transformation functor.
          *
          */
         radix_map(std::initializer_list<value_type> __l,
                   const _Key_transform &__key_transformer = _Key_transform())
-                : _M_t(__key_transformer /*, _Pair_alloc_type(__a) */) {
+                : _M_t(__key_transformer) {
             _M_t.insert_unique(__l.begin(), __l.end());
         }
 
         /**
-         *  @brief  %Map assignment operator.
-         *  @param  __x  A %map with identical elements.
+         *  @brief  Map assignment operator.
+         *  @param  __x  A map with identical elements.
          *
          */
         radix_map &operator=(const radix_map &__x) {
@@ -130,7 +150,7 @@ namespace art
         radix_map &operator=(radix_map &&__x) = default;
 
         /**
-         *  @brief  %Map list assignment operator.
+         *  @brief  Map list assignment operator.
          *  @param  __l  An initializer_list.
          *
          *  Fills the map with the contents of an initializer_list.
@@ -146,32 +166,38 @@ namespace art
         //////////////
 
         /**
+         * Returns true if the map is empty.  (Thus begin() would equal
+         *  end().)
+         */
+        bool empty() const noexcept {
+            return _M_t.empty();
+        }
+
+        /**
          * Returns the size of the map.
          */
-        size_type size() const { return _M_t.size(); }
+        size_type size() const noexcept {
+            return _M_t.size();
+        }
 
         /**
          * Returns the maximum size of the map.
          */
-        size_type max_size() const { return _M_t.max_size(); }
-
-        /**
-         * Returns true if the map is empty.  (Thus begin() would equal
-         *  end().)
-        */
-        bool empty() const { return _M_t.empty(); }
+        size_type max_size() const noexcept {
+            return _M_t.max_size();
+        }
 
         ///////////////
         // Modifiers //
         ///////////////
 
         /**
-         *  Erases all elements in a %map.
+         *  Erases all elements in a map.
          */
         void clear() { _M_t.clear(); }
 
         /**
-         *  @brief Attempts to insert a std::pair into the %map.
+         *  @brief Attempts to insert a std::pair into the map.
 
          *  @param __x Pair to be inserted.
          *
@@ -179,9 +205,9 @@ namespace art
          *           points to the possibly inserted pair, and the second is
          *           a bool that is true if the pair was actually inserted.
          *
-         *  This function attempts to insert a (key, value) %pair into the %map.
-         *  A %map relies on unique keys and thus a %pair is only inserted if its
-         *  first element (the key) is not already present in the %map.
+         *  This function attempts to insert a (key, value) %pair into the map.
+         *  A map relies on unique keys and thus a %pair is only inserted if its
+         *  first element (the key) is not already present in the map.
          *
          *  Insertion requires O(k) time.
          */
@@ -200,7 +226,7 @@ namespace art
         }
 
         /**
-         *  @brief Attempts to insert a list of std::pairs into the %map.
+         *  @brief Attempts to insert a list of std::pairs into the map.
          *  @param  __list  A std::initializer_list<value_type> of pairs to be
          *                  inserted.
          */
@@ -221,13 +247,6 @@ namespace art
             return _M_t.erase(__it);
         }
 
-        /*
-        // Since C++11
-        const_iterator erase(const_iterator __it) {
-            return _M_t.erase(__it);
-        }
-        */
-
         iterator erase(iterator __first, iterator __last) {
             for (; __first != __last; ++__first)
                 _M_t.erase(__first);
@@ -235,10 +254,9 @@ namespace art
             return __last;
         }
 
-
         /**
-         *  @brief  Swaps data with another %map.
-         *  @param  __x  A %map of the same element and allocator types.
+         *  @brief  Swaps data with another map.
+         *  @param  __x  A map of the same element and allocator types.
          *
          *  This exchanges the elements between two maps in constant time.
          */
@@ -252,7 +270,7 @@ namespace art
         ////////////////////
 
         /**
-         * @brief  Subscript ( @c [] ) access to %map data.
+         * @brief  Subscript ( @c [] ) access to map data.
          * @param  __k  The key for which data should be retrieved.
          * @return  A reference to the data of the (key,data) %pair.
          *
@@ -275,10 +293,10 @@ namespace art
         }
 
         /**
-         *  @brief  Access to %map data.
+         *  @brief  Access to map data.
          *  @param  __k  The key for which data should be retrieved.
          *  @return  A reference to the data whose key is equivalent to @a __k, if
-         *           such a data is present in the %map.
+         *           such a data is present in the map.
          *  @throw  std::out_of_range  If no such data is present.
          */
         mapped_type &at(const key_type &__k) {
@@ -297,7 +315,7 @@ namespace art
         }
 
         /**
-         *  @brief Tries to locate an element in a %map.
+         *  @brief Tries to locate an element in a map.
          *  @param  __k  Key of (key, value) %pair to be located.
          *  @return  Iterator pointing to sought-after element, or end() if not
          *           found.
@@ -361,51 +379,51 @@ namespace art
         // Iterators //
         ///////////////
 
-        iterator begin() {
+        iterator begin() noexcept {
             return _M_t.begin();
         }
 
-        const_iterator begin() const {
+        const_iterator begin() const noexcept {
             return _M_t.begin();
         }
 
-        const_iterator cbegin() const {
+        const_iterator cbegin() const noexcept {
             return _M_t.begin();
         }
 
-        iterator end() {
+        iterator end() noexcept {
             return _M_t.end();
         }
 
-        const_iterator end() const {
+        const_iterator end() const noexcept {
             return _M_t.end();
         }
 
-        const_iterator cend() const {
+        const_iterator cend() const noexcept {
             return _M_t.end();
         }
 
-        reverse_iterator rbegin() {
+        reverse_iterator rbegin() noexcept {
             return _M_t.rbegin();
         }
 
-        const_reverse_iterator rbegin() const {
+        const_reverse_iterator rbegin() const noexcept {
             return _M_t.rbegin();
         }
 
-        const_reverse_iterator crbegin() const {
+        const_reverse_iterator crbegin() const noexcept {
             return _M_t.rbegin();
         }
 
-        reverse_iterator rend() {
+        reverse_iterator rend() noexcept {
             return _M_t.rend();
         }
 
-        const_reverse_iterator rend() const {
+        const_reverse_iterator rend() const noexcept {
             return _M_t.rend();
         }
 
-        const_reverse_iterator crend() const {
+        const_reverse_iterator crend() const noexcept {
             return _M_t.rend();
         }
 
@@ -436,8 +454,8 @@ namespace art
 
     /**
      *  @brief  Map equality comparison.
-     *  @param  __x  A %map.
-     *  @param  __y  A %map of the same type as @a x.
+     *  @param  __x  A map.
+     *  @param  __y  A map of the same type as @a x.
      *  @return  True iff the size and elements of the maps are equal.
      *
      *  This is an equivalence relation.  It is linear in the size of the
@@ -453,8 +471,8 @@ namespace art
 
     /**
      *  @brief  Map ordering relation.
-     *  @param  __x  A %map.
-     *  @param  __y  A %map of the same type as @a x.
+     *  @param  __x  A map.
+     *  @param  __y  A map of the same type as @a x.
      *  @return  True iff @a x is lexicographically less than @a y.
      *
      *  This is a total ordering relation.  It is linear in the size of the

@@ -1,9 +1,12 @@
 #include "catch.hpp"
 #include "art/adaptive_radix_tree.h"
+#include "art/radix_map.h"
 
+typedef std::pair<const uint64_t, uint64_t> value_type;
+typedef art::detail::Select1st<value_type> selector;
 
 TEST_CASE("Can tiebreak at level 1", "[art]") {
-    art::adaptive_radix_tree<int, int> art;
+    art::adaptive_radix_tree<uint64_t, value_type, selector> art;
     art.insert_unique(std::make_pair(5, 5));
     art.insert_unique(std::make_pair(6, 6));
     art.insert_unique(std::make_pair(261, 261));
@@ -13,7 +16,7 @@ TEST_CASE("Can tiebreak at level 1", "[art]") {
 }
 
 SCENARIO("growing the root node", "[art]") {
-    art::adaptive_radix_tree<uint64_t, uint64_t> art;
+    art::adaptive_radix_tree<uint64_t, value_type, selector> art;
 
     std::vector<uint64_t> data(256);
     std::iota(data.begin(), data.end(), 0);

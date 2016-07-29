@@ -2,7 +2,7 @@
 #include "catch.hpp"
 #include "art/radix_map.h"
 
-TEST_CASE("Move Constructor", "[map-move]") {
+TEST_CASE("Move Constructor", "[radix-map]") {
     art::radix_map<int, int> source;
     art::radix_map<int, int> reference;
     for (int i = -1000; i < 1000; i++) {
@@ -18,7 +18,7 @@ TEST_CASE("Move Constructor", "[map-move]") {
     }
 }
 
-TEST_CASE("Move Assignment", "[map-move]") {
+TEST_CASE("Move Assignment", "[radix-map]") {
     art::radix_map<int, int> target;
     art::radix_map<int, int> reference;
     {
@@ -39,7 +39,7 @@ TEST_CASE("Move Assignment", "[map-move]") {
     }
 }
 
-TEST_CASE("Move container assignment is valid after source has been destroyed", "[map-move]") {
+TEST_CASE("Move container assignment is valid after source has been destroyed", "[radix-map]") {
     art::radix_map<int, int> target;
     art::radix_map<int, int> reference;
     {
@@ -59,7 +59,7 @@ TEST_CASE("Move container assignment is valid after source has been destroyed", 
     }
 }
 
-TEST_CASE("Swap", "[map-move]") {
+TEST_CASE("Swap", "[radix-map]") {
     art::radix_map<int, int> a;
     std::map<int, int> reference1;
     for (int i = -1000; i < 1000; i++) {
@@ -90,7 +90,7 @@ TEST_CASE("Swap", "[map-move]") {
     }
 }
 
-TEST_CASE("Copy Constructor", "[map-move]") {
+TEST_CASE("Copy Constructor", "[radix-map]") {
     art::radix_map<int, int> source;
     art::radix_map<int, int> reference;
     for (int i = -1000; i < 1000; i++) {
@@ -113,7 +113,7 @@ TEST_CASE("Copy Constructor", "[map-move]") {
     }
 }
 
-TEST_CASE("Copy Assignment", "[map-move]") {
+TEST_CASE("Copy Assignment", "[radix-map]") {
     art::radix_map<int, int> target;
     art::radix_map<int, int> reference;
 
@@ -134,7 +134,7 @@ TEST_CASE("Copy Assignment", "[map-move]") {
 
 }
 
-TEST_CASE("Copy container assignment is valid after source has been destroyed", "[map-move]") {
+TEST_CASE("Copy container assignment is valid after source has been destroyed", "[radix-map]") {
     art::radix_map<int, int> target;
     art::radix_map<int, int> reference;
     {
@@ -154,7 +154,7 @@ TEST_CASE("Copy container assignment is valid after source has been destroyed", 
     }
 }
 
-TEST_CASE("Copy construct with empty source", "[map-move]") {
+TEST_CASE("Copy construct with empty source", "[radix-map]") {
     art::radix_map<int, int> reference;
     art::radix_map<int, int> source;
     art::radix_map<int, int> target(source);
@@ -168,7 +168,7 @@ TEST_CASE("Copy construct with empty source", "[map-move]") {
     REQUIRE(source.size() == 0);
 }
 
-TEST_CASE("Copy assign with empty source", "[map-move]") {
+TEST_CASE("Copy assign with empty source", "[radix-map]") {
     art::radix_map<int, int> reference;
     art::radix_map<int, int> source;
     art::radix_map<int, int> target;
@@ -183,7 +183,7 @@ TEST_CASE("Copy assign with empty source", "[map-move]") {
     REQUIRE(source.size() == 0);
 }
 
-TEST_CASE("Move construct with empty source", "[map-move]") {
+TEST_CASE("Move construct with empty source", "[radix-map]") {
     art::radix_map<int, int> reference;
     art::radix_map<int, int> source;
     art::radix_map<int, int> target(std::move(source));
@@ -198,7 +198,7 @@ TEST_CASE("Move construct with empty source", "[map-move]") {
     REQUIRE(source.size() == 0);
 }
 
-TEST_CASE("Move assign with empty source", "[map-move]") {
+TEST_CASE("Move assign with empty source", "[radix-map]") {
     art::radix_map<int, int> reference;
     art::radix_map<int, int> source;
     art::radix_map<int, int> target;

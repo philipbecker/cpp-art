@@ -2,7 +2,7 @@
 #include "catch.hpp"
 #include "art/radix_map.h"
 
-TEST_CASE("Relational Operators", "[map-relational-operators]") {
+TEST_CASE("Relational Operators", "[radix-map]") {
     art::radix_map<int, int> radix_map;
     art::radix_map<int, int> reference;
 

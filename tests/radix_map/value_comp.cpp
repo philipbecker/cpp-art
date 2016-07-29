@@ -2,7 +2,7 @@
 #include "catch.hpp"
 #include "art/radix_map.h"
 
-TEST_CASE("Value compare of signed integers", "[map-value-compare]") {
+TEST_CASE("Value compare of signed integers", "[radix-map]") {
     art::radix_map<int, int> radix_map;
 
     auto min = std::pair<int, int>(std::numeric_limits<int>::min(), 200);

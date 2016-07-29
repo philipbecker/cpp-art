@@ -15,6 +15,8 @@ set(
         radix_map/relational_operators.cpp
         radix_map/value_comp.cpp
         radix_map/stress_tests.cpp
+        radix_set/modification.cpp
+        radix_set/iterator.cpp
 )
 
 add_executable(tests ${TEST_FILES})

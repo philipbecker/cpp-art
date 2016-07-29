@@ -1,14 +1,22 @@
 #include "catch.hpp"
 #include "art/adaptive_radix_tree.h"
+#include "art/radix_map.h"
 
 using namespace art;
 
-typedef adaptive_radix_tree<int, int>::Key Key;
-typedef adaptive_radix_tree<int, int>::_Leaf _leaf;
-typedef adaptive_radix_tree<int, int>::_Node_4 node_4;
-typedef adaptive_radix_tree<int, int>::_Node_16 node_16;
-typedef adaptive_radix_tree<int, int>::_Node_48 node_48;
-typedef adaptive_radix_tree<int, int>::_Node_256 node_256;
+typedef std::pair<const int, int> value_type;
+typedef adaptive_radix_tree<int, value_type,
+        art::detail::Select1st<value_type>>::Key Key;
+typedef adaptive_radix_tree<int, value_type,
+        art::detail::Select1st<value_type>>::_Leaf _leaf;
+typedef adaptive_radix_tree<int, value_type,
+        art::detail::Select1st<value_type>>::_Node_4 node_4;
+typedef adaptive_radix_tree<int, value_type,
+        art::detail::Select1st<value_type>>::_Node_16 node_16;
+typedef adaptive_radix_tree<int, value_type,
+        art::detail::Select1st<value_type>>::_Node_48 node_48;
+typedef adaptive_radix_tree<int, value_type,
+        art::detail::Select1st<value_type>>::_Node_256 node_256;
 
 TEST_CASE ("Insert into node 16", "[nodes]") {
     std::vector<int> data = {

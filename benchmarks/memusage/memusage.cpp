@@ -93,7 +93,7 @@ int main() {
         //art::radix_set<int64_t> set;
         for (auto &d : data) {
             map.insert(d);
-            //set.insert(d.second);
+            //set.insert(d.first);
         }
 
         double vm, rss;

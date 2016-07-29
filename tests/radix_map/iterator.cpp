@@ -4,7 +4,7 @@
 
 
 SCENARIO("given an empty container", "[iterator]") {
-    art::radix_map<unsigned, unsigned> map;
+    art::radix_map<unsigned, long> map;
 
     THEN ("iterator's begin is equal to its end") {
         REQUIRE(map.begin() == map.end());
@@ -27,7 +27,7 @@ SCENARIO("given an empty container", "[iterator]") {
 
 SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") {
     art::radix_map<unsigned, unsigned> radix_map;
-    std::map<unsigned, unsigned> std_map;
+    std::map<unsigned, unsigned> std_set;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -36,15 +36,15 @@ SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") 
     for (unsigned i = 0; i < 10000; i++) {
         auto k = dis(gen);
         radix_map.insert(std::pair<unsigned, unsigned>(k, i));
-        std_map.emplace(k, i);
+        std_set.emplace(k, i);
     }
 
-    REQUIRE(radix_map.begin()->second == std_map.begin()->second);
-    REQUIRE(radix_map.rbegin()->second == std_map.rbegin()->second);
+    REQUIRE(radix_map.begin()->second == std_set.begin()->second);
+    REQUIRE(radix_map.rbegin()->second == std_set.rbegin()->second);
 
     THEN ("forward iteration is equal to std::map") {
         auto it_radix = radix_map.begin(), it_radix_end = radix_map.end();
-        auto it_std = std_map.begin(), it_std_end = std_map.end();
+        auto it_std = std_set.begin(), it_std_end = std_set.end();
         for (; it_std != it_std_end; ++it_radix, ++it_std) {
             REQUIRE(it_radix->second == it_std->second);
         }
@@ -52,7 +52,7 @@ SCENARIO("iteration with unsigned integers compared to std::map", "[iterator]") 
     }
     THEN ("reverse iteration is equal to std::map") {
         auto it_radix_reverse = radix_map.rbegin(), it_radix_rend = radix_map.rend();
-        auto it_std_reverse = std_map.rbegin(), it_std_rend = std_map.rend();
+        auto it_std_reverse = std_set.rbegin(), it_std_rend = std_set.rend();
         for (; it_std_reverse != it_std_rend; ++it_radix_reverse, ++it_std_reverse) {
             REQUIRE(it_radix_reverse->second == it_std_reverse->second);
         }

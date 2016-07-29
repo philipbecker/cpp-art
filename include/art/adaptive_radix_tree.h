@@ -15,7 +15,7 @@ namespace art
     typedef uint8_t byte;
     static const byte EMPTY_MARKER = 63;
 
-    template<typename _Key, typename _T,
+    template<typename _Key, typename _Value, typename _KeyOfValue,
             typename _Key_transform = key_transform<_Key> >
     struct adaptive_radix_tree {
     public:
@@ -35,8 +35,7 @@ namespace art
         struct _Node_256;
 
         typedef _Key key_type;
-        typedef _T mapped_type;
-        typedef pair<const _Key, _T> value_type;
+        typedef _Value value_type;
 
     private:
         typedef _Node *Node_ptr;
@@ -195,8 +194,6 @@ namespace art
             _Leaf(value_type value)
                     : _Node(nullptr), _value(value) {}
 
-            _Leaf(key_type key, mapped_type mapped_value)
-                    : _Node(nullptr), _value(key, mapped_value) {}
 
             _Leaf(value_type value, Node_ptr parent)
                     : _Node(parent), _value(value) {}
@@ -256,8 +253,8 @@ namespace art
             virtual node_type get_type() const override { return node_type::_leaf_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Leaf: " << _value.first << " -> "
-                          << _value.second << ", parent " << this->_parent << std::endl;
+                std::cout << this << " Leaf: " << _KeyOfValue()(_value)
+                          << ", parent " << this->_parent << std::endl;
             }
         };
 
@@ -272,12 +269,12 @@ namespace art
 
             _Dummy_Node()
                     : _Node(this), _root(nullptr),
-                      _leaf(new _Leaf(value_type(key_type(), mapped_type()), this)) {
+                      _leaf(new _Leaf(value_type(), this)) {
             }
 
             _Dummy_Node(Node_ptr root, Leaf_ptr leaf)
                     : _Node(this), _root(root),
-                      _leaf(new _Leaf(value_type(key_type(), mapped_type()), this)) {
+                      _leaf(new _Leaf(value_type(), this)) {
             }
 
             // Copy constructor
@@ -1310,7 +1307,7 @@ namespace art
 
         size_t max_size() const {
             if (sizeof(transformed_key_type) < sizeof(size_type))
-                return size_t(1) << (8 * sizeof(transformed_key_type));
+                return size_type(1) << (8 * sizeof(transformed_key_type));
             return std::numeric_limits<size_type>::max();
         }
 
@@ -1323,7 +1320,7 @@ namespace art
         ///////////////
 
         struct adapt_radix_tree_iterator {
-            typedef pair<const _Key, _T> value_type;
+            typedef _Value value_type;
             typedef value_type &reference;
             typedef value_type *pointer;
 
@@ -1346,7 +1343,7 @@ namespace art
             _Self &operator++() {
                 Leaf_ptr leaf = static_cast<Leaf_ptr>(node);
                 Inner_Node_ptr parent = static_cast<Inner_Node_ptr>(leaf->_parent);
-                node = parent->successor({_Key_transform()(leaf->_value.first)});
+                node = parent->successor({_Key_transform()(_KeyOfValue()(leaf->_value))});
                 return *this;
             }
 
@@ -1361,7 +1358,7 @@ namespace art
             _Self &operator--() {
                 Leaf_ptr leaf = static_cast<Leaf_ptr>(node);
                 Inner_Node_ptr parent = static_cast<Inner_Node_ptr>(leaf->_parent);
-                node = parent->predecessor({_Key_transform()(leaf->_value.first)});
+                node = parent->predecessor({_Key_transform()(_KeyOfValue()(leaf->_value))});
                 return *this;
             }
 
@@ -1390,7 +1387,7 @@ namespace art
         };
 
         struct adapt_radix_tree_const_iterator {
-            typedef pair<const _Key, _T> value_type;
+            typedef _Value value_type;
             typedef const value_type &reference;
             typedef const value_type *pointer;
 
@@ -1418,7 +1415,7 @@ namespace art
             _Self &operator++() {
                 Const_Leaf_ptr leaf = static_cast<Const_Leaf_ptr>(node);
                 Const_Inner_Node_ptr parent = static_cast<Const_Inner_Node_ptr>(leaf->_parent);
-                node = parent->successor({_Key_transform()(leaf->_value.first)});
+                node = parent->successor({_Key_transform()(_KeyOfValue()(leaf->_value))});
                 return *this;
             }
 
@@ -1433,7 +1430,7 @@ namespace art
             _Self &operator--() {
                 Const_Leaf_ptr leaf = static_cast<Const_Leaf_ptr>(node);
                 Const_Inner_Node_ptr parent = static_cast<Const_Inner_Node_ptr>(leaf->_parent);
-                node = parent->predecessor({_Key_transform()(leaf->_value.first)});
+                node = parent->predecessor({_Key_transform()(_KeyOfValue()(leaf->_value))});
                 return *this;
             }
 
@@ -1529,7 +1526,7 @@ namespace art
         }
 
         pair<iterator, bool> insert_unique(const value_type &__x) {
-            Key transformed_key = {_M_key_transform(__x.first)};
+            Key transformed_key = {_M_key_transform(_KeyOfValue()(__x))};
             const auto key_size = sizeof(Key);
 
             // Empty Tree
@@ -1550,7 +1547,7 @@ namespace art
                     if (current_node->is_leaf()) {
                         // Hit an existing leaf
                         Leaf_ptr existing_leaf = reinterpret_cast<Leaf_ptr>(current_node);
-                        Key existing_key = {_M_key_transform(existing_leaf->_value.first)};
+                        Key existing_key = {_M_key_transform(_KeyOfValue()(existing_leaf->_value))};
                         if (transformed_key.value == existing_key.value) {
                             // if it is a duplicate entry, ignore
                             return make_pair(iterator(existing_leaf), false);
@@ -1624,7 +1621,8 @@ namespace art
         pair<iterator, bool> emplace_unique(_Args &&... __args) {
             Leaf_ptr leaf;
             try {
-                leaf = new _Leaf(std::forward<_Args>(__args)...);
+                // @TODO forward directly into constructor
+                leaf = new _Leaf(value_type(std::forward<_Args>(__args)...));
             } catch (...) {
                 delete leaf;
                 // leaf->~_Leaf();
@@ -1632,7 +1630,7 @@ namespace art
             }
 
             try {
-                Key key = {_M_key_transform(leaf->_value.first)};
+                Key key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
                 pair<Node_ptr, int> __res = get_insert_unique_pos(key);
                 if (__res.second >= 0)
                     return pair<iterator, int>(insert_leaf(__res.first, __res.second, leaf, key), true);
@@ -1665,7 +1663,7 @@ namespace art
                 if (current_node != nullptr) {
                     if (current_node->is_leaf()) {
                         Leaf_ptr existing_leaf = reinterpret_cast<Leaf_ptr>(current_node);
-                        Key existing_key = {_M_key_transform(existing_leaf->_value.first)};
+                        Key existing_key = {_M_key_transform(_KeyOfValue()(existing_leaf->_value))};
                         if (__k.value == existing_key.value) {
                             return pair<Node_ptr, int>(existing_leaf, -1);
                         } else {
@@ -1747,7 +1745,7 @@ namespace art
             const auto key_size = sizeof(Key);
 
             if (_M_root->is_leaf()) {
-                Key existing_key = {_M_key_transform(static_cast<Leaf_ptr >(_M_root)->_value.first)};
+                Key existing_key = {_M_key_transform(_KeyOfValue()(static_cast<Leaf_ptr>(_M_root)->_value))};
                 if (transformed_key.value == existing_key.value) {
                     delete _M_root;
                     _M_root = nullptr;
@@ -1767,7 +1765,7 @@ namespace art
 
                 if (child->is_leaf()) {
                     Leaf_ptr existing_leaf = static_cast<Leaf_ptr>(child);
-                    Key existing_key = {_M_key_transform(existing_leaf->_value.first)};
+                    Key existing_key = {_M_key_transform(_KeyOfValue()(existing_leaf->_value))};
                     if (transformed_key.value == existing_key.value) {
                         // Delete the leaf
                         current_node->erase(transformed_key.chunks[depth]);
@@ -1792,7 +1790,7 @@ namespace art
             ++__result;
 
             // Delete leaf
-            Key transformed_key = {_M_key_transform(__it->first)};
+            Key transformed_key = {_M_key_transform(_KeyOfValue()(*__it))};
             Leaf_ptr leaf = static_cast<Leaf_ptr >(__it.node);
 
             // Edge case, leaf is the root/last element in container
@@ -1902,7 +1900,7 @@ namespace art
 
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
-                    Key existing_key = {_M_key_transform(leaf->_value.first)};
+                    Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
                     if (transformed_key.value == existing_key.value)
                         return iterator(current_node);
                     return end();
@@ -1927,7 +1925,7 @@ namespace art
 
                 if (current_node->is_leaf()) {
                     Const_Leaf_ptr leaf = static_cast<Const_Leaf_ptr>(current_node);
-                    Key existing_key = {_M_key_transform(leaf->_value.first)};
+                    Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
                     if (transformed_key.value == existing_key.value)
                         return const_iterator(current_node);
                     return end();
@@ -1955,7 +1953,7 @@ namespace art
 
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
-                    Key existing_key = {_M_key_transform(leaf->_value.first)};
+                    Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
 
                     for (unsigned j = i; j < key_size; j++) {
                         if (transformed_key.chunks[j] > existing_key.chunks[j]) {
@@ -1989,7 +1987,7 @@ namespace art
 
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
-                    Key existing_key = {_M_key_transform(leaf->_value.first)};
+                    Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
 
                     for (unsigned j = i; j < key_size; j++) {
                         if (transformed_key.chunks[j] > existing_key.chunks[j]) {
@@ -2023,7 +2021,7 @@ namespace art
 
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
-                    Key existing_key = {_M_key_transform(leaf->_value.first)};
+                    Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
 
                     for (unsigned j = i; j < key_size; j++)
                         if (transformed_key.chunks[j] < existing_key.chunks[j])
@@ -2056,7 +2054,7 @@ namespace art
 
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
-                    Key existing_key = {_M_key_transform(leaf->_value.first)};
+                    Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
 
                     for (unsigned j = i; j < key_size; j++)
                         if (transformed_key.chunks[j] < existing_key.chunks[j])
@@ -2185,51 +2183,51 @@ namespace art
     // Relational Operators //
     //////////////////////////
 
-    template<typename _Key, typename _Tp, typename _Key_transform>
+    template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator==(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
-               const adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
+    operator==(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &lhs,
+               const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &rhs) {
         return lhs.size() == rhs.size()
                && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
     // Based on operator==
-    template<typename _Key, typename _Tp, typename _Key_transform>
+    template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator!=(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &lhs,
-               const adaptive_radix_tree<_Key, _Tp, _Key_transform> &rhs) {
+    operator!=(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &lhs,
+               const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &rhs) {
         return !(lhs == rhs);
     }
 
-    template<typename _Key, typename _Tp, typename _Key_transform>
+    template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator<(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
-              const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+    operator<(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
+              const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
         return std::lexicographical_compare(__x.begin(), __x.end(),
                                             __y.begin(), __y.end());
     }
 
     // Based on operator<
-    template<typename _Key, typename _Tp, typename _Key_transform>
+    template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator>(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
-              const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+    operator>(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
+              const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
         return __y < __x;
     }
 
     // Based on operator<
-    template<typename _Key, typename _Tp, typename _Key_transform>
+    template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator<=(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
-               const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+    operator<=(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
+               const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
         return !(__y < __x);
     }
 
     // Based on operator<
-    template<typename _Key, typename _Tp, typename _Key_transform>
+    template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator>=(const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__x,
-               const adaptive_radix_tree<_Key, _Tp, _Key_transform> &__y) {
+    operator>=(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
+               const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
         return !(__x < __y);
     }
 

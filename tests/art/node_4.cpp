@@ -1,14 +1,22 @@
 #include "catch.hpp"
 #include "art/adaptive_radix_tree.h"
+#include "art/radix_map.h"
 
 using namespace art;
 
-typedef adaptive_radix_tree<uint64_t, uint64_t>::Key Key;
-typedef adaptive_radix_tree<uint64_t, uint64_t>::_Leaf _leaf;
-typedef adaptive_radix_tree<uint64_t, uint64_t>::_Node_4 node_4;
-typedef adaptive_radix_tree<uint64_t, uint64_t>::_Node_16 node_16;
-typedef adaptive_radix_tree<uint64_t, uint64_t>::_Node_48 node_48;
-typedef adaptive_radix_tree<uint64_t, uint64_t>::_Node_256 node_256;
+typedef std::pair<const uint64_t, uint64_t> value_type;
+typedef adaptive_radix_tree<uint64_t, value_type,
+        art::detail::Select1st<value_type>>::Key Key;
+typedef adaptive_radix_tree<uint64_t, value_type,
+        art::detail::Select1st<value_type>>::_Leaf _leaf;
+typedef adaptive_radix_tree<uint64_t, value_type,
+        art::detail::Select1st<value_type>>::_Node_4 node_4;
+typedef adaptive_radix_tree<uint64_t, value_type,
+        art::detail::Select1st<value_type>>::_Node_16 node_16;
+typedef adaptive_radix_tree<uint64_t, value_type,
+        art::detail::Select1st<value_type>>::_Node_48 node_48;
+typedef adaptive_radix_tree<uint64_t, value_type,
+        art::detail::Select1st<value_type>>::_Node_256 node_256;
 
 SCENARIO ("given a node_4 with one element", "[nodes]") {
     uint64_t first_value = 261;

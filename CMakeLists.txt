@@ -14,6 +14,7 @@ set(
         include/art/key_transform.h
         include/art/adaptive_radix_tree.h
         include/art/radix_map.h
+        include/art/radix_set.h
 )
 
 add_library(art STATIC ${SOURCE_FILES})

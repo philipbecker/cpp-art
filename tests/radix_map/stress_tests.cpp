@@ -4,7 +4,7 @@
 #include "art/radix_map.h"
 
 
-TEST_CASE("Stress test insert", "[stress]") {
+TEST_CASE("Stress test insert", "[radix-map-stress]") {
     art::radix_map<int, int> art;
 
     std::random_device rd;
@@ -35,9 +35,9 @@ TEST_CASE("Stress test insert", "[stress]") {
     }
 }
 
-TEST_CASE("Stress test emplace", "[stress]") {
+TEST_CASE("Stress test emplace", "[radix-map-stress]") {
     art::radix_map<int, int> art;
-    std::map<int, int> std_map;
+    std::map<int, int> std_set;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -56,12 +56,12 @@ TEST_CASE("Stress test emplace", "[stress]") {
         for (int i = 0; i < size; i++) {
             auto p = art.emplace(data[i], i);
             REQUIRE(p.second);
-            std_map.emplace(data[i], i);
+            std_set.emplace(data[i], i);
         }
 
         SECTION ("can iterate") {
             auto it_radix = art.begin(), it_radix_end = art.end();
-            auto it_std = std_map.begin(), it_std_end = std_map.end();
+            auto it_std = std_set.begin(), it_std_end = std_set.end();
             for (; it_std != it_std_end; ++it_radix, ++it_std) {
                 REQUIRE(it_radix->second == it_std->second);
             }
@@ -77,9 +77,9 @@ TEST_CASE("Stress test emplace", "[stress]") {
     }
 }
 
-TEST_CASE("Stress test erase by key", "[stress]") {
+TEST_CASE("Stress test erase by key", "[radix-map-stress]") {
     art::radix_map<int32_t, int32_t> radix_map;
-    std::map<int32_t, int32_t> std_map;
+    std::map<int32_t, int32_t> std_set;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -96,7 +96,7 @@ TEST_CASE("Stress test erase by key", "[stress]") {
     const auto number_of_elements = data.size();
     for (int i = 0; i < number_of_elements; i++) {
         radix_map.emplace(data[i], i);
-        std_map.emplace(data[i], i);
+        std_set.emplace(data[i], i);
     }
 
     std::random_shuffle(data.begin(), data.end());
@@ -106,16 +106,16 @@ TEST_CASE("Stress test erase by key", "[stress]") {
     for (int i = 0; i < rounds; i++) {
         for (int j = 0; j < block_size; j++) {
             radix_map.erase(data[i * block_size + j]);
-            std_map.erase(data[i * block_size + j]);
+            std_set.erase(data[i * block_size + j]);
         }
 
-        REQUIRE(radix_map.size() == std_map.size());
+        REQUIRE(radix_map.size() == std_set.size());
         for (int k = (i+1) * block_size; k < data.size(); k++) {
-            REQUIRE(radix_map.at(data[k]) == std_map.at(data[k]));
+            REQUIRE(radix_map.at(data[k]) == std_set.at(data[k]));
         }
 
         auto it_radix = radix_map.begin(), it_radix_end = radix_map.end();
-        auto it_std = std_map.begin(), it_std_end = std_map.end();
+        auto it_std = std_set.begin(), it_std_end = std_set.end();
         for (; it_std != it_std_end; ++it_radix, ++it_std) {
             REQUIRE(it_radix->second == it_std->second);
         }
@@ -123,9 +123,9 @@ TEST_CASE("Stress test erase by key", "[stress]") {
     }
 }
 
-TEST_CASE("Stress test erase by iterator", "[stress]") {
+TEST_CASE("Stress test erase by iterator", "[radix-map-stress]") {
     art::radix_map<int32_t, int32_t> radix_map;
-    std::map<int32_t, int32_t> std_map;
+    std::map<int32_t, int32_t> std_set;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -142,7 +142,7 @@ TEST_CASE("Stress test erase by iterator", "[stress]") {
     const auto number_of_elements = data.size();
     for (int i = 0; i < number_of_elements; i++) {
         radix_map.emplace(data[i], i);
-        std_map.emplace(data[i], i);
+        std_set.emplace(data[i], i);
     }
 
     std::random_shuffle(data.begin(), data.end());
@@ -152,16 +152,16 @@ TEST_CASE("Stress test erase by iterator", "[stress]") {
     for (int i = 0; i < rounds; i++) {
         for (int j = 0; j < block_size; j++) {
             radix_map.erase(radix_map.find(data[i * block_size + j]));
-            std_map.erase(data[i * block_size + j]);
+            std_set.erase(data[i * block_size + j]);
         }
 
-        REQUIRE(radix_map.size() == std_map.size());
+        REQUIRE(radix_map.size() == std_set.size());
         for (int k = (i+1) * block_size; k < data.size(); k++) {
-            REQUIRE(radix_map.at(data[k]) == std_map.at(data[k]));
+            REQUIRE(radix_map.at(data[k]) == std_set.at(data[k]));
         }
 
         auto it_radix = radix_map.begin(), it_radix_end = radix_map.end();
-        auto it_std = std_map.begin(), it_std_end = std_map.end();
+        auto it_std = std_set.begin(), it_std_end = std_set.end();
         for (; it_std != it_std_end; ++it_radix, ++it_std) {
             REQUIRE(it_radix->second == it_std->second);
         }
@@ -169,7 +169,7 @@ TEST_CASE("Stress test erase by iterator", "[stress]") {
     }
 }
 
-TEST_CASE("Stress test lower & upper bound", "[stress]") {
+TEST_CASE("Stress test lower & upper bound", "[radix-map-stress]") {
     std::map<int, int> map;
     art::radix_map<int, int> art;
 
