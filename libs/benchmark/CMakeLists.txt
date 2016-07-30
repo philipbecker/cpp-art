@@ -1,8 +1,10 @@
 include(ExternalProject)
+find_package(Git REQUIRED)
 
 ExternalProject_Add (
         benchmark
         GIT_REPOSITORY "https://github.com/google/benchmark.git"
+        TIMEOUT 10
         CMAKE_ARGS "-DBENCHMARK_ENABLE_TESTING=OFF;-DCMAKE_BUILD_TYPE=Release"
         SOURCE_DIR "${CMAKE_BINARY_DIR}/benchmark"
         BINARY_DIR "${CMAKE_BINARY_DIR}/benchmark"

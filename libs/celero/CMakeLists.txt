@@ -1,9 +1,11 @@
 include(ExternalProject)
+find_package(Git REQUIRED)
 
 ExternalProject_Add(
         Celero
         PREFIX ${CMAKE_BINARY_DIR}/Celero
         GIT_REPOSITORY "https://github.com/DigitalInBlue/Celero.git"
+        TIMEOUT 10
         CMAKE_ARGS "-DCELERO_ENABLE_EXPERIMENTS=OFF;-DCMAKE_BUILD_TYPE=Release"
         SOURCE_DIR "Celero"
         BINARY_DIR "CeleroBuild"

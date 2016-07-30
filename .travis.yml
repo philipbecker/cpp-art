@@ -1,5 +1,18 @@
 language: cpp
 sudo: required
+dist: trusty
+
+#cache:
+#  ccache: true
+#  directories:
+#    - $HOME/.ccache
+
+#env:
+#  global:
+#    - USE_CCACHE=1
+#    - CCACHE_COMPRESS=1
+#    - CCACHE_MAXSIZE=200M
+#    - CCACHE_CPP2=1
 
 env:
   matrix:
@@ -10,15 +23,49 @@ matrix:
     - env: TRAVIS_EMPTY_JOB_WORKAROUND=true
 
   include:
+    # Linux GCC
     - os: linux
-      dist: trusty
       compiler: gcc
       addons: &gcc5-trusty
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-5']
       env:
-        - COMPILER='g++-5'
+        - COMPILER='g++-5' BUILD_TYPE='Release'
+
+    # Linux Clang
+    - os: linux
+      compiler: clang
+      addons: &clang35
+        apt:
+          sources: ['llvm-toolchain-trusty', 'ubuntu-toolchain-r-test']
+          packages: ['clang-3.5']
+      env: COMPILER='clang++-3.5' BUILD_TYPE='Release'
+
+#    - os: linux
+#          compiler: clang
+#          addons: &clang36
+#            apt:
+#              sources: ['llvm-toolchain-precise-3.6', 'ubuntu-toolchain-r-test']
+#              packages: ['clang-3.6']
+#          env: COMPILER='ccache clang++-3.6' BUILD_TYPE='Release'
+#
+#    - os: linux
+#          compiler: clang
+#          addons: &clang37
+#            apt:
+#              sources: ['llvm-toolchain-precise-3.7', 'ubuntu-toolchain-r-test']
+#              packages: ['clang-3.7']
+#          env: COMPILER='ccache clang++-3.7' BUILD_TYPE='Release'
+#
+#    - os: linux
+#          compiler: clang
+#          addons: &clang38
+#            apt:
+#              sources: ['llvm-toolchain-precise-3.5', 'ubuntu-toolchain-r-test']
+#              packages: ['clang-3.5']
+#          env: COMPILER='ccache clang++-3.5' BUILD_TYPE='Release'
+
 
 install:
   ############################################################################
@@ -32,7 +79,7 @@ install:
   ############################################################################
   - |
     if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      CMAKE_URL="http://www.cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.tar.gz"
+      CMAKE_URL="http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz"
       mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
       export PATH=${DEPS_DIR}/cmake/bin:${PATH}
     else
@@ -43,9 +90,9 @@ before_script:
   - BUILD_DIR=${TRAVIS_BUILD_DIR}/build
   - mkdir -p ${BUILD_DIR}
   - cd ${BUILD_DIR}
-  - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${COMPILER} ..
+  - cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DCMAKE_CXX_COMPILER=${COMPILER} ..
 
 script:
   - cd ${BUILD_DIR}
   - make tests
-  - cd ${BUILD_DIR}/tests && ./tests > /dev/null
+  - cd ${BUILD_DIR}/tests && ./tests

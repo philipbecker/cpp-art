@@ -4,11 +4,11 @@ include_directories(${GBENCHMARK_INCLUDE_DIR})
 # CELERO BENCHMARK SUITE
 set(
         PERF_FILES
-        celeros/benchmarks.cpp
-        celeros/insert.cpp
-        celeros/lookup.cpp
-        celeros/iteration.cpp
-        celeros/parameters.h
+        celero/benchmarks.cpp
+        celero/insert.cpp
+        celero/lookup.cpp
+        celero/iteration.cpp
+        celero/parameters.h
 )
 
 add_executable(celeros_suite EXCLUDE_FROM_ALL ${PERF_FILES})

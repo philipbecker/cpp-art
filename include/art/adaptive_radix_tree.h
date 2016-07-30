@@ -281,13 +281,13 @@ namespace art
 
             // Copy constructor
             _Dummy_Node(const _Dummy_Node &__x) : _Node(__x._parent) {
-                *_leaf = *(__x._leaf);
+                _leaf = __x._leaf;
             }
 
             // Copy assignment
             _Dummy_Node &operator=(const _Dummy_Node &__x) {
                 this->_parent = __x._parent;
-                *_leaf = *__x._leaf;
+                _leaf = __x._leaf;
                 return *this;
             }
 
