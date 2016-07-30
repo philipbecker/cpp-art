@@ -17,6 +17,8 @@ set(
         radix_map/stress_tests.cpp
         radix_set/modification.cpp
         radix_set/iterator.cpp
+        radix_set/stress_tests.cpp
+        radix_set/move_and_copy.cpp
 )
 
 add_executable(tests ${TEST_FILES})

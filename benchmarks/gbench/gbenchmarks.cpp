@@ -5,8 +5,8 @@
 #include <btree_map.h>
 #include <art/radix_map.h>
 
-const int START = 20;
-const int END = 21;
+const int START = 24;
+const int END = 24;
 
 template<typename T>
 struct Generator {
@@ -382,7 +382,8 @@ static void BM_Iteration_Dense(benchmark::State &state) {
 // INSERT //
 ////////////
 const double MIN_INSERT_TIME = 2.0;
-/**
+
+/*
 BENCHMARK_TEMPLATE(BM_Insert_Sparse, std::map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -417,11 +418,21 @@ BENCHMARK_TEMPLATE(BM_Insert_Sequential, art::radix_map<int64_t, int>)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(MIN_INSERT_TIME);
 */
+
 ////////////
 // LOOKUP //
 ////////////
 
 const double MIN_LOOKUP_TIME = 5.0;
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, art::radix_map<int64_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int64_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
+
 
 /**
 // SPARSE INT32 KEY
@@ -437,6 +448,23 @@ const double MIN_LOOKUP_TIME = 5.0;
 //BENCHMARK_TEMPLATE(BM_Lookup_Sparse, btree::btree_map<int64_t, int>)->Range(1 << START, 1 << END);
 //BENCHMARK_TEMPLATE(BM_Lookup_Sparse, art::radix_map<int64_t, int>)->Range(1 << START, 1 << END);
 */
+// SPARSE INT32 KEY: VALID KEYS ONLY
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, std::map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, std::unordered_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, btree::btree_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, art::radix_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
 
 // SPARSE INT64 KEY: VALID KEYS ONLY
 BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, std::map<int64_t, int>)
@@ -457,19 +485,33 @@ BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, art::radix_map<int64_t, int>)
         ->MinTime(MIN_LOOKUP_TIME);
 
 /**
-// DENSE INT32 KEY
-BENCHMARK_TEMPLATE(BM_Lookup_Dense, std::map<int32_t, int>)->Range(1 << START, 1 << END);
-BENCHMARK_TEMPLATE(BM_Lookup_Dense, std::unordered_map<int32_t, int>)->Range(1 << START, 1 << END);
-BENCHMARK_TEMPLATE(BM_Lookup_Dense, btree::btree_map<int32_t, int>)->Range(1 << START, 1 << END);
-BENCHMARK_TEMPLATE(BM_Lookup_Dense, art::radix_map<int32_t, int>)->Range(1 << START, 1 << END);
-*/
-/**
 // DENSE INT64 KEY
 BENCHMARK_TEMPLATE(BM_Lookup_Dense, std::map<int64_t, int>)->Range(1 << START, 1 << END);
 BENCHMARK_TEMPLATE(BM_Lookup_Dense, std::unordered_map<int64_t, int>)->Range(1 << START, 1 << END);
 BENCHMARK_TEMPLATE(BM_Lookup_Dense, btree::btree_map<int64_t, int>)->Range(1 << START, 1 << END);
 BENCHMARK_TEMPLATE(BM_Lookup_Dense, art::radix_map<int64_t, int>)->Range(1 << START, 1 << END);
 */
+// DENSE INT32 KEY: VALID KEYS ONLY
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, std::map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
+
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, std::unordered_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
+
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, btree::btree_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
+
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(MIN_LOOKUP_TIME);
+
 // DENSE INT64 KEY: VALID KEYS ONLY
 BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, std::map<int64_t, int>)
         ->Range(1 << START, 1 << END)
@@ -491,61 +533,65 @@ BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int64_t, int>)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(MIN_LOOKUP_TIME);
 
+
 ///////////
 // ERASE //
 ///////////
+
 const double MIN_ERASE_TIME = 2.0;
+
+/*
 BENCHMARK_TEMPLATE(BM_Erase_Sparse, std::map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 BENCHMARK_TEMPLATE(BM_Erase_Sparse, std::unordered_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 BENCHMARK_TEMPLATE(BM_Erase_Sparse, btree::btree_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 BENCHMARK_TEMPLATE(BM_Erase_Sparse, art::radix_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 
 BENCHMARK_TEMPLATE(BM_Erase_Dense, std::map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 BENCHMARK_TEMPLATE(BM_Erase_Dense, std::unordered_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 BENCHMARK_TEMPLATE(BM_Erase_Dense, btree::btree_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 BENCHMARK_TEMPLATE(BM_Erase_Dense, art::radix_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 
 BENCHMARK_TEMPLATE(BM_Erase_Sequential, std::map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 BENCHMARK_TEMPLATE(BM_Erase_Sequential, std::unordered_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 BENCHMARK_TEMPLATE(BM_Erase_Sequential, btree::btree_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
+        ->MinTime(MIN_ERASE_TIME);
 BENCHMARK_TEMPLATE(BM_Erase_Sequential, art::radix_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
-        ->MinTime(MIN_INSERT_TIME);
-
+        ->MinTime(MIN_ERASE_TIME);
+*/
 
 ///////////////
 // ITERATION //

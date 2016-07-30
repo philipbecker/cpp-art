@@ -1,10 +1,10 @@
 #include <map>
 #include "catch.hpp"
-#include "art/radix_map.h"
+#include "art/radix_set.h"
 
 
-TEST_CASE("Radix map stress test insert", "[radix-map-stress]") {
-    art::radix_map<int, int> art;
+TEST_CASE("Radix set stress test insert", "[radix-set-stress]") {
+    art::radix_set<int> set;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -21,22 +21,22 @@ TEST_CASE("Radix map stress test insert", "[radix-map-stress]") {
     SECTION ("insertion of unique elements is successful") {
         const auto size = data.size();
         for (int i = 0; i < size; i++) {
-            auto p = art.insert(std::make_pair(data[i], data[i]));
+            auto p = set.insert(data[i]);
             REQUIRE(p.second);
         }
 
         SECTION ("can't insert duplicate values") {
             for (int i = 0; i < size; i++) {
-                auto p = art.insert(std::make_pair(data[i], data[i]));
+                auto p = set.insert(data[i]);
                 REQUIRE_FALSE(p.second);
             }
         }
     }
 }
 
-TEST_CASE("Radix map stress test emplace", "[radix-map-stress]") {
-    art::radix_map<int, int> art;
-    std::map<int, int> std_map;
+TEST_CASE("Radix set stress test emplace", "[radix-set-stress]") {
+    art::radix_set<int> radix_set;
+    std::set<int> std_set;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -53,32 +53,32 @@ TEST_CASE("Radix map stress test emplace", "[radix-map-stress]") {
     SECTION ("insertion of unique elements is successful") {
         const auto size = data.size();
         for (int i = 0; i < size; i++) {
-            auto p = art.emplace(data[i], i);
+            auto p = radix_set.emplace(data[i]);
             REQUIRE(p.second);
-            std_map.emplace(data[i], i);
+            std_set.emplace(data[i]);
         }
 
         SECTION ("can iterate") {
-            auto it_radix = art.begin(), it_radix_end = art.end();
-            auto it_std = std_map.begin(), it_std_end = std_map.end();
+            auto it_radix = radix_set.begin(), it_radix_end = radix_set.end();
+            auto it_std = std_set.begin(), it_std_end = std_set.end();
             for (; it_std != it_std_end; ++it_radix, ++it_std) {
-                REQUIRE(it_radix->second == it_std->second);
+                REQUIRE(*it_radix == *it_std);
             }
             REQUIRE(it_radix == it_radix_end);
         }
 
         SECTION ("can't insert duplicate values") {
             for (int i = 0; i < size; i++) {
-                auto p = art.emplace(data[i], i);
+                auto p = radix_set.emplace(data[i]);
                 REQUIRE_FALSE(p.second);
             }
         }
     }
 }
 
-TEST_CASE("Radix map stress test erase by key", "[radix-map-stress]") {
-    art::radix_map<int32_t, int32_t> radix_map;
-    std::map<int32_t, int32_t> std_map;
+TEST_CASE("Radix set stress test erase by key", "[radix-set-stress]") {
+    art::radix_set<int32_t> radix_set;
+    std::set<int32_t> std_set;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -94,8 +94,8 @@ TEST_CASE("Radix map stress test erase by key", "[radix-map-stress]") {
 
     const auto number_of_elements = data.size();
     for (int i = 0; i < number_of_elements; i++) {
-        radix_map.emplace(data[i], i);
-        std_map.emplace(data[i], i);
+        radix_set.emplace(data[i]);
+        std_set.emplace(data[i]);
     }
 
     std::random_shuffle(data.begin(), data.end());
@@ -104,27 +104,27 @@ TEST_CASE("Radix map stress test erase by key", "[radix-map-stress]") {
     auto rounds = number_of_elements / block_size;
     for (int i = 0; i < rounds; i++) {
         for (int j = 0; j < block_size; j++) {
-            radix_map.erase(data[i * block_size + j]);
-            std_map.erase(data[i * block_size + j]);
+            radix_set.erase(data[i * block_size + j]);
+            std_set.erase(data[i * block_size + j]);
         }
 
-        REQUIRE(radix_map.size() == std_map.size());
+        REQUIRE(radix_set.size() == std_set.size());
         for (int k = (i+1) * block_size; k < data.size(); k++) {
-            REQUIRE(radix_map.at(data[k]) == std_map.at(data[k]));
+            REQUIRE(*radix_set.find(data[k]) == *std_set.find(data[k]));
         }
 
-        auto it_radix = radix_map.begin(), it_radix_end = radix_map.end();
-        auto it_std = std_map.begin(), it_std_end = std_map.end();
+        auto it_radix = radix_set.begin(), it_radix_end = radix_set.end();
+        auto it_std = std_set.begin(), it_std_end = std_set.end();
         for (; it_std != it_std_end; ++it_radix, ++it_std) {
-            REQUIRE(it_radix->second == it_std->second);
+            REQUIRE(*it_radix == *it_std);
         }
         REQUIRE(it_radix == it_radix_end);
     }
 }
 
-TEST_CASE("Radix map stress test erase by iterator", "[radix-map-stress]") {
-    art::radix_map<int32_t, int32_t> radix_map;
-    std::map<int32_t, int32_t> std_map;
+TEST_CASE("Radix set stress test erase by iterator", "[radix-set-stress]") {
+    art::radix_set<int32_t> radix_set;
+    std::set<int32_t> std_set;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -140,8 +140,8 @@ TEST_CASE("Radix map stress test erase by iterator", "[radix-map-stress]") {
 
     const auto number_of_elements = data.size();
     for (int i = 0; i < number_of_elements; i++) {
-        radix_map.emplace(data[i], i);
-        std_map.emplace(data[i], i);
+        radix_set.emplace(data[i]);
+        std_set.emplace(data[i]);
     }
 
     std::random_shuffle(data.begin(), data.end());
@@ -150,27 +150,27 @@ TEST_CASE("Radix map stress test erase by iterator", "[radix-map-stress]") {
     auto rounds = number_of_elements / block_size;
     for (int i = 0; i < rounds; i++) {
         for (int j = 0; j < block_size; j++) {
-            radix_map.erase(radix_map.find(data[i * block_size + j]));
-            std_map.erase(data[i * block_size + j]);
+            radix_set.erase(radix_set.find(data[i * block_size + j]));
+            std_set.erase(data[i * block_size + j]);
         }
 
-        REQUIRE(radix_map.size() == std_map.size());
+        REQUIRE(radix_set.size() == std_set.size());
         for (int k = (i+1) * block_size; k < data.size(); k++) {
-            REQUIRE(radix_map.at(data[k]) == std_map.at(data[k]));
+            REQUIRE(*radix_set.find(data[k]) == *std_set.find(data[k]));
         }
 
-        auto it_radix = radix_map.begin(), it_radix_end = radix_map.end();
-        auto it_std = std_map.begin(), it_std_end = std_map.end();
+        auto it_radix = radix_set.begin(), it_radix_end = radix_set.end();
+        auto it_std = std_set.begin(), it_std_end = std_set.end();
         for (; it_std != it_std_end; ++it_radix, ++it_std) {
-            REQUIRE(it_radix->second == it_std->second);
+            REQUIRE(*it_radix == *it_std);
         }
         REQUIRE(it_radix == it_radix_end);
     }
 }
 
-TEST_CASE("Radix map stress test lower & upper bound", "[radix-map-stress]") {
-    std::map<int, int> map;
-    art::radix_map<int, int> art;
+TEST_CASE("Radix set stress test lower & upper bound", "[radix-set-stress]") {
+    std::set<int> set;
+    art::radix_set<int> art;
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -178,26 +178,24 @@ TEST_CASE("Radix map stress test lower & upper bound", "[radix-map-stress]") {
 
     for (int i = 0; i < 10000; i++) {
         auto k = dis(gen);
-        map.insert(std::make_pair(k, 2 * i));
-        art.insert(std::make_pair(k, 2 * i));
+        set.insert(k);
+        art.insert(k);
     }
 
     SECTION ("lower bound") {
         for (int i = -100000; i < 100000; i++) {
-            auto it_std = map.lower_bound(i);
+            auto it_std = set.lower_bound(i);
             auto it_art = art.lower_bound(i);
-            if (it_std != map.end()) {
-                REQUIRE((*it_art).first == (*it_std).first);
-                REQUIRE((*it_art).second == (*it_std).second);
+            if (it_std != set.end()) {
+                REQUIRE(*it_art == *it_std);
             } else {
                 REQUIRE(it_art == art.end());
             }
 
-            it_std = map.upper_bound(i);
+            it_std = set.upper_bound(i);
             it_art = art.upper_bound(i);
-            if (it_std != map.end()) {
-                REQUIRE((*it_art).first == (*it_std).first);
-                REQUIRE((*it_art).second == (*it_std).second);
+            if (it_std != set.end()) {
+                REQUIRE(*it_art == *it_std);
             } else {
                 REQUIRE(it_art == art.end());
             }
