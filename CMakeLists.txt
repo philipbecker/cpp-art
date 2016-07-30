@@ -34,11 +34,6 @@ add_subdirectory(${EXT_PROJECTS_DIR}/celero)
 add_subdirectory(${EXT_PROJECTS_DIR}/benchmark)
 add_subdirectory(benchmarks)
 
-# SANDBOX MAIN
-add_executable(main ${SOURCE_FILES} main.cpp)
-target_link_libraries(main art)
-add_dependencies(main art)
-
 # CLION needs this
 include_directories(${CATCH_INCLUDE_DIR})
 include_directories(${CELERO_INCLUDE_DIR})
