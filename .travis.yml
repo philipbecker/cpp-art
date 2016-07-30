@@ -11,14 +11,14 @@ matrix:
 
   include:
     - os: linux
-        dist: trusty
-        compiler: gcc
-        addons: &gcc5-trusty
-          apt:
-            sources: ['ubuntu-toolchain-r-test']
-            packages: ['g++-5']
-        env:
-          - COMPILER='ccache g++-5'
+      dist: trusty
+      compiler: gcc
+      addons: &gcc5-trusty
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-5']
+      env:
+        - COMPILER='g++-5'
 
 install:
   ############################################################################
@@ -40,11 +40,12 @@ install:
     fi
 
 before_script:
-    - BUILD_DIR=`pwd`/build
-    - mkdir -p ${BUILD_DIR}
-    - cd ${BUILD_DIR}
-    - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${CXX} ..
+  - BUILD_DIR=`pwd`/build
+  - mkdir -p ${BUILD_DIR}
+  - cd ${BUILD_DIR}
+  - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${COMPILER} ..
+
 script:
-    - cd ${BUILD_DIR}
-    - make tests
-    - cd ${BUILD_DIR}/tests && ./tests > /dev/null
+  - cd ${BUILD_DIR}
+  - make tests
+  - cd ${BUILD_DIR}/tests && ./tests > /dev/null
