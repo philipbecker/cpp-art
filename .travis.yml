@@ -40,7 +40,7 @@ install:
     fi
 
 before_script:
-  - BUILD_DIR=`pwd`/build
+  - BUILD_DIR=${TRAVIS_BUILD_DIR}/build
   - mkdir -p ${BUILD_DIR}
   - cd ${BUILD_DIR}
   - cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=${COMPILER} ..
