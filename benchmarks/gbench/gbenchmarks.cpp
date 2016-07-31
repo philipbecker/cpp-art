@@ -168,7 +168,7 @@ static void BM_Insert_Sparse(benchmark::State &state) {
             state.PauseTiming();
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range_x() / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -200,7 +200,7 @@ static void BM_Insert_Dense(benchmark::State &state) {
             state.PauseTiming();
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range_x() / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -236,7 +236,7 @@ static void BM_Insert_Sequential(benchmark::State &state) {
             state.PauseTiming();
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range_x() / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -268,7 +268,7 @@ static void BM_Erase_Sparse(benchmark::State &state) {
                 m.insert(std::make_pair(values[j], 1));
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range_x() / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -300,7 +300,7 @@ static void BM_Erase_Dense(benchmark::State &state) {
                 m.insert(std::make_pair(values[j], 1));
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range_x() / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -377,13 +377,31 @@ static void BM_Iteration_Dense(benchmark::State &state) {
     state.SetItemsProcessed(items_processed);
     state.SetBytesProcessed(items_processed * sizeof(V));
 }
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, btree::btree_map<int64_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, btree::btree_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int64_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
 
 ////////////
 // INSERT //
 ////////////
 const double MIN_INSERT_TIME = 2.0;
 
-/*
 BENCHMARK_TEMPLATE(BM_Insert_Sparse, std::map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -417,13 +435,14 @@ BENCHMARK_TEMPLATE(BM_Insert_Sequential, art::radix_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(MIN_INSERT_TIME);
-*/
+
 
 ////////////
 // LOOKUP //
 ////////////
 
 const double MIN_LOOKUP_TIME = 5.0;
+/**
 BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, art::radix_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -432,6 +451,7 @@ BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(MIN_LOOKUP_TIME);
+*/
 
 
 /**
@@ -511,6 +531,7 @@ BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int32_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(MIN_LOOKUP_TIME);
+
 
 // DENSE INT64 KEY: VALID KEYS ONLY
 BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, std::map<int64_t, int>)

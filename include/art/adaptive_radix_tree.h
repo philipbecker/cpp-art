@@ -546,7 +546,8 @@ namespace art
             virtual node_type get_type() const override { return node_type::node_4_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Node 4, count: " << this->size()
+                std::cout << this << " Node 4, depth: " << this->_depth
+                                  << " count: " << this->size()
                           << ", parent " << this->_parent << std::endl;
                 if (this->size() > 0) {
                     for (size_t i = 0; i < this->_count; i++) {
@@ -756,7 +757,8 @@ namespace art
             virtual node_type get_type() const override { return node_type::node_16_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Node 16, count: " << this->size()
+                std::cout << this << " Node 16, depth: " << this->_depth
+                                  << " count: " << this->size()
                           << ", parent " << this->_parent << std::endl;
                 for (size_t i = 0; i < this->_count; i++) {
                     std::cout << ((unsigned) keys[i]) << " | ";
@@ -961,15 +963,17 @@ namespace art
             virtual node_type get_type() const override { return node_type::node_48_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Node 48, count: " << this->size()
+                std::cout << this << " Node 48, depth: " << this->_depth
+                                  << " count: " << this->size()
                           << ", parent " << this->_parent << std::endl;
                 for (size_t i = 0; i < 256; i++) {
                     if (child_index[i] != EMPTY_MARKER)
                         std::cout << i << " | ";
                 }
                 std::cout << std::endl;
-                for (size_t i = 0; i < this->_count; i++) {
-                    std::cout << i << ": " << children[i] << " | ";
+                for (size_t i = 0; i < 256; i++) {
+                    if (child_index[i] != EMPTY_MARKER)
+                        std::cout << i << ": " << children[child_index[i]] << " | ";
                 }
                 std::cout << std::endl;
             }
@@ -1141,7 +1145,8 @@ namespace art
             virtual node_type get_type() const override { return node_type::node_256_t; }
 
             virtual void debug() const override {
-                std::cout << this << " Node 256, count: " << this->size()
+                std::cout << this << " Node 256, depth: " << this->_depth
+                          << " count: " << this->size()
                           << ", parent " << this->_parent << std::endl;
                 for (size_t i = 0; i < 256; i++) {
                     if (children[i] != nullptr)

@@ -23,7 +23,27 @@ matrix:
     - env: TRAVIS_EMPTY_JOB_WORKAROUND=true
 
   include:
-    # Linux GCC
+    #############
+    # Linux GCC #
+    #############
+#    - os: linux
+#      compiler: gcc
+#      addons: &gcc4.8-trusty
+#        apt:
+#          sources: ['ubuntu-toolchain-r-test']
+#          packages: ['g++-4.8']
+#      env:
+#        - COMPILER='g++-4.8' BUILD_TYPE='Release'
+#
+#    - os: linux
+#      compiler: gcc
+#      addons: &gcc4.9-trusty
+#        apt:
+#          sources: ['ubuntu-toolchain-r-test']
+#          packages: ['g++-4.9']
+#      env:
+#        - COMPILER='g++-4.9' BUILD_TYPE='Release'
+
     - os: linux
       compiler: gcc
       addons: &gcc5-trusty
@@ -33,7 +53,18 @@ matrix:
       env:
         - COMPILER='g++-5' BUILD_TYPE='Release'
 
-    # Linux Clang
+#    - os: linux
+#      compiler: gcc
+#      addons: &gcc6-trusty
+#        apt:
+#          sources: ['ubuntu-toolchain-r-test']
+#          packages: ['g++-6']
+#      env:
+#        - COMPILER='g++-6' BUILD_TYPE='Release'
+
+    ###############
+    # Linux Clang #
+    ###############
     - os: linux
       compiler: clang
       addons: &clang35

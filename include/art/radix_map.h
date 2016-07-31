@@ -248,8 +248,9 @@ namespace art
         }
 
         iterator erase(iterator __first, iterator __last) {
-            for (; __first != __last; ++__first)
-                _M_t.erase(__first);
+            while (__first != __last) {
+                _M_t.erase(__first++);
+            }
 
             return __last;
         }
