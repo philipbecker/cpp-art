@@ -1194,31 +1194,11 @@ namespace art
                 return;
             }
 
-            switch (__x._M_root->get_type()) {
-                case node_type::node_4_t:
-                    _M_root = new _Node_4(*static_cast<_Node_4 *>(__x._M_root));
-                    break;
-                case node_type::node_16_t:
-                    _M_root = new _Node_16(*static_cast<_Node_16 *>(__x._M_root));
-                    break;
-                case node_type::node_48_t:
-                    _M_root = new _Node_48(*static_cast<_Node_48 *>(__x._M_root));
-                    break;
-                case node_type::node_256_t:
-                    _M_root = new _Node_256(*static_cast<_Node_256 *>(__x._M_root));
-                    break;
-                case node_type::_leaf_t:
-                    _M_root = new _Leaf(*static_cast<Leaf_ptr>(__x._M_root));
-                    break;
-                default:
-                    throw;
-            }
+            _M_root = copy_node(__x._M_root);
             _M_count = __x._M_count;
             _M_dummy_node = new _Dummy_Node();
-            if (_M_root != nullptr) {
-                _M_root->_parent = _M_dummy_node;
-                _M_dummy_node->_root = _M_root;
-            }
+            _M_root->_parent = _M_dummy_node;
+            _M_dummy_node->_root = _M_root;
 
             _M_key_transform = __x._M_key_transform;
         }
@@ -1253,30 +1233,11 @@ namespace art
                 }
 
                 // Then do copy construction
-                switch (__x._M_root->get_type()) {
-                    case node_type::node_4_t:
-                        _M_root = new _Node_4(*static_cast<_Node_4 *>(__x._M_root));
-                        break;
-                    case node_type::node_16_t:
-                        _M_root = new _Node_16(*static_cast<_Node_16 *>(__x._M_root));
-                        break;
-                    case node_type::node_48_t:
-                        _M_root = new _Node_48(*static_cast<_Node_48 *>(__x._M_root));
-                        break;
-                    case node_type::node_256_t:
-                        _M_root = new _Node_256(*static_cast<_Node_256 *>(__x._M_root));
-                        break;
-                    case node_type::_leaf_t:
-                        _M_root = new _Leaf(*static_cast<Leaf_ptr>(__x._M_root));
-                        break;
-                    default:
-                        throw;
-                }
+                _M_root = copy_node(__x._M_root);
                 _M_count = __x._M_count;
-                if (_M_root != nullptr) {
-                    _M_root->_parent = _M_dummy_node;
-                    _M_dummy_node->_root = _M_root;
-                }
+                _M_root->_parent = _M_dummy_node;
+                _M_dummy_node->_root = _M_root;
+
                 _M_key_transform = __x._M_key_transform;
             }
             return *this;
@@ -1302,6 +1263,23 @@ namespace art
             _M_count = 0;
             _M_root = nullptr;
             _M_dummy_node = new _Dummy_Node();
+        }
+
+        Node_ptr copy_node(Node_ptr __x) {
+            switch (__x->get_type()) {
+                case node_type::node_4_t:
+                    return new _Node_4(*static_cast<_Node_4 *>(__x));
+                case node_type::node_16_t:
+                    return new _Node_16(*static_cast<_Node_16 *>(__x));
+                case node_type::node_48_t:
+                    return new _Node_48(*static_cast<_Node_48 *>(__x));
+                case node_type::node_256_t:
+                    return new _Node_256(*static_cast<_Node_256 *>(__x));
+                case node_type::_leaf_t:
+                    return new _Leaf(*static_cast<Leaf_ptr>(__x));
+                default:
+                    throw;
+            }
         }
 
         //////////////

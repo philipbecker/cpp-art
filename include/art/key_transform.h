@@ -1,7 +1,8 @@
 #ifndef ART_KEY_TRANSFORM_H
 #define ART_KEY_TRANSFORM_H
 
-// #include "byte_swap.h"
+#include <array>
+#include <utility>
 
 namespace art
 {
@@ -106,6 +107,31 @@ namespace art
         int64_t operator()(int64_t __val) const noexcept {
             __val ^= int64_t(1) << (64 - 1);
             return is_big_endian() ? __val : byte_swap(__val);
+        }
+    };
+
+    // Pair of supported keys
+    template<typename T1, typename T2>
+    struct key_transform<std::pair<T1, T2> > {
+    private:
+        key_transform<T1> first;
+        key_transform<T2> second;
+
+        typedef std::array<uint8_t, sizeof(T1) + sizeof(T2)> transformed_type;
+    public:
+        key_transform() : first(), second() {}
+        transformed_type operator()(const std::pair<T1, T2> &key) {
+            transformed_type transformed_key;
+            auto transformed1 = first(key.first);
+            auto transformed2 = second(key.second);
+
+            std::move(static_cast<const char *>(static_cast<const void *>(&transformed1)),
+                      static_cast<const char *>(static_cast<const void *>(&transformed1)) + sizeof(transformed1),
+                      transformed_key.begin());
+            std::move(static_cast<const char *>(static_cast<const void *>(&transformed2)),
+                      static_cast<const char *>(static_cast<const void *>(&transformed2)) + sizeof(transformed2),
+                      transformed_key.begin() + sizeof(transformed1));
+            return transformed_key;
         }
     };
 }
