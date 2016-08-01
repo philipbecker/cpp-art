@@ -161,13 +161,10 @@ namespace art
             return *this;
         }
 
-        //////////////
-        // Capacity //
-        //////////////
+        // Capacity
 
         /**
-         * Returns true if the map is empty.  (Thus begin() would equal
-         *  end().)
+         * Returns true if the map is empty.
          */
         bool empty() const noexcept {
             return _M_t.empty();
@@ -187,9 +184,7 @@ namespace art
             return _M_t.max_size();
         }
 
-        ///////////////
-        // Modifiers //
-        ///////////////
+        // Modifiers
 
         /**
          *  Erases all elements in a map.
@@ -234,23 +229,57 @@ namespace art
             insert(__list.begin(), __list.end());
         }
 
+        /**
+         *  @brief Attempts to build and insert an element into the map.
+         *  @param __args  Arguments used to generate an element.
+         *  @return  A pair, of which the first element is an iterator that points
+         *           to the possibly inserted element, and the second is a bool
+         *           that is true if the element was actually inserted.
+         */
         template<typename... _Args>
         std::pair<iterator, bool> emplace(_Args &&... __args) {
             return _M_t.emplace_unique(std::forward<_Args>(__args)...);
         }
 
+        /**
+         *  @brief Attempts to erase the element with the given key (if it exists).
+         *  @param  __k The key to erase.
+         *  @return The number of erased elements (0 or 1).
+         *
+         * Note that this function only erases the element, and that if
+         * the element is itself a pointer, the pointed-to memory is not touched
+         * in any way.
+         */
         size_type erase(const key_type &__k) {
             return _M_t.erase_unique(__k);
         }
 
-        iterator erase(iterator __it) {
-            return _M_t.erase(__it);
+        /**
+         *  @brief Erases an element at a given position.
+         *  @param  __position  Iterator pointing to the element to be erased.
+         *  @return An iterator to the successor of the erased element.
+         *
+         * Note that this function only erases the element, and that if
+         * the element is itself a pointer, the pointed-to memory is not touched
+         * in any way.
+         */
+        iterator erase(iterator __position) {
+            return _M_t.erase(__position);
         }
 
+        /**
+         * @brief Erases a range [first, last) of elements from a map.
+         * @param __first  Iterator pointing to the start of the range.
+         * @param __last  Iteraot pointing to the end of the range.
+         * @return The iterator __last.
+         *
+         * Note that this function only erases the element, and that if
+         * the element is itself a pointer, the pointed-to memory is not touched
+         * in any way.
+         */
         iterator erase(iterator __first, iterator __last) {
-            while (__first != __last) {
+            while (__first != __last)
                 _M_t.erase(__first++);
-            }
 
             return __last;
         }
@@ -266,9 +295,7 @@ namespace art
         }
 
 
-        ////////////////////
-        // Element access //
-        ////////////////////
+        // Element access
 
         /**
          * @brief  Subscript ( @c [] ) access to map data.
@@ -307,10 +334,13 @@ namespace art
             return (*res).second;
         }
 
-        ////////////
-        // Lookup //
-        ////////////
+        // Lookup
 
+        /**
+         *  @brief  Finds the number of elements.
+         *  @param  __x  Key to located.
+         *  @return  Number of elements with specified key.
+         */
         size_type count(const key_type &__x) const {
             return _M_t.find(__x) == _M_t.end() ? 0 : 1;
         }
@@ -376,61 +406,117 @@ namespace art
             return _M_t.equal_range(__k);
         }
 
-        ///////////////
-        // Iterators //
-        ///////////////
+        // Iterators
 
+        /**
+         * Returns an iterator that points to the first element in the map.
+         * Iteration is done in ascending order acoording to the comparison
+         * of the transformed keys' binary representations.
+         */
         iterator begin() noexcept {
             return _M_t.begin();
         }
 
+        /**
+         * Returns a read-only iterator that points to the first element in the map.
+         * Iteration is done in ascending order acoording to the comparison
+         * of the transformed keys' binary representations.
+         */
         const_iterator begin() const noexcept {
             return _M_t.begin();
         }
 
+        /**
+         * Returns a read-only iterator that points to the first element in the map.
+         * Iteration is done in ascending order acoording to the comparison
+         * of the transformed keys' binary representations.
+         */
         const_iterator cbegin() const noexcept {
             return _M_t.begin();
         }
 
+        /**
+         * Returns a iterator that points to the last element in the map.
+         * Iteration is done in ascending order acoording to the comparison
+         * of the transformed keys' binary representations.
+         */
         iterator end() noexcept {
             return _M_t.end();
         }
 
+        /**
+         * Returns a read-only iterator that points to the last element in the map.
+         * Iteration is done in ascending order acoording to the comparison
+         * of the transformed keys' binary representations.
+         */
         const_iterator end() const noexcept {
             return _M_t.end();
         }
 
+        /**
+         * Returns a read-only iterator that points to the last element in the map.
+         * Iteration is done in ascending order acoording to the comparison
+         * of the transformed keys' binary representations.
+         */
         const_iterator cend() const noexcept {
             return _M_t.end();
         }
 
+        /**
+         * Returns a reverse iterator that points to the first element in the map.
+         * Iteration is done in descending order acoording to the comparison
+         * of the transformed keys' binary representations.
+         */
         reverse_iterator rbegin() noexcept {
             return _M_t.rbegin();
         }
 
+        /**
+         * Returns a read-only reverse iterator that points to the first element
+         * in the map. Iteration is done in descending order acoording to the
+         * comparison of the transformed keys' binary representations.
+         */
         const_reverse_iterator rbegin() const noexcept {
             return _M_t.rbegin();
         }
 
+        /**
+         * Returns a read-only reverse iterator that points to the first element
+         * in the map. Iteration is done in descending order acoording to the
+         * comparison of the transformed keys' binary representations.
+         */
         const_reverse_iterator crbegin() const noexcept {
             return _M_t.rbegin();
         }
 
+        /**
+         * Returns a reverse iterator that points to the last element
+         * in the map. Iteration is done in descending order acoording to the
+         * comparison of the transformed keys' binary representations.
+         */
         reverse_iterator rend() noexcept {
             return _M_t.rend();
         }
 
+        /**
+         * Returns a read-only reverse iterator that points to the last element
+         * in the map. Iteration is done in descending order acoording to the
+         * comparison of the transformed keys' binary representations.
+         */
         const_reverse_iterator rend() const noexcept {
             return _M_t.rend();
         }
 
+        /**
+         * Returns a read-only reverse iterator that points to the last element
+         * in the map. Iteration is done in descending order acoording to the
+         * comparison of the transformed keys' binary representations.
+         */
         const_reverse_iterator crend() const noexcept {
             return _M_t.rend();
         }
 
-        ///////////////
-        // Observers //
-        ///////////////
+        // Observers
 
         _Key_transform key_trans() const {
             return _M_t.key_trans();
@@ -449,9 +535,7 @@ namespace art
                               const radix_map<_K1, _T1, _C1> &);
     };
 
-    //////////////////////////
-    // Relational Operators //
-    //////////////////////////
+    // Relational Operators
 
     /**
      *  @brief  Map equality comparison.
