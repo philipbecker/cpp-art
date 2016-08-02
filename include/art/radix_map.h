@@ -314,10 +314,10 @@ namespace art
             // @TODO more efficient to write extra method to avoid 2 lookups
             iterator it = _M_t.find(__k);
             if (it != _M_t.end())
-                return (*it).second;
+                return it->second;
 
             std::pair<iterator, bool> res = _M_t.emplace_unique(__k, mapped_type());
-            return (*res.first).second;
+            return res.first->second;
         }
 
         /**
