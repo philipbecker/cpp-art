@@ -295,3 +295,19 @@ TEST_CASE("upper_bound", "[radix-map]") {
     REQUIRE(art.upper_bound(0)->first == 5);
     REQUIRE(art.upper_bound(5) == art.end());
 }
+
+TEST_CASE("complex mapped type", "[radix-map]") {
+    struct A {
+        int id;
+        std::string name;
+
+        A(int id, const std::string &name) : id(id), name(name) {}
+    };
+
+    art::radix_map<int, A> radix_map;
+
+    auto p = radix_map.insert(std::pair<int, A>(27, {12312, "Max"}));
+    REQUIRE(p.second);
+    p = radix_map.insert(std::pair<int, A>(15, {23212, "Muster"}));
+    REQUIRE(p.second);
+}

@@ -7,7 +7,6 @@ cpp-art is a C++11 STL-commpliant map and set container based on an [Adaptive Ra
 * There is a **`key_transform`** function instead of `key_comp`/`hash` that you can implement for **custom types**. The return type of  `key_transform` **must be an integer type** for now.
 * Container is **not thread-safe** (yet)!!!
 * [AllocatorAwareContainer](http://en.cppreference.com/w/cpp/concept/AllocatorAwareContainer) is on the roadmap.
-* Mapped type needs to be default constructible.
 * Erase by iterator only works with non-const iterator.
 
 # Getting Started
