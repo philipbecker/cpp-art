@@ -1,4 +1,4 @@
-# cpp-art [![Build Status](https://travis-ci.com/philipbecker/cpp-art.svg?token=hxeqbVxYkPnTffugJJXK&branch=master)](https://travis-ci.com/philipbecker/cpp-art) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/philipbecker/cpp-art/blob/master/LICENSE)
+# cpp-art [![GitHub release](https://img.shields.io/github/release/philipbecker/cpp-art.svg?maxAge=2592000)]() [![Build Status](https://travis-ci.org/philipbecker/cpp-art.svg?branch=v0.8.0)](https://travis-ci.org/philipbecker/cpp-art) [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://github.com/philipbecker/cpp-art/blob/master/LICENSE)
 cpp-art is a C++11 STL-commpliant map and set container based on an [Adaptive Radix Tree](http://db.in.tum.de/~leis/papers/ART.pdf) (ART) implementation. ART supports O(k) operations (where k is the size of the key in bytes) while limiting the characteristic space overhead of radix trees by changing node sizes. (See the [wiki](https://github.com/philipbecker/cpp-art/wiki) for more information.) The containers provide virtually the same interface as their stl counterparts (see the wiki for the interface documentation: [radix_map](https://github.com/philipbecker/adaptive_radix_tree/wiki/art::radix_map), [radix_set](https://github.com/philipbecker/adaptive_radix_tree/wiki/art::radix_set)) and they meet (mostly/completely?) the requirements of [Container](http://en.cppreference.com/w/cpp/concept/Container), [AssociativeContainer](http://en.cppreference.com/w/cpp/concept/AssociativeContainer) (there is a [key_transform](https://github.com/philipbecker/cpp-art/wiki/art::key_transform) instead of key_comp) and [ReversibleContainer](http://en.cppreference.com/w/cpp/concept/ReversibleContainer). (Please report other deviations as issues.)
 
 
@@ -23,5 +23,6 @@ cpp-art is a header-only library and requires C++11 features. Simply add `<path-
 ## Random Lookup of Valid 64-Bit (left) and 32-Bit (right) Keys in a Container with 16M Elements
 Looking up non-existing keys is up to 3-5 times faster in a radix tree, other containers are unaffected or gain much less.
 ![](benchmarks/charts/lookup-64.png?raw=true) ![](benchmarks/charts/lookup-32.png?raw=true)
-## Space Overhead of a Container 16M Elements
+
+## Space Overhead of a Container with 16M Elements
 ![](benchmarks/charts/space-overhead.png?raw=true)
