@@ -81,7 +81,7 @@ TEST_CASE("Signed 64 bit keys are supported", "[art]") {
 }
 
 TEST_CASE("Pairs of supported keys are supported", "[art]") {
-    art::radix_set<std::pair<short, int>> set;
+    art::radix_set<std::pair<short, long>> set;
 
     auto zero_five = set.insert(std::make_pair(0, 5));
     REQUIRE(zero_five.second);

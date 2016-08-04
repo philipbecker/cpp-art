@@ -382,6 +382,11 @@ BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, btree::btree_map<int64_t, int>)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(5.0);
 
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int64_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+
 BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int32_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -392,10 +397,27 @@ BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, btree::btree_map<int32_t, int>)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(5.0);
 
-BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int64_t, int>)
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, btree::btree_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(5.0);
+
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, art::radix_map<int64_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, art::radix_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, btree::btree_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+
+
 
 ////////////
 // INSERT //
