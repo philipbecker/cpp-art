@@ -57,7 +57,7 @@ static void BM_Lookup_Sparse(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
 
-    const int size = state.range_x();
+    const int size = state.range(0);
     Generator<K> key_generator;
     while (state.KeepRunning()) {
         state.PauseTiming();
@@ -67,7 +67,7 @@ static void BM_Lookup_Sparse(benchmark::State &state) {
             benchmark::DoNotOptimize(m.find(key_generator.next()));
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range(0);
     state.SetItemsProcessed(items_processed);
     //state.SetBytesProcessed(items_processed * sizeof(V));
 }
@@ -77,7 +77,7 @@ static void BM_Lookup_Sparse_Valid(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
 
-    const int size = state.range_x();
+    const int size = state.range(0);
     while (state.KeepRunning()) {
         state.PauseTiming();
         Container m = ConstructRandomMap<Container>(size);
@@ -91,7 +91,7 @@ static void BM_Lookup_Sparse_Valid(benchmark::State &state) {
             benchmark::DoNotOptimize(m.find(keys[i]));
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range(0);
     state.SetItemsProcessed(items_processed);
     //state.SetBytesProcessed(items_processed * sizeof(V));
 }
@@ -101,7 +101,7 @@ static void BM_Lookup_Dense(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
 
-    const int size = state.range_x();
+    const int size = state.range(0);
     while (state.KeepRunning()) {
         state.PauseTiming();
         Container m = ConstructDenseMap<Container>(size);
@@ -111,7 +111,7 @@ static void BM_Lookup_Dense(benchmark::State &state) {
             benchmark::DoNotOptimize(m.find(key_generator.next()));
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range(0);
     state.SetItemsProcessed(items_processed);
     //state.SetBytesProcessed(items_processed * sizeof(V));
 }
@@ -121,7 +121,7 @@ static void BM_Lookup_Dense_Valid(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
 
-    const int size = state.range_x();
+    const int size = state.range(0);
     while (state.KeepRunning()) {
         state.PauseTiming();
         Container m = ConstructDenseMap<Container>(size);
@@ -135,7 +135,7 @@ static void BM_Lookup_Dense_Valid(benchmark::State &state) {
             benchmark::DoNotOptimize(m.find(keys[i]));
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range(0);
     state.SetItemsProcessed(items_processed);
     //state.SetBytesProcessed(items_processed * sizeof(V));
 }
@@ -144,7 +144,7 @@ template<typename Container>
 static void BM_Insert_Sparse(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
-    const int size = state.range_x();
+    const int size = state.range(0);
 
     while (state.KeepRunning()) {
         state.PauseTiming();
@@ -168,7 +168,7 @@ static void BM_Insert_Sparse(benchmark::State &state) {
             state.PauseTiming();
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x() / 10;
+    const size_t items_processed = state.iterations() * state.range(0) / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -176,7 +176,7 @@ template<typename Container>
 static void BM_Insert_Dense(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
-    const int size = state.range_x();
+    const int size = state.range(0);
 
     while (state.KeepRunning()) {
         state.PauseTiming();
@@ -200,7 +200,7 @@ static void BM_Insert_Dense(benchmark::State &state) {
             state.PauseTiming();
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x() / 10;
+    const size_t items_processed = state.iterations() * state.range(0) / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -208,7 +208,7 @@ template<typename Container>
 static void BM_Insert_Sequential(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
-    const int size = state.range_x();
+    const int size = state.range(0);
 
     Container m;
     Generator<K> key_generator;
@@ -236,7 +236,7 @@ static void BM_Insert_Sequential(benchmark::State &state) {
             state.PauseTiming();
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x() / 10;
+    const size_t items_processed = state.iterations() * state.range(0) / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -244,7 +244,7 @@ template<typename Container>
 static void BM_Erase_Sparse(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
-    const int size = state.range_x();
+    const int size = state.range(0);
 
     while (state.KeepRunning()) {
         state.PauseTiming();
@@ -268,7 +268,7 @@ static void BM_Erase_Sparse(benchmark::State &state) {
                 m.insert(std::make_pair(values[j], 1));
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x() / 10;
+    const size_t items_processed = state.iterations() * state.range(0) / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -276,7 +276,7 @@ template<typename Container>
 static void BM_Erase_Dense(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
-    const int size = state.range_x();
+    const int size = state.range(0);
 
     while (state.KeepRunning()) {
         state.PauseTiming();
@@ -300,7 +300,7 @@ static void BM_Erase_Dense(benchmark::State &state) {
                 m.insert(std::make_pair(values[j], 1));
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x() / 10;
+    const size_t items_processed = state.iterations() * state.range(0) / 10;
     state.SetItemsProcessed(items_processed);
 }
 
@@ -308,7 +308,7 @@ template<typename Container>
 static void BM_Erase_Sequential(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::key_type>::type K;
     typedef typename std::remove_const<typename Container::value_type>::type V;
-    const int size = state.range_x();
+    const int size = state.range(0);
 
     Container m;
     Generator<K> key_generator;
@@ -336,7 +336,7 @@ static void BM_Erase_Sequential(benchmark::State &state) {
                 m.insert(std::make_pair(values[j], 1));
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range(0);
     state.SetItemsProcessed(items_processed);
 }
 
@@ -344,7 +344,7 @@ template<typename Container>
 static void BM_Iteration_Sparse(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::value_type>::type V;
 
-    const int size = state.range_x();
+    const int size = state.range(0);
     while (state.KeepRunning()) {
         state.PauseTiming();
         Container m = ConstructRandomMap<Container>(size);
@@ -354,7 +354,7 @@ static void BM_Iteration_Sparse(benchmark::State &state) {
             benchmark::DoNotOptimize(sum += e.second);
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range(0);
     state.SetItemsProcessed(items_processed);
     state.SetBytesProcessed(items_processed * sizeof(V));
 }
@@ -363,7 +363,7 @@ template<typename Container>
 static void BM_Iteration_Dense(benchmark::State &state) {
     typedef typename std::remove_const<typename Container::value_type>::type V;
 
-    const int size = state.range_x();
+    const int size = state.range(0);
     while (state.KeepRunning()) {
         state.PauseTiming();
         Container m = ConstructDenseMap<Container>(size);
@@ -373,26 +373,41 @@ static void BM_Iteration_Dense(benchmark::State &state) {
             benchmark::DoNotOptimize(sum += e.second);
         }
     }
-    const size_t items_processed = state.iterations() * state.range_x();
+    const size_t items_processed = state.iterations() * state.range(0);
     state.SetItemsProcessed(items_processed);
     state.SetBytesProcessed(items_processed * sizeof(V));
 }
+
 BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, btree::btree_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(5.0);
-
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int64_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, btree::btree_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
 BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int32_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(5.0);
 
-BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, btree::btree_map<int32_t, int>)
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, btree::btree_map<int64_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(5.0);
-
-BENCHMARK_TEMPLATE(BM_Lookup_Dense_Valid, art::radix_map<int64_t, int>)
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, art::radix_map<int64_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, btree::btree_map<int32_t, int>)
+        ->Range(1 << START, 1 << END)
+        ->Unit(benchmark::TimeUnit::kMillisecond)
+        ->MinTime(5.0);
+BENCHMARK_TEMPLATE(BM_Lookup_Sparse_Valid, art::radix_map<int32_t, int>)
         ->Range(1 << START, 1 << END)
         ->Unit(benchmark::TimeUnit::kMillisecond)
         ->MinTime(5.0);
