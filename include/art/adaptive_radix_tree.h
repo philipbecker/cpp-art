@@ -7,6 +7,7 @@
 #include <utility>
 #include <iostream>
 #include <limits>
+#include <cstring>
 #include "key_transform.h"
 
 namespace art {
@@ -1698,7 +1699,7 @@ namespace art {
                         // Hit an existing leaf
                         Leaf_ptr existing_leaf = reinterpret_cast<Leaf_ptr>(current_node);
                         Key existing_key = {_M_key_transform(_KeyOfValue()(existing_leaf->_value))};
-                        if (transformed_key.value == existing_key.value) {
+                        if (!std::memcmp(&transformed_key, &existing_key, sizeof(transformed_key))) {
                             // if it is a duplicate entry, ignore
                             return make_pair(iterator(existing_leaf), false);
                         } else {
@@ -1917,7 +1918,7 @@ namespace art {
                     if (current_node->is_leaf()) {
                         Leaf_ptr existing_leaf = reinterpret_cast<Leaf_ptr>(current_node);
                         Key existing_key = {_M_key_transform(_KeyOfValue()(existing_leaf->_value))};
-                        if (__k.value == existing_key.value) {
+                        if (!std::memcmp(&__k, &existing_key, sizeof(__k))) {
                             return existing_leaf;
                         } else {
                             for (int32_t j = depth; j < key_size; j++) {
@@ -2008,7 +2009,7 @@ namespace art {
 
             if (_M_root->is_leaf()) {
                 Key existing_key = {_M_key_transform(_KeyOfValue()(static_cast<Leaf_ptr>(_M_root)->_value))};
-                if (transformed_key.value == existing_key.value) {
+                if (!std::memcmp(&transformed_key, &existing_key, sizeof(transformed_key))) {
                     delete _M_root;
                     _M_root = nullptr;
                     _M_count--;
@@ -2035,7 +2036,7 @@ namespace art {
                 if (child->is_leaf()) {
                     Leaf_ptr existing_leaf = static_cast<Leaf_ptr>(child);
                     Key existing_key = {_M_key_transform(_KeyOfValue()(existing_leaf->_value))};
-                    if (transformed_key.value == existing_key.value) {
+                    if (!std::memcmp(&transformed_key, &existing_key, sizeof(transformed_key))) {
                         // Delete the leaf
                         current_node->erase(transformed_key.chunks[depth]);
                         _M_count--;
@@ -2164,7 +2165,7 @@ namespace art {
                 if (current_node->is_leaf()) {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
-                    if (transformed_key.value == existing_key.value)
+                    if (!std::memcmp(&transformed_key, &existing_key, sizeof(transformed_key)))
                         return iterator(leaf);
                     return end();
                 }
@@ -2195,7 +2196,7 @@ namespace art {
                 if (current_node->is_leaf()) {
                     Const_Leaf_ptr leaf = static_cast<Const_Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
-                    if (transformed_key.value == existing_key.value)
+                    if (!std::memcmp(&transformed_key, &existing_key, sizeof(transformed_key)))
                         return const_iterator(leaf);
                     return end();
                 }
@@ -2230,13 +2231,11 @@ namespace art {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
 
-                    for (unsigned j = depth; j < key_size; j++) {
-                        if (transformed_key.chunks[j] > existing_key.chunks[j]) {
-                            auto successor = previous_node->successor(transformed_key);
-                            return iterator(successor);
-                        }
-                    }
-                    return iterator(leaf);
+                    if (std::memcmp(&transformed_key, &existing_key, sizeof(transformed_key)) <= 0)
+                        return iterator(leaf);
+
+                    auto successor = previous_node->successor(transformed_key);
+                    return iterator(successor);
                 }
 
                 auto current_inner = static_cast<Inner_Node_ptr>(current_node);
@@ -2270,13 +2269,11 @@ namespace art {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
 
-                    for (unsigned j = depth; j < key_size; j++) {
-                        if (transformed_key.chunks[j] > existing_key.chunks[j]) {
-                            auto successor = previous_node->successor(transformed_key);
-                            return const_iterator(successor);
-                        }
-                    }
-                    return const_iterator(leaf);
+                    if (std::memcmp(&transformed_key, &existing_key, sizeof(transformed_key)) <= 0)
+                        return const_iterator(leaf);
+
+                    auto successor = previous_node->successor(transformed_key);
+                    return const_iterator(successor);
                 }
                 auto current_inner = static_cast<Const_Inner_Node_ptr>(current_node);
                 auto pos = current_inner->prefix_mismatch_pos(transformed_key);
@@ -2309,9 +2306,8 @@ namespace art {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
 
-                    for (unsigned j = depth; j < key_size; j++)
-                        if (transformed_key.chunks[j] < existing_key.chunks[j])
-                            return iterator(leaf);
+                    if (std::memcmp(&transformed_key, &existing_key, sizeof(transformed_key)) < 0)
+                        return iterator(leaf);
 
                     auto successor = previous_node->successor(transformed_key);
                     return iterator(successor);
@@ -2347,9 +2343,8 @@ namespace art {
                     Leaf_ptr leaf = static_cast<Leaf_ptr>(current_node);
                     Key existing_key = {_M_key_transform(_KeyOfValue()(leaf->_value))};
 
-                    for (unsigned j = depth; j < key_size; j++)
-                        if (transformed_key.chunks[j] < existing_key.chunks[j])
-                            return const_iterator(leaf);
+                    if (std::memcmp(&transformed_key, &existing_key, sizeof(transformed_key)) < 0)
+                        return const_iterator(leaf);
 
                     auto successor = previous_node->successor(transformed_key);
                     return const_iterator(successor);
