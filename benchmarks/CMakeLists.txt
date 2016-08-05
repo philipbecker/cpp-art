@@ -43,7 +43,7 @@ target_link_libraries(
 add_dependencies(
         gbench_suite
         art
-        benchmark
+        google-benchmark
 )
 
 # MEMORY USAGE
