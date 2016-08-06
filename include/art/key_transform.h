@@ -134,6 +134,21 @@ namespace art
             return transformed_key;
         }
     };
+
+    // fixed size ascii string transform
+    template<>
+    struct key_transform<std::string> {
+        std::array<char, 256> operator()(const std::string &__val) const noexcept {
+            // make sure to initialize the whole array, otherwise the suffix of
+            // identical keys could be different, which would cause memcmp over
+            // the array to fail
+            std::array<char, 256> transformed {};
+            std::copy(__val.cbegin(), __val.cend(), transformed.begin());
+            // append unique terminator value as keys may not be prefixes of other keys
+            transformed[__val.size()] = '\0';
+            return transformed;
+        }
+    };
 }
 
 #endif //ART_KEY_TRANSFORM_H
