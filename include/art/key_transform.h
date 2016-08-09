@@ -4,8 +4,7 @@
 #include <array>
 #include <utility>
 
-namespace art
-{
+namespace art {
     inline uint16_t byte_swap(uint16_t __val) {
         return (__val << 8) | (__val >> 8);
     }
@@ -41,7 +40,7 @@ namespace art
         return !(*(char *) &num == 1);
     }
 
-    template<typename _Key>
+    template<typename _Key, size_t MAX_SIZE = 256>
     struct key_transform;
 
     // Unsigned integers are already binary comparable.
@@ -117,9 +116,12 @@ namespace art
         key_transform<T1> first;
         key_transform<T2> second;
 
-        typedef std::array<uint8_t, sizeof(T1) + sizeof(T2)> transformed_type;
+        typedef std::array<uint8_t,
+                sizeof(decltype(key_transform<T1>()(T1()))) +
+                sizeof(decltype(key_transform<T2>()(T2())))> transformed_type;
     public:
         key_transform() : first(), second() {}
+
         transformed_type operator()(const std::pair<T1, T2> &key) {
             transformed_type transformed_key;
             auto transformed1 = first(key.first);
@@ -136,16 +138,26 @@ namespace art
     };
 
     // fixed size ascii string transform
-    template<>
-    struct key_transform<std::string> {
-        std::array<char, 256> operator()(const std::string &__val) const noexcept {
+    template<size_t MAX_SIZE>
+    struct key_transform<std::string, MAX_SIZE> {
+        std::array<char, MAX_SIZE> operator()(const std::string &key) const noexcept {
             // make sure to initialize the whole array, otherwise the suffix of
-            // identical keys could be different, which would cause memcmp over
-            // the array to fail
-            std::array<char, 256> transformed {};
-            std::copy(__val.cbegin(), __val.cend(), transformed.begin());
-            // append unique terminator value as keys may not be prefixes of other keys
-            transformed[__val.size()] = '\0';
+            // identical keys could be different
+            std::array<char, MAX_SIZE> transformed{};
+            std::memcpy(&transformed, key.c_str(), key.size() + 1);
+
+            return transformed;
+        }
+    };
+
+    template<size_t MAX_SIZE>
+    struct key_transform<const char *, MAX_SIZE> {
+        std::array<char, MAX_SIZE> operator()(const char *key) const noexcept {
+            // make sure to initialize the whole array, otherwise the suffix of
+            // identical keys could be different
+            std::array<char, MAX_SIZE> transformed{};
+            std::memcpy(&transformed, key, strlen(key) + 1);
+
             return transformed;
         }
     };

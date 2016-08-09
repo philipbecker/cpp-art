@@ -24,19 +24,12 @@ namespace art {
     public:
         // Forward declaration for typedefs
         struct _Node;
-
         struct _Inner_Node;
-
         struct _Base_Leaf;
-
         struct _Leaf;
-
         struct _Node_4;
-
         struct _Node_16;
-
         struct _Node_48;
-
         struct _Node_256;
 
         typedef _Key key_type;
@@ -87,17 +80,15 @@ namespace art {
 
             virtual void clear() = 0;
 
-            virtual void insert(const byte &key_byte, Node_ptr node) = 0;
+            virtual void insert(const byte key_byte, Node_ptr node) = 0;
 
-            virtual void erase(const byte &key_byte) = 0;
+            virtual void erase(const byte key_byte) = 0;
 
-            virtual Node_ptr *find_ref(const byte &key_byte) = 0;
+            virtual Node_ptr find(const byte key_byte) = 0;
 
-            virtual Node_ptr find(const byte &key_byte) = 0;
+            virtual Const_Node_ptr find(const byte key_byte) const = 0;
 
-            virtual Const_Node_ptr find(const byte &key_byte) const = 0;
-
-            virtual void update_child_ptr(const byte &key_byte, Node_ptr node) = 0;
+            virtual void update_child_ptr(const byte key_byte, Node_ptr node) = 0;
 
             virtual Base_Leaf_ptr minimum() = 0;
 
@@ -162,6 +153,16 @@ namespace art {
                 return *this;
             }
 
+            /**
+             * @brief Determines the first mismatch position of the key with the prefix.
+             * @param key  Key to be matched with the prefix.
+             * @return Position of first mismatch. If sequences are identical, the prefix length
+             *         is returned.
+             *
+             * Compares the key with the prefix up to the prefix length. If the prefix length is
+             * longer than what can be stored in the node directly (pessimistic path compression),
+             * the rest of the prefix is automatically loaded from a descendent leaf.
+             */
             size_t prefix_mismatch_pos(const Key &key) const {
                 // pessimistic path compression
                 size_t pos = 0;
@@ -177,6 +178,27 @@ namespace art {
                         if (key.chunks[_depth + pos] != min_key.chunks[_depth + pos])
                             return pos;
                 }
+
+                return _prefix_length;
+            }
+
+            /**
+             * @brief Determines the first mismatch position of the key with the prefix.
+             * @param key  Key to be matched with the prefix.
+             * @return Position of first mismatch. If sequences are identical, the prefix length
+             *         is returned.
+             *
+             * Only compares the prefix directly stored in the node (pessimistic path compression).
+             * Prefer this method when doing read-only operations as performance is significantly
+             * improved and complete equality is checked in the leaf anyway.
+             */
+            size_t pes_prefix_mismatch_pos(const Key &key) const {
+                // pessimistic path compression
+                size_t pos = 0;
+                const auto pessimistic_length = std::min((size_t) _prefix_length, MAX_PREFIX_LENGTH);
+                for (; pos < pessimistic_length; pos++)
+                    if (key.chunks[_depth + pos] != _prefix[pos])
+                        return pos;
 
                 return _prefix_length;
             }
@@ -197,17 +219,15 @@ namespace art {
 
             virtual void clear() = 0;
 
-            virtual void insert(const byte &key_byte, Node_ptr node) = 0;
+            virtual void insert(const byte key_byte, Node_ptr node) = 0;
 
-            virtual void erase(const byte &key_byte) = 0;
+            virtual void erase(const byte key_byte) = 0;
 
-            virtual Node_ptr *find_ref(const byte &key_byte) = 0;
+            virtual Node_ptr find(const byte key_byte) = 0;
 
-            virtual Node_ptr find(const byte &key_byte) = 0;
+            virtual Const_Node_ptr find(const byte key_byte) const = 0;
 
-            virtual Const_Node_ptr find(const byte &key_byte) const = 0;
-
-            virtual void update_child_ptr(const byte &key_byte, Node_ptr node) = 0;
+            virtual void update_child_ptr(const byte key_byte, Node_ptr node) = 0;
 
             virtual Base_Leaf_ptr minimum() = 0;
 
@@ -244,17 +264,15 @@ namespace art {
 
             void clear() override {}
 
-            virtual void insert(const byte &key_byte, Node_ptr node) override {}
+            virtual void insert(const byte key_byte, Node_ptr node) override {}
 
-            virtual void erase(const byte &key_byte) override {}
+            virtual void erase(const byte key_byte) override {}
 
-            virtual Node_ptr *find_ref(const byte &key_byte) override { return nullptr; }
+            virtual Node_ptr find(const byte key_byte) override { return nullptr; }
 
-            virtual Node_ptr find(const byte &key_byte) override { return nullptr; }
+            virtual Const_Node_ptr find(const byte key_byte) const override { return nullptr; }
 
-            virtual Const_Node_ptr find(const byte &key_byte) const override { return nullptr; }
-
-            virtual void update_child_ptr(const byte &key_byte, Node_ptr node) override {}
+            virtual void update_child_ptr(const byte key_byte, Node_ptr node) override {}
 
             virtual Base_Leaf_ptr minimum() override { return this; }
 
@@ -308,23 +326,19 @@ namespace art {
 
             void clear() override {}
 
-            virtual void insert(const byte &key_byte, Node_ptr node) override {}
+            virtual void insert(const byte key_byte, Node_ptr node) override {}
 
-            virtual void erase(const byte &key_byte) override {}
+            virtual void erase(const byte key_byte) override {}
 
-            virtual Node_ptr *find_ref(const byte &key_byte) override {
+            virtual Node_ptr find(const byte key_byte) override {
                 return nullptr;
             }
 
-            virtual Node_ptr find(const byte &key_byte) override {
+            virtual Const_Node_ptr find(const byte key_byte) const override {
                 return nullptr;
             }
 
-            virtual Const_Node_ptr find(const byte &key_byte) const override {
-                return nullptr;
-            }
-
-            virtual void update_child_ptr(const byte &key_byte, Node_ptr node) override {}
+            virtual void update_child_ptr(const byte key_byte, Node_ptr node) override {}
 
             virtual Leaf_ptr minimum() override { return this; }
 
@@ -390,23 +404,19 @@ namespace art {
 
             void clear() override {}
 
-            virtual void insert(const byte &key_byte, Node_ptr node) override {}
+            virtual void insert(const byte key_byte, Node_ptr node) override {}
 
-            virtual void erase(const byte &key_byte) override {}
+            virtual void erase(const byte key_byte) override {}
 
-            virtual Node_ptr *find_ref(const byte &key_byte) override {
+            virtual Node_ptr find(const byte key_byte) override {
                 return nullptr;
             }
 
-            virtual Node_ptr find(const byte &key_byte) override {
+            virtual Const_Node_ptr find(const byte key_byte) const override {
                 return nullptr;
             }
 
-            virtual Const_Node_ptr find(const byte &key_byte) const override {
-                return nullptr;
-            }
-
-            virtual void update_child_ptr(const byte &key_byte, Node_ptr node) override {
+            virtual void update_child_ptr(const byte key_byte, Node_ptr node) override {
                 _root = node;
             }
 
@@ -461,21 +471,21 @@ namespace art {
             std::array<Node_ptr, 4> children{};
 
             // Grow constructor
-            _Node_4(Leaf_ptr leaf, const byte &key_byte, int32_t depth)
+            _Node_4(Leaf_ptr leaf, const byte key_byte, int32_t depth)
                     : _Inner_Node(leaf->_parent, 1, depth) {
                 keys[0] = key_byte;
                 children[0] = leaf;
                 leaf->_parent = this;
             }
 
-            _Node_4(Node_ptr child, const byte &key_byte, int32_t depth)
+            _Node_4(Node_ptr child, const byte key_byte, int32_t depth)
                     : _Inner_Node(child->_parent, 1, depth) {
                 keys[0] = key_byte;
                 children[0] = child;
                 child->_parent = this;
             }
 
-            _Node_4(Node_ptr child, const byte &key_byte, int32_t depth,
+            _Node_4(Node_ptr child, const byte key_byte, int32_t depth,
                     uint16_t prefix_length, std::array<byte, MAX_PREFIX_LENGTH> &prefix)
                     : _Inner_Node(child->_parent, 1, depth, prefix_length, prefix) {
                 keys[0] = key_byte;
@@ -544,7 +554,7 @@ namespace art {
                 }
             }
 
-            virtual void insert(const byte &key_byte, Node_ptr node) override {
+            virtual void insert(const byte key_byte, Node_ptr node) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
                 if (pos < this->_count) {
@@ -556,7 +566,7 @@ namespace art {
                 this->_count++;
             }
 
-            virtual void erase(const byte &key_byte) override {
+            virtual void erase(const byte key_byte) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
                 if (pos < this->_count) {
@@ -567,16 +577,7 @@ namespace art {
                 }
             }
 
-            virtual Node_ptr *find_ref(const byte &key_byte) override {
-                unsigned pos = 0;
-                for (; pos < this->_count && keys[pos] < key_byte; pos++);
-
-                if (pos < this->_count && keys[pos] == key_byte)
-                    return &children[pos];
-                return nullptr;
-            }
-
-            virtual Node_ptr find(const byte &key_byte) override {
+            virtual Node_ptr find(const byte key_byte) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
@@ -585,7 +586,7 @@ namespace art {
                 return nullptr;
             }
 
-            virtual Const_Node_ptr find(const byte &key_byte) const override {
+            virtual Const_Node_ptr find(const byte key_byte) const override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
@@ -594,7 +595,7 @@ namespace art {
                 return nullptr;
             }
 
-            virtual void update_child_ptr(const byte &key_byte, Node_ptr node) override {
+            virtual void update_child_ptr(const byte key_byte, Node_ptr node) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
@@ -764,7 +765,7 @@ namespace art {
                 }
             }
 
-            virtual void insert(const byte &key_byte, Node_ptr node) override {
+            virtual void insert(const byte key_byte, Node_ptr node) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
                 if (pos != this->_count) {
@@ -776,7 +777,7 @@ namespace art {
                 this->_count++;
             }
 
-            virtual void erase(const byte &key_byte) override {
+            virtual void erase(const byte key_byte) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
                 if (pos < this->_count) {
@@ -787,16 +788,7 @@ namespace art {
                 }
             }
 
-            virtual Node_ptr *find_ref(const byte &key_byte) override {
-                unsigned pos = 0;
-                for (; pos < this->_count && keys[pos] < key_byte; pos++);
-
-                if (pos < this->_count && keys[pos] == key_byte)
-                    return &children[pos];
-                return nullptr;
-            }
-
-            virtual Node_ptr find(const byte &key_byte) override {
+            virtual Node_ptr find(const byte key_byte) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
@@ -805,7 +797,7 @@ namespace art {
                 return nullptr;
             }
 
-            virtual Const_Node_ptr find(const byte &key_byte) const override {
+            virtual Const_Node_ptr find(const byte key_byte) const override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
@@ -814,7 +806,7 @@ namespace art {
                 return nullptr;
             }
 
-            virtual void update_child_ptr(const byte &key_byte, Node_ptr node) override {
+            virtual void update_child_ptr(const byte key_byte, Node_ptr node) override {
                 unsigned pos = 0;
                 for (; pos < this->_count && keys[pos] < key_byte; pos++);
 
@@ -990,7 +982,7 @@ namespace art {
                 }
             }
 
-            virtual void insert(const byte &key_byte, Node_ptr node) override {
+            virtual void insert(const byte key_byte, Node_ptr node) override {
                 unsigned pos = 0;
                 for (; children[pos] != nullptr; pos++);
                 child_index[key_byte] = pos;
@@ -998,32 +990,26 @@ namespace art {
                 this->_count++;
             }
 
-            virtual void erase(const byte &key_byte) override {
+            virtual void erase(const byte key_byte) override {
                 delete children[child_index[key_byte]];
                 children[child_index[key_byte]] = nullptr;
                 child_index[key_byte] = EMPTY_MARKER;
                 this->_count--;
             }
 
-            virtual Node_ptr *find_ref(const byte &key_byte) override {
-                if (child_index[key_byte] != EMPTY_MARKER)
-                    return &children[child_index[key_byte]];
-                return nullptr;
-            }
-
-            virtual Node_ptr find(const byte &key_byte) override {
+            virtual Node_ptr find(const byte key_byte) override {
                 if (child_index[key_byte] != EMPTY_MARKER)
                     return children[child_index[key_byte]];
                 return nullptr;
             }
 
-            virtual Const_Node_ptr find(const byte &key_byte) const override {
+            virtual Const_Node_ptr find(const byte key_byte) const override {
                 if (child_index[key_byte] != EMPTY_MARKER)
                     return children[child_index[key_byte]];
                 return nullptr;
             }
 
-            virtual void update_child_ptr(const byte &key_byte, Node_ptr node) override {
+            virtual void update_child_ptr(const byte key_byte, Node_ptr node) override {
                 if (child_index[key_byte] != EMPTY_MARKER)
                     children[child_index[key_byte]] = node;
             }
@@ -1181,36 +1167,30 @@ namespace art {
                 }
             }
 
-            virtual void insert(const byte &key_byte, Node_ptr node) override {
+            virtual void insert(const byte key_byte, Node_ptr node) override {
                 children[key_byte] = node;
                 this->_count++;
             }
 
-            virtual void erase(const byte &key_byte) override {
+            virtual void erase(const byte key_byte) override {
                 delete children[key_byte];
                 children[key_byte] = nullptr;
                 this->_count--;
             }
 
-            virtual Node_ptr *find_ref(const byte &key_byte) override {
-                if (children[key_byte] != nullptr)
-                    return &children[key_byte];
-                return nullptr;
-            }
-
-            virtual Node_ptr find(const byte &key_byte) override {
+            virtual Node_ptr find(const byte key_byte) override {
                 if (children[key_byte] != nullptr)
                     return children[key_byte];
                 return nullptr;
             }
 
-            virtual Const_Node_ptr find(const byte &key_byte) const override {
+            virtual Const_Node_ptr find(const byte key_byte) const override {
                 if (children[key_byte] != nullptr)
                     return children[key_byte];
                 return nullptr;
             }
 
-            virtual void update_child_ptr(const byte &key_byte, Node_ptr node) override {
+            virtual void update_child_ptr(const byte key_byte, Node_ptr node) override {
                 if (children[key_byte] != nullptr)
                     children[key_byte] = node;
             }
@@ -1666,6 +1646,7 @@ namespace art {
             _M_count = 0;
         }
 
+
         pair<iterator, bool> insert_unique(const value_type &__x) {
             Key transformed_key = {_M_key_transform(_KeyOfValue()(__x))};
             const auto key_size = sizeof(Key);
@@ -1727,6 +1708,7 @@ namespace art {
                             update_child_ptr(current_node->_parent, current_node, transformed_key);
                         }
                         depth += pos;
+
                         previous_node = current_node;
                         current_node = current_node->find(transformed_key.chunks[depth]);
                     }
@@ -1846,6 +1828,25 @@ namespace art {
             node->_depth += mismatch_pos + 1;
 
             return new_node;
+        }
+
+        void compress_node_into_child(_Node_4 *node, Inner_Node_ptr child) {
+            std::array<byte, MAX_PREFIX_LENGTH> prefix;
+
+            if (node->_prefix_length < MAX_PREFIX_LENGTH) {
+                std::move(child->_prefix.begin(),
+                          child->_prefix.begin() + (MAX_PREFIX_LENGTH - node->_prefix_length - 1),
+                          child->_prefix.begin() + node->_prefix_length + 1);
+                std::move(node->_prefix.begin(), node->_prefix.begin() + node->_prefix_length, child->_prefix.begin());
+                child->_prefix[node->_prefix_length] = node->keys[0];
+            } else {
+                std::move(node->_prefix.begin(), node->_prefix.end(), child->_prefix.begin());
+            }
+            child->_depth = node->_depth;
+            child->_prefix_length += node->_prefix_length + 1;
+            child->_parent = node->_parent;
+
+            delete node;
         }
 
         /**
@@ -2118,6 +2119,39 @@ namespace art {
             return node;
         }
 
+        /**
+         * @brief Attempts to shrink the node and recursively compresses one-way nodes into childs it.
+         * @param node  Node that might be shrunk and whose one-way parents are dropped.
+         * @param depth  Initial depth of the node.
+         * @param key  Key that was erased.
+         * @return A pointer to the unchanged or shrunk node.
+         */
+        Node_ptr shrink_after_erase_2(Node_ptr node, int32_t depth, const Key &key) {
+            // Parent of deleted leaf now underfull?
+            int32_t j = 1;
+            while (node->size() < node->min_size()) {
+                pair<Node_ptr, bool> p = shrink(node);
+
+                // Cannot shrink node 4 to leaf, because child is not a leaf
+                if (!p.second)
+                    return node;
+
+                node = p.first;
+
+                // Compress one-way node into child
+                while (node->size() == 1 && node->get_type() == node_type::node_4_t) {
+                    Node_ptr child = static_cast<_Node_4 *>(node)->children[0];
+
+                    if (child->get_type() != node_type::_leaf_t) {
+
+
+                    }
+                    node = child;
+                }
+            }
+            return node;
+        }
+
     public:
         void swap(adaptive_radix_tree &__x) {
             std::swap(_M_root, __x._M_root);
@@ -2151,7 +2185,7 @@ namespace art {
                 }
 
                 auto current_inner = static_cast<Inner_Node_ptr>(current_node);
-                auto pos = current_inner->prefix_mismatch_pos(transformed_key);
+                auto pos = current_inner->pes_prefix_mismatch_pos(transformed_key);
                 if (pos < current_inner->_prefix_length)
                     return end();
 
@@ -2182,7 +2216,7 @@ namespace art {
                 }
 
                 auto current_inner = static_cast<Const_Inner_Node_ptr>(current_node);
-                auto pos = current_inner->prefix_mismatch_pos(transformed_key);
+                auto pos = current_inner->pes_prefix_mismatch_pos(transformed_key);
                 if (pos < current_inner->_prefix_length)
                     return end();
 
@@ -2422,6 +2456,9 @@ namespace art {
                         Leaf_ptr child = static_cast<Leaf_ptr >(node4->children[0]);
                         delete node4;
                         return pair<Node_ptr, bool>(child, true);
+                    } else {
+                        // @TODO
+                        // compress_node_into_child(node4, static_cast<Inner_Node_ptr>(node4->children[0]));
                     }
                     return pair<Node_ptr, bool>(old_node, false);
                 }
