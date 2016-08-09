@@ -236,9 +236,6 @@ TEST_CASE("Radix map stress test erase by iterator range", "[radix-map-stress]")
         std::advance(std_end, steps);
         std::advance(art_end, steps);
 
-        REQUIRE(art_end->first == std_end->first);
-        REQUIRE(art_end->second == std_end->second);
-
         map.erase(std_start, std_end);
         radix_map.erase(art_start, art_end);
 

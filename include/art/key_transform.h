@@ -1,6 +1,7 @@
 #ifndef ART_KEY_TRANSFORM_H
 #define ART_KEY_TRANSFORM_H
 
+#include <stdint.h>
 #include <array>
 #include <utility>
 
@@ -145,18 +146,6 @@ namespace art {
             // identical keys could be different
             std::array<char, MAX_SIZE> transformed{};
             std::memcpy(&transformed, key.c_str(), key.size() + 1);
-
-            return transformed;
-        }
-    };
-
-    template<size_t MAX_SIZE>
-    struct key_transform<const char *, MAX_SIZE> {
-        std::array<char, MAX_SIZE> operator()(const char *key) const noexcept {
-            // make sure to initialize the whole array, otherwise the suffix of
-            // identical keys could be different
-            std::array<char, MAX_SIZE> transformed{};
-            std::memcpy(&transformed, key, strlen(key) + 1);
 
             return transformed;
         }

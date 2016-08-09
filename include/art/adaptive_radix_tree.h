@@ -5,10 +5,15 @@
 #include <stddef.h>
 #include <iterator>
 #include <utility>
-#include <iostream>
 #include <limits>
 #include <cstring>
 #include "key_transform.h"
+
+#ifdef ART_DEBUG
+
+#include <iostream>
+
+#endif
 
 namespace art {
     using std::pair;
@@ -116,7 +121,11 @@ namespace art {
 
             virtual Const_Base_Leaf_ptr predecessor(const Key &key) const = 0;
 
+#ifdef ART_DEBUG
+
             virtual void debug() const = 0;
+
+#endif
         };
 
         struct _Inner_Node : public _Node {
@@ -203,6 +212,8 @@ namespace art {
                 return _prefix_length;
             }
 
+#ifdef ART_DEBUG
+
             void debug_prefix() const {
                 std::cout << "Prefix " << this->_prefix_length << ": ";
                 for (uint16_t i = 0; i < std::min((size_t) this->_prefix_length, MAX_PREFIX_LENGTH); i++) {
@@ -216,6 +227,8 @@ namespace art {
                 }
                 std::cout << std::endl;
             }
+
+#endif
 
             virtual void clear() = 0;
 
@@ -237,9 +250,9 @@ namespace art {
 
             virtual Const_Base_Leaf_ptr maximum() const = 0;
 
-            virtual bool is_leaf() const { return false; }
+            virtual bool is_leaf() const override { return false; }
 
-            virtual uint16_t size() const { return _count; }
+            virtual uint16_t size() const override { return _count; }
 
             virtual uint16_t min_size() const = 0;
 
@@ -255,7 +268,11 @@ namespace art {
 
             virtual Const_Base_Leaf_ptr predecessor(const Key &key) const = 0;
 
+#ifdef ART_DEBUG
+
             virtual void debug() const = 0;
+
+#endif
         };
 
         struct _Base_Leaf : public _Node {
@@ -298,9 +315,13 @@ namespace art {
 
             virtual node_type get_type() const override { return node_type::_leaf_t; }
 
+#ifdef ART_DEBUG
+
             virtual void debug() const override {
                 std::cout << this << " Base Leaf: " << ", parent " << this->_parent << std::endl;
             }
+
+#endif
         };
 
         struct _Leaf : public _Base_Leaf {
@@ -364,10 +385,14 @@ namespace art {
 
             virtual node_type get_type() const override { return node_type::_leaf_t; }
 
+#ifdef ART_DEBUG
+
             virtual void debug() const override {
                 std::cout << this << " Leaf: "
                           << ", parent " << this->_parent << std::endl;
             }
+
+#endif
         };
 
         /**
@@ -456,9 +481,13 @@ namespace art {
 
             virtual node_type get_type() const override { return node_type::_dummy_node_t; }
 
+#ifdef ART_DEBUG
+
             virtual void debug() const override {
                 std::cout << "Dummy Node debug" << std::endl;
             }
+
+#endif
 
             ~_Dummy_Node() {
                 delete _leaf;
@@ -665,6 +694,8 @@ namespace art {
 
             virtual node_type get_type() const override { return node_type::node_4_t; }
 
+#ifdef ART_DEBUG
+
             virtual void debug() const override {
                 std::cout << this << " Node 4, depth: " << this->_depth
                           << " count: " << this->size()
@@ -682,6 +713,8 @@ namespace art {
                     std::cout << std::endl;
                 }
             }
+
+#endif
         };
 
         struct _Node_16 : public _Inner_Node {
@@ -876,6 +909,8 @@ namespace art {
 
             virtual node_type get_type() const override { return node_type::node_16_t; }
 
+#ifdef ART_DEBUG
+
             virtual void debug() const override {
                 std::cout << this << " Node 16, depth: " << this->_depth
                           << " count: " << this->size()
@@ -891,6 +926,8 @@ namespace art {
                 }
                 std::cout << std::endl;
             }
+
+#endif
         };
 
 
@@ -1080,6 +1117,8 @@ namespace art {
 
             virtual node_type get_type() const override { return node_type::node_48_t; }
 
+#ifdef ART_DEBUG
+
             virtual void debug() const override {
                 std::cout << this << " Node 48, depth: " << this->_depth
                           << " count: " << this->size()
@@ -1097,6 +1136,8 @@ namespace art {
                 }
                 std::cout << std::endl;
             }
+
+#endif
         };
 
         struct _Node_256 : public _Inner_Node {
@@ -1261,6 +1302,8 @@ namespace art {
 
             virtual node_type get_type() const override { return node_type::node_256_t; }
 
+#ifdef ART_DEBUG
+
             virtual void debug() const override {
                 std::cout << this << " Node 256, depth: " << this->_depth
                           << " count: " << this->size()
@@ -1282,6 +1325,8 @@ namespace art {
                 }
                 std::cout << std::endl;
             }
+
+#endif
         };
 
     private:
@@ -1818,7 +1863,6 @@ namespace art {
                                                     ((int32_t) node->_prefix_length) - (mismatch_pos + 1));
                 const auto end = start + prefix_length;
 
-
                 std::copy(std::begin(min_key.chunks) + start,
                           std::begin(min_key.chunks) + end,
                           node->_prefix.begin());
@@ -1830,23 +1874,41 @@ namespace art {
             return new_node;
         }
 
-        void compress_node_into_child(_Node_4 *node, Inner_Node_ptr child) {
+        /**
+         * @brief Removes a one-way node and moves its prefix and key into its only child.
+         * @param node  Pointer to one-way node that will be removed.
+         * @param child Pointer to only child of the one-way node.
+         */
+        Node_ptr compress_node_into_child(_Node_4 *node) {
             std::array<byte, MAX_PREFIX_LENGTH> prefix;
 
-            if (node->_prefix_length < MAX_PREFIX_LENGTH) {
-                std::move(child->_prefix.begin(),
-                          child->_prefix.begin() + (MAX_PREFIX_LENGTH - node->_prefix_length - 1),
-                          child->_prefix.begin() + node->_prefix_length + 1);
-                std::move(node->_prefix.begin(), node->_prefix.begin() + node->_prefix_length, child->_prefix.begin());
-                child->_prefix[node->_prefix_length] = node->keys[0];
+            Node_ptr child = node->children[0];
+
+            if (child->get_type() == node_type::_leaf_t) {
+                child->_parent = node->_parent;
+                if (node->_depth == 0)
+                    replace_root(child);
             } else {
-                std::move(node->_prefix.begin(), node->_prefix.end(), child->_prefix.begin());
+                auto child_inner = static_cast<Inner_Node_ptr>(child);
+                if (node->_prefix_length < MAX_PREFIX_LENGTH) {
+                    // shift existing prefix to the right
+                    std::move(child_inner->_prefix.begin(),
+                              child_inner->_prefix.begin() + (MAX_PREFIX_LENGTH - node->_prefix_length - 1),
+                              child_inner->_prefix.begin() + node->_prefix_length + 1);
+                    // move prefix and key of node into the child
+                    std::move(node->_prefix.begin(), node->_prefix.begin() + node->_prefix_length,
+                              child_inner->_prefix.begin());
+                    child_inner->_prefix[node->_prefix_length] = node->keys[0];
+                } else {
+                    std::move(node->_prefix.begin(), node->_prefix.end(), child_inner->_prefix.begin());
+                }
+                child_inner->_depth = node->_depth;
+                child_inner->_prefix_length += node->_prefix_length + 1;
+                child_inner->_parent = node->_parent;
             }
-            child->_depth = node->_depth;
-            child->_prefix_length += node->_prefix_length + 1;
-            child->_parent = node->_parent;
 
             delete node;
+            return child;
         }
 
         /**
@@ -1866,10 +1928,6 @@ namespace art {
                 const int32_t depth = inner_parent->_depth + inner_parent->_prefix_length;
                 inner_parent->update_child_ptr(key.chunks[depth], child);
             }
-        }
-
-        void compress_one_way_node_into_child(Node_ptr node) {
-
         }
 
         /**
@@ -2063,93 +2121,22 @@ namespace art {
 
     private:
         /**
-         * @brief Shrink node if necessary and delete obsolete nodes above.
+         * @brief Shrink node if necessary and compress one-way node into node below.
          * @param node  Pointer to node where erasure took place.
          * @param transformed_key  Key that was erased.
          */
-        void fix_after_erase(Inner_Node_ptr node, const Key &transformed_key) {
-            Node_ptr shrunk_node = shrink_after_erase(node, node->_depth, transformed_key);
-
-            // Node wasn't changed
-            if (shrunk_node == node)
-                return;
-
-            update_child_ptr(shrunk_node->_parent, shrunk_node, transformed_key);
-        }
-
-        /**
-         * @brief Attempts to shrink the node and recursively remove one-way parents above it.
-         * @param node  Node that might be shrunk and whose one-way parents are dropped.
-         * @param depth  Initial depth of the node.
-         * @param key  Key that was erased.
-         * @return A pointer to the unchanged or shrunk node.
-         */
-        Node_ptr shrink_after_erase(Node_ptr node, int32_t depth, const Key &key) {
-            // Parent of deleted leaf now underfull?
-            int32_t j = 1;
-            while (node->size() < node->min_size()) {
+        void fix_after_erase(Node_ptr node, const Key &transformed_key) {
+            if (node->size() < node->min_size()) {
                 pair<Node_ptr, bool> p = shrink(node);
 
-                // Cannot shrink node 4 to leaf, because child is not a leaf
-                if (!p.second)
-                    return node;
-
                 node = p.first;
-
-                // As long as the node above the leaf is a one-way node, compress path
-                while (node->is_leaf() && node->_parent->size() <= 1 && depth - j >= -1) {
-                    Node_ptr parent = node->_parent;
-                    if (parent->get_type() == node_type::_dummy_node_t) {
-                        node->_parent = _M_dummy_node;
-                        return node;
-                    }
-
-                    Node_ptr grandparent = parent->_parent;
-                    if (grandparent->get_type() == node_type::_dummy_node_t) {
-                        node->_parent = _M_dummy_node;
-                        delete parent;
-                        return node;
-                    }
-                    grandparent->update_child_ptr(key.chunks[depth - j - 1], node);
-                    node->_parent = grandparent;
-                    delete parent;
-                    j++;
-                }
+                update_child_ptr(node->_parent, node, transformed_key);
             }
-            return node;
-        }
 
-        /**
-         * @brief Attempts to shrink the node and recursively compresses one-way nodes into childs it.
-         * @param node  Node that might be shrunk and whose one-way parents are dropped.
-         * @param depth  Initial depth of the node.
-         * @param key  Key that was erased.
-         * @return A pointer to the unchanged or shrunk node.
-         */
-        Node_ptr shrink_after_erase_2(Node_ptr node, int32_t depth, const Key &key) {
-            // Parent of deleted leaf now underfull?
-            int32_t j = 1;
-            while (node->size() < node->min_size()) {
-                pair<Node_ptr, bool> p = shrink(node);
-
-                // Cannot shrink node 4 to leaf, because child is not a leaf
-                if (!p.second)
-                    return node;
-
-                node = p.first;
-
-                // Compress one-way node into child
-                while (node->size() == 1 && node->get_type() == node_type::node_4_t) {
-                    Node_ptr child = static_cast<_Node_4 *>(node)->children[0];
-
-                    if (child->get_type() != node_type::_leaf_t) {
-
-
-                    }
-                    node = child;
-                }
+            if (node->get_type() == node_type::node_4_t && node->size() == 1) {
+                node = compress_node_into_child(static_cast<_Node_4*>(node));
+                update_child_ptr(node->_parent, node, transformed_key);
             }
-            return node;
         }
 
     public:
