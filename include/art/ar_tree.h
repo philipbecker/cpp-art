@@ -21,7 +21,6 @@ namespace art {
 
     typedef uint8_t byte;
 
-
     template<typename _Key, typename _Value, typename _KeyOfValue,
             typename _Key_transform = key_transform <_Key> >
     struct ar_tree {
@@ -49,7 +48,7 @@ namespace art {
         typedef _Leaf *Leaf_ptr;
         typedef const _Leaf *Const_Leaf_ptr;
 
-        static const byte EMPTY_MARKER = 63;
+        static const byte EMPTY_MARKER;
 
         enum node_type : uint8_t {
             _leaf_t = 0, node_4_t = 1, node_16_t = 2,
@@ -152,49 +151,9 @@ namespace art {
                 return *this;
             }
 
-            virtual void clear() = 0;
-
-            virtual void insert(const byte key_byte, Node_ptr node) = 0;
-
-            virtual void erase(const byte key_byte) = 0;
-
-            virtual Node_ptr find(const byte key_byte) = 0;
-
-            virtual Const_Node_ptr find(const byte key_byte) const = 0;
-
-            virtual void update_child_ptr(const byte key_byte, Node_ptr node) = 0;
-
-            virtual Base_Leaf_ptr minimum() = 0;
-
-            virtual Const_Base_Leaf_ptr minimum() const = 0;
-
-            virtual Base_Leaf_ptr maximum() = 0;
-
-            virtual Const_Base_Leaf_ptr maximum() const = 0;
-
             virtual bool is_leaf() const override { return false; }
 
             virtual uint16_t size() const override { return _count; }
-
-            virtual uint16_t min_size() const = 0;
-
-            virtual uint16_t max_size() const = 0;
-
-            virtual node_type get_type() const = 0;
-
-            virtual Base_Leaf_ptr successor(const Key &key) = 0;
-
-            virtual Const_Base_Leaf_ptr successor(const Key &key) const = 0;
-
-            virtual Base_Leaf_ptr predecessor(const Key &key) = 0;
-
-            virtual Const_Base_Leaf_ptr predecessor(const Key &key) const = 0;
-
-#ifdef ART_DEBUG
-
-            virtual void debug() const = 0;
-
-#endif
         };
 
         struct _Base_Leaf : public _Node {
@@ -2251,6 +2210,9 @@ namespace art {
             throw; // unreachable
         }
     };
+
+    template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
+    const byte ar_tree<_Key, _Tp, _KeyOfValue, _Key_transform>::EMPTY_MARKER = 63;
 
     //////////////////////////
     // Relational Operators //
