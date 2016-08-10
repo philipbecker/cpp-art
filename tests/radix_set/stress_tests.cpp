@@ -202,3 +202,25 @@ TEST_CASE("Radix set stress test lower & upper bound", "[radix-set-stress]") {
         }
     }
 }
+
+TEST_CASE("Radix set stress test 16 byte pair", "[radix-set-stress]") {
+    std::set<std::pair<uint64_t, uint64_t> > set;
+    art::radix_set<std::pair<uint64_t, uint64_t> > radix_set;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<uint64_t> dis(0, std::numeric_limits<uint64_t>::max());
+
+    for (int i = 0; i < 10000; i++) {
+        auto first = dis(gen);
+        auto second = dis(gen);
+        auto std_res = set.insert(std::make_pair(first, second));
+        auto radix_res = radix_set.insert(std::make_pair(first, second));
+        REQUIRE(radix_res.second == std_res.second);
+    }
+
+    SECTION ("maps are equal") {
+        REQUIRE(radix_set.size() == set.size());
+        REQUIRE(std::equal(set.begin(), set.end(), radix_set.begin()));
+    }
+}

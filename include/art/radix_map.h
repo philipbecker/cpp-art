@@ -1,12 +1,12 @@
 #ifndef REFERENCE_ART_MAP_H
 #define REFERENCE_ART_MAP_H
 
-#include "adaptive_radix_tree.h"
+#include <type_traits>
+#include "ar_prefix_tree.h"
+#include "ar_tree.h"
 
-namespace art
-{
-    namespace detail
-    {
+namespace art {
+    namespace detail {
         template<typename _Pair>
         struct Select1st : public std::unary_function<_Pair, typename _Pair::first_type> {
 
@@ -43,7 +43,7 @@ namespace art
         typedef _Key key_type;
         typedef _T mapped_type;
         typedef std::pair<const _Key, _T> value_type;
-        typedef _Key_transform key_transformer;
+        typedef _Key_transform key_transformer_type;
         //typedef _Alloc allocator_type;
         typedef value_type &reference;
         typedef const value_type &const_reference;
@@ -51,8 +51,16 @@ namespace art
     private:
         //typedef typename _Alloc::value_type _Alloc_value_type;
 
-        typedef adaptive_radix_tree<key_type, value_type,
-                detail::Select1st<value_type>, _Key_transform> _Rep_type;
+        /**
+         * Switch between art implementation with and without path compression
+         * (prefixes in nodes) based on (transformed) key length. For short keys,
+         * the cost of handling prefixes outweigh the benefits.
+         */
+        typedef typename std::conditional<sizeof(decltype(_Key_transform()(_Key()))) <= 6,
+                ar_tree<key_type, value_type,
+                        detail::Select1st<value_type>, _Key_transform>,
+                ar_prefix_tree<key_type, value_type,
+                        detail::Select1st<value_type>, _Key_transform>>::type _Rep_type;
 
         _Rep_type _M_t;
 
@@ -80,7 +88,7 @@ namespace art
                     : key_transformer(__key_transformer) {}
 
         public:
-            typedef typename adaptive_radix_tree<_Key, _T, _Key_transform>::Key transformed_key_type;
+            typedef typename ar_prefix_tree<_Key, _T, _Key_transform>::Key transformed_key_type;
 
             bool operator()(const value_type &__x, const value_type &__y) const {
                 transformed_key_type x_key = {key_transformer(__x.first)};
@@ -314,10 +322,10 @@ namespace art
             // @TODO more efficient to write extra method to avoid 2 lookups
             iterator it = _M_t.find(__k);
             if (it != _M_t.end())
-                return (*it).second;
+                return it->second;
 
             std::pair<iterator, bool> res = _M_t.emplace_unique(__k, mapped_type());
-            return (*res.first).second;
+            return res.first->second;
         }
 
         /**

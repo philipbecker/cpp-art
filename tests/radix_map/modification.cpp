@@ -20,8 +20,27 @@ SCENARIO("given an empty art", "[radix-map]") {
             REQUIRE(art.find(5)->second == 27);
         }
 
-        AND_WHEN("the same element is inserted again") {
-            auto p = art.insert(std::make_pair(5, 27));
+        AND_WHEN("the same key is inserted again") {
+            auto p = art.insert(std::make_pair(5, 40));
+            THEN("the insertion failed and its size is still 1") {
+                REQUIRE_FALSE(p.second);
+                REQUIRE(art.size() == 1);
+                REQUIRE(art.find(5) != art.end());
+                REQUIRE(art.find(5)->second == 27);
+            }
+        }
+    }
+    WHEN("an element is emplaced") {
+        art.emplace(5, 27);
+        THEN("its size is 1 and the inserted value is correct") {
+            REQUIRE(art.size() == 1);
+            REQUIRE_FALSE(art.empty());
+            REQUIRE(art.find(5) != art.end());
+            REQUIRE(art.find(5)->second == 27);
+        }
+
+        AND_WHEN("the same key is inserted again") {
+            auto p = art.emplace(5, 40);
             THEN("the insertion failed and its size is still 1") {
                 REQUIRE_FALSE(p.second);
                 REQUIRE(art.size() == 1);
@@ -259,8 +278,8 @@ TEST_CASE("Operator at", "[radix-map]") {
             map.at(k) = i;
             art.at(k) = i;
             REQUIRE(art.at(k) == map.at(k));
-            REQUIRE((*art.find(k)).first == (*map.find(k)).first);
-            REQUIRE((*art.find(k)).second == (*map.find(k)).second);
+            REQUIRE(art.find(k)->first == map.find(k)->first);
+            REQUIRE(art.find(k)->second == map.find(k)->second);
         } else {
             // Key not in map, expect out of range exception
             REQUIRE_THROWS(art.at(k));

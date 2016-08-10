@@ -1,11 +1,13 @@
 #ifndef ART_KEY_TRANSFORM_H
 #define ART_KEY_TRANSFORM_H
 
+#include <stdint.h>
+#include <cstring>
 #include <array>
 #include <utility>
 
-namespace art
-{
+
+namespace art {
     inline uint16_t byte_swap(uint16_t __val) {
         return (__val << 8) | (__val >> 8);
     }
@@ -41,7 +43,7 @@ namespace art
         return !(*(char *) &num == 1);
     }
 
-    template<typename _Key>
+    template<typename _Key, size_t MAX_SIZE = 256>
     struct key_transform;
 
     // Unsigned integers are already binary comparable.
@@ -117,9 +119,12 @@ namespace art
         key_transform<T1> first;
         key_transform<T2> second;
 
-        typedef std::array<uint8_t, sizeof(T1) + sizeof(T2)> transformed_type;
+        typedef std::array<uint8_t,
+                sizeof(decltype(key_transform<T1>()(T1()))) +
+                sizeof(decltype(key_transform<T2>()(T2())))> transformed_type;
     public:
         key_transform() : first(), second() {}
+
         transformed_type operator()(const std::pair<T1, T2> &key) {
             transformed_type transformed_key;
             auto transformed1 = first(key.first);
@@ -132,6 +137,19 @@ namespace art
                       static_cast<const char *>(static_cast<const void *>(&transformed2)) + sizeof(transformed2),
                       transformed_key.begin() + sizeof(transformed1));
             return transformed_key;
+        }
+    };
+
+    // fixed size ascii string transform
+    template<size_t MAX_SIZE>
+    struct key_transform<std::string, MAX_SIZE> {
+        std::array<char, MAX_SIZE> operator()(const std::string &key) const noexcept {
+            // make sure to initialize the whole array, otherwise the suffix of
+            // identical keys could be different
+            std::array<char, MAX_SIZE> transformed{};
+            std::memcpy(&transformed, key.c_str(), key.size() + 1);
+
+            return transformed;
         }
     };
 }

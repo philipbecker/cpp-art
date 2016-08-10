@@ -102,3 +102,51 @@ TEST_CASE("Pairs of supported keys are supported", "[art]") {
     REQUIRE(set.size() == v.size());
     REQUIRE(std::equal(v.begin(), v.end(), set.begin()));
 }
+
+TEST_CASE("Type short as key is supported", "[art]") {
+    art::radix_set<short> set;
+
+    short k = 100;
+    auto p = set.insert(k);
+    REQUIRE(p.second);
+}
+
+TEST_CASE("Type unsigned short as key is supported", "[art]") {
+    art::radix_set<unsigned short> set;
+
+    unsigned short k = 200;
+    auto p = set.insert(k);
+    REQUIRE(p.second);
+}
+
+TEST_CASE("Type int as key is supported", "[art]") {
+    art::radix_set<int> set;
+
+    int k = 100;
+    auto p = set.insert(k);
+    REQUIRE(p.second);
+}
+
+TEST_CASE("Type unsigned int as key is supported", "[art]") {
+    art::radix_set<unsigned int> set;
+
+    unsigned int k = 200;
+    auto p = set.insert(k);
+    REQUIRE(p.second);
+}
+
+TEST_CASE("Type long as key is supported", "[art]") {
+    art::radix_set<long> set;
+
+    long k = 100;
+    auto p = set.insert(k);
+    REQUIRE(p.second);
+}
+
+TEST_CASE("Type unsigned long as key is supported", "[art]") {
+    art::radix_set<unsigned long> set;
+
+    unsigned long k = 200;
+    auto p = set.insert(k);
+    REQUIRE(p.second);
+}
