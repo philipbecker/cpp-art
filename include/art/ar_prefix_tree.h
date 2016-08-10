@@ -1,12 +1,12 @@
-#ifndef ART_ADAPT_RADIX_TREE_H
-#define ART_ADAPT_RADIX_TREE_H
+#ifndef ART_AR_PREFIX_TREE_H
+#define ART_AR_PREFIX_TREE_H
 
 #include <array>
+#include <cstring>
 #include <stddef.h>
 #include <iterator>
 #include <utility>
 #include <limits>
-#include <cstring>
 #include "key_transform.h"
 
 #ifdef ART_DEBUG
@@ -20,12 +20,11 @@ namespace art {
     using std::make_pair;
 
     typedef uint8_t byte;
-    static const byte EMPTY_MARKER = 63;
-    static const size_t MAX_PREFIX_LENGTH = 8;
+
 
     template<typename _Key, typename _Value, typename _KeyOfValue,
             typename _Key_transform = key_transform<_Key> >
-    struct adaptive_radix_tree {
+    struct ar_prefix_tree {
     public:
         // Forward declaration for typedefs
         struct _Node;
@@ -49,6 +48,9 @@ namespace art {
         typedef const _Base_Leaf *Const_Base_Leaf_ptr;
         typedef _Leaf *Leaf_ptr;
         typedef const _Leaf *Const_Leaf_ptr;
+
+        static const byte EMPTY_MARKER = 63;
+        static const size_t MAX_PREFIX_LENGTH = 8;
 
         enum node_type : uint8_t {
             _leaf_t = 0, node_4_t = 1, node_16_t = 2,
@@ -536,6 +538,22 @@ namespace art {
             _Node_4(const _Node_4 &__x)
                     : _Inner_Node(__x._parent, __x._count, __x._depth, __x._prefix_length, __x._prefix),
                       keys(__x.keys) {
+                copy_children(__x);
+            }
+
+            // Copy assignment
+            _Node_4 &operator=(const _Node_4 &__x) {
+                this->_parent = __x._parent;
+                this->_count = __x._count;
+                this->_depth = __x._depth;
+                this->_prefix_length = __x._prefix_length;
+                this->_prefix = __x._prefix;
+                keys = __x.keys;
+                copy_children(__x);
+                return *this;
+            }
+
+            void copy_children(const _Node_4 &__x) {
                 for (int i = 0; i < __x._count; i++) {
                     switch (__x.children[i]->get_type()) {
                         case node_type::node_4_t:
@@ -562,18 +580,6 @@ namespace art {
                             throw;
                     }
                 }
-            }
-
-            // Copy assignment
-            _Node_4 &operator=(const _Node_4 &__x) {
-                this->_parent = __x._parent;
-                this->_count = __x._count;
-                this->_depth = __x._depth;
-                this->_prefix_length = __x._prefix_length;
-                this->_prefix = __x._prefix;
-                keys = __x.keys;
-                children = __x.children;
-                return *this;
             }
 
             void clear() override {
@@ -750,6 +756,22 @@ namespace art {
             _Node_16(const _Node_16 &__x)
                     : _Inner_Node(__x._parent, __x._count, __x._depth, __x._prefix_length, __x._prefix),
                       keys(__x.keys) {
+                copy_children(__x);
+            }
+
+            // Copy assignment
+            _Node_16 &operator=(const _Node_16 &__x) {
+                this->_parent = __x._parent;
+                this->_count = __x._count;
+                this->_depth = __x._depth;
+                this->_prefix_length = __x._prefix_length;
+                this->_prefix = __x._prefix;
+                keys = __x.keys;
+                copy_children(__x);
+                return *this;
+            }
+
+            void copy_children(const _Node_16 &__x) {
                 for (int i = 0; i < __x._count; i++) {
                     switch (__x.children[i]->get_type()) {
                         case node_type::node_4_t:
@@ -777,18 +799,6 @@ namespace art {
                             break;
                     }
                 }
-            }
-
-            // Copy assignment
-            _Node_16 &operator=(const _Node_16 &__x) {
-                this->_parent = __x._parent;
-                this->_count = __x._count;
-                this->_depth = __x._depth;
-                this->_prefix_length = __x._prefix_length;
-                this->_prefix = __x._prefix;
-                keys = __x.keys;
-                children = __x.children;
-                return *this;
             }
 
             void clear() override {
@@ -967,6 +977,22 @@ namespace art {
             // Copy constructor
             _Node_48(const _Node_48 &__x)
                     : _Inner_Node(__x._parent, __x._count, __x._depth), child_index(__x.child_index) {
+                copy_children(__x);
+            }
+
+            // Copy assignment
+            _Node_48 &operator=(const _Node_48 &__x) {
+                this->_parent = __x._parent;
+                this->_count = __x._count;
+                this->_depth = __x._depth;
+                this->_prefix_length = __x._prefix_length;
+                this->_prefix = __x._prefix;
+                child_index = __x.child_index;
+                copy_children(__x);
+                return *this;
+            }
+
+            void copy_children(const _Node_48 &__x) {
                 for (int i = 0; i < 256; i++) {
                     if (__x.child_index[i] != EMPTY_MARKER) {
                         switch (__x.children[child_index[i]]->get_type()) {
@@ -996,18 +1022,6 @@ namespace art {
                         }
                     }
                 }
-            }
-
-            // Copy assignment
-            _Node_48 &operator=(const _Node_48 &__x) {
-                this->_parent = __x._parent;
-                this->_count = __x._count;
-                this->_depth = __x._depth;
-                this->_prefix_length = __x._prefix_length;
-                this->_prefix = __x._prefix;
-                child_index = __x.child_index;
-                children = __x.children;
-                return *this;
             }
 
             void clear() override {
@@ -1158,6 +1172,21 @@ namespace art {
             // Copy constructor
             _Node_256(const _Node_256 &__x)
                     : _Inner_Node(__x._parent, __x._count, __x._depth, __x._prefix_length, __x._prefix) {
+                copy_children(__x);
+            }
+
+            // Copy assignment
+            _Node_256 &operator=(const _Node_256 &__x) {
+                this->_parent = __x._parent;
+                this->_count = __x._count;
+                this->_depth = __x._depth;
+                this->_prefix_length = __x._prefix_length;
+                this->_prefix = __x._prefix;
+                copy_children(__x);
+                return *this;
+            }
+
+            void copy_children(const _Node_256 &__x) {
                 for (int i = 0; i < 256; i++) {
                     if (__x.children[i] != nullptr) {
                         switch (__x.children[i]->get_type()) {
@@ -1187,16 +1216,6 @@ namespace art {
                         }
                     }
                 }
-            }
-
-            // Copy assignment
-            _Node_256 &operator=(const _Node_256 &__x) {
-                this->_count = __x._count;
-                this->_parent = __x._parent;
-                this->_prefix_length = __x._prefix_length;
-                this->_prefix = __x._prefix;
-                children = __x.children;
-                return *this;
             }
 
             void clear() override {
@@ -1341,17 +1360,17 @@ namespace art {
         Node_ptr _M_root;
 
         // Default constructor
-        adaptive_radix_tree() {
+        ar_prefix_tree() {
             init();
         }
 
-        adaptive_radix_tree(const _Key_transform &key_transformer)
+        ar_prefix_tree(const _Key_transform &key_transformer)
                 : _M_key_transform(key_transformer) {
             init();
         }
 
         // Copy constructor
-        adaptive_radix_tree(const adaptive_radix_tree &__x) {
+        ar_prefix_tree(const ar_prefix_tree &__x) {
             if (__x.empty()) {
                 // Nothing to copy
                 init();
@@ -1368,7 +1387,7 @@ namespace art {
         }
 
         // Move constructor
-        adaptive_radix_tree(adaptive_radix_tree &&__x) {
+        ar_prefix_tree(ar_prefix_tree &&__x) {
             _M_root = std::move(__x._M_root);
             _M_count = std::move(__x._M_count);
             _M_key_transform = std::move(__x._M_key_transform);
@@ -1385,7 +1404,7 @@ namespace art {
         }
 
         // Copy assignment
-        adaptive_radix_tree &operator=(const adaptive_radix_tree &__x) {
+        ar_prefix_tree &operator=(const ar_prefix_tree &__x) {
             if (this != &__x) {
                 // remove old container contents
                 clear();
@@ -1408,7 +1427,7 @@ namespace art {
         }
 
         // Move assignment
-        adaptive_radix_tree &operator=(adaptive_radix_tree &&__x) {
+        ar_prefix_tree &operator=(ar_prefix_tree &&__x) {
             _M_root = std::move(__x._M_root);
             _M_count = std::move(__x._M_count);
             _M_key_transform = std::move(__x._M_key_transform);
@@ -1468,7 +1487,7 @@ namespace art {
         // Iterators //
         ///////////////
 
-        struct adapt_radix_tree_iterator {
+        struct ar_prefix_tree_iterator {
             typedef _Value value_type;
             typedef value_type &reference;
             typedef value_type *pointer;
@@ -1476,15 +1495,15 @@ namespace art {
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
 
-            typedef adapt_radix_tree_iterator _Self;
+            typedef ar_prefix_tree_iterator _Self;
 
             // pointer to current leaf node
             Base_Leaf_ptr node;
 
-            adapt_radix_tree_iterator() : node(nullptr) {}
+            ar_prefix_tree_iterator() : node(nullptr) {}
 
 
-            adapt_radix_tree_iterator(Base_Leaf_ptr node)
+            ar_prefix_tree_iterator(Base_Leaf_ptr node)
                     : node(node) {
             }
 
@@ -1543,28 +1562,28 @@ namespace art {
             }
         };
 
-        struct adapt_radix_tree_const_iterator {
+        struct ar_prefix_tree_const_iterator {
             typedef _Value value_type;
             typedef const value_type &reference;
             typedef const value_type *pointer;
 
-            typedef adapt_radix_tree_iterator iterator;
+            typedef ar_prefix_tree_iterator iterator;
 
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
 
-            typedef adapt_radix_tree_const_iterator _Self;
+            typedef ar_prefix_tree_const_iterator _Self;
 
             // pointer to current leaf node
             Const_Base_Leaf_ptr node;
 
-            adapt_radix_tree_const_iterator() : node(nullptr) {}
+            ar_prefix_tree_const_iterator() : node(nullptr) {}
 
             // Copy Constructor
-            adapt_radix_tree_const_iterator(const iterator &__it)
+            ar_prefix_tree_const_iterator(const iterator &__it)
                     : node(__it.node) {}
 
-            explicit adapt_radix_tree_const_iterator(Const_Base_Leaf_ptr node)
+            explicit ar_prefix_tree_const_iterator(Const_Base_Leaf_ptr node)
                     : node(node) {
             }
 
@@ -1628,8 +1647,8 @@ namespace art {
             }
         };
 
-        typedef adapt_radix_tree_iterator iterator;
-        typedef adapt_radix_tree_const_iterator const_iterator;
+        typedef ar_prefix_tree_iterator iterator;
+        typedef ar_prefix_tree_const_iterator const_iterator;
         typedef std::reverse_iterator<iterator> reverse_iterator;
         typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
         typedef size_t size_type;
@@ -2134,13 +2153,13 @@ namespace art {
             }
 
             if (node->get_type() == node_type::node_4_t && node->size() == 1) {
-                node = compress_node_into_child(static_cast<_Node_4*>(node));
+                node = compress_node_into_child(static_cast<_Node_4 *>(node));
                 update_child_ptr(node->_parent, node, transformed_key);
             }
         }
 
     public:
-        void swap(adaptive_radix_tree &__x) {
+        void swap(ar_prefix_tree &__x) {
             std::swap(_M_root, __x._M_root);
             std::swap(_M_count, __x._M_count);
             std::swap(_M_dummy_node, __x._M_dummy_node);
@@ -2398,7 +2417,7 @@ namespace art {
             return nullptr;
         }
 
-        ~adaptive_radix_tree() {
+        ~ar_prefix_tree() {
             clear();
             delete _M_dummy_node;
         }
@@ -2443,9 +2462,6 @@ namespace art {
                         Leaf_ptr child = static_cast<Leaf_ptr >(node4->children[0]);
                         delete node4;
                         return pair<Node_ptr, bool>(child, true);
-                    } else {
-                        // @TODO
-                        // compress_node_into_child(node4, static_cast<Inner_Node_ptr>(node4->children[0]));
                     }
                     return pair<Node_ptr, bool>(old_node, false);
                 }
@@ -2480,8 +2496,8 @@ namespace art {
 
     template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator==(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &lhs,
-               const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &rhs) {
+    operator==(const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &lhs,
+               const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &rhs) {
         return lhs.size() == rhs.size()
                && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
@@ -2489,15 +2505,15 @@ namespace art {
     // Based on operator==
     template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator!=(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &lhs,
-               const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &rhs) {
+    operator!=(const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &lhs,
+               const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &rhs) {
         return !(lhs == rhs);
     }
 
     template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator<(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
-              const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
+    operator<(const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
+              const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
         return std::lexicographical_compare(__x.begin(), __x.end(),
                                             __y.begin(), __y.end());
     }
@@ -2505,28 +2521,28 @@ namespace art {
     // Based on operator<
     template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator>(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
-              const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
+    operator>(const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
+              const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
         return __y < __x;
     }
 
     // Based on operator<
     template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator<=(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
-               const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
+    operator<=(const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
+               const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
         return !(__y < __x);
     }
 
     // Based on operator<
     template<typename _Key, typename _Tp, typename _KeyOfValue, typename _Key_transform>
     inline bool
-    operator>=(const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
-               const adaptive_radix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
+    operator>=(const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__x,
+               const ar_prefix_tree<_Key, _Tp, _KeyOfValue, _Key_transform> &__y) {
         return !(__x < __y);
     }
 
 }
 
 
-#endif //ART_ADAPT_RADIX_TREE_H
+#endif //ART_AR_PREFIX_TREE_H

@@ -1,12 +1,12 @@
 #ifndef ART_RADIX_SET_H
 #define ART_RADIX_SET_H
 
-#include "art/adaptive_radix_tree.h"
+#include <type_traits>
+#include "art/ar_prefix_tree.h"
+#include "art/ar_tree.h"
 
-namespace art
-{
-    namespace detail
-    {
+namespace art {
+    namespace detail {
         template<typename T>
         struct Identity : public std::unary_function<T, T> {
 
@@ -35,7 +35,7 @@ namespace art
      *  Sets support bidirectional iterators.
      */
     template<typename _Key,
-            typename _Key_transform = key_transform <_Key> >
+            typename _Key_transform = key_transform<_Key> >
     class radix_set {
     public:
         typedef _Key key_type;
@@ -45,8 +45,17 @@ namespace art
         typedef const value_type &const_reference;
 
     private:
-        typedef adaptive_radix_tree <key_type, value_type,
-        detail::Identity<value_type>, _Key_transform> _Rep_type;
+        /**
+         * Switch between art implementation with and without path compression
+         * (prefixes in nodes) based on (transformed) key length. For short keys,
+         * the cost of handling prefixes outweigh the benefits.
+         */
+        typedef typename std::conditional<sizeof(decltype(_Key_transform()(_Key()))) <= 6,
+                ar_tree<key_type, value_type,
+                        detail::Identity<value_type>, _Key_transform>,
+                ar_prefix_tree<key_type, value_type,
+                        detail::Identity<value_type>, _Key_transform>>::type _Rep_type;
+
         _Rep_type _M_t;
 
     public:

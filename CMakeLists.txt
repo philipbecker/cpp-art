@@ -5,14 +5,15 @@ set(EXT_PROJECTS_DIR libs)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_CXX_FLAGS_DEBUG "-DMY_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DART_DEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
 
 set(ART_INCLUDE_DIR include)
 set(
         SOURCE_FILES
         include/art/key_transform.h
-        include/art/adaptive_radix_tree.h
+        include/art/ar_prefix_tree.h
+        include/art/ar_tree.h
         include/art/radix_map.h
         include/art/radix_set.h
 )

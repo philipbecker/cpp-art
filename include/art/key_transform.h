@@ -2,8 +2,10 @@
 #define ART_KEY_TRANSFORM_H
 
 #include <stdint.h>
+#include <cstring>
 #include <array>
 #include <utility>
+
 
 namespace art {
     inline uint16_t byte_swap(uint16_t __val) {
